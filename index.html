@@ -163,6 +163,7 @@ canvas{display:block}
   <div class="sess soff" id="s-as"><div><div style="font-weight:700;font-size:12px">🌏 آسيا</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px">GMT 00:00–09:00</div></div><div id="s-as-st" style="font-size:10px">○ CLOSED</div></div>
   <div class="sess son" id="s-eu"><div><div style="font-weight:700;font-size:12px">🇪🇺 أوروبا</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px">GMT 08:00–17:00</div></div><div id="s-eu-st" style="font-size:11px;font-weight:700">● OPEN</div></div>
   <div class="sess soff" id="s-us"><div><div style="font-weight:700;font-size:12px">🇺🇸 أمريكا</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px">GMT 13:30–22:00</div></div><div id="s-us-st" style="font-size:10px">○ CLOSED</div></div>
+  <div id="mktStatus" class="bdg bok" style="margin-top:4px">🟢 جاري التحقق...</div>
 
   <div class="shdr sg" style="margin-top:4px"><span>TOP-DOWN ANALYSIS</span></div>
   <div class="trow"><div class="tlbl">D1 الاتجاه</div><div class="tv tx" id="t-d1">جاري...</div></div>
@@ -349,6 +350,19 @@ canvas{display:block}
       <button class="btn" onclick="testSound('tp')" style="font-size:10px">🎯 هدف</button>
     </div>
     <div id="audioStatus" class="bdg bwrn" style="margin-top:4px">اضغط أي زر لتفعيل الصوت</div>
+  </div>
+
+  <!-- NEWS ANALYSIS -->
+  <div>
+    <div class="shdr sr"><span>📰 تحليل الأخبار اللحظية</span></div>
+    <button class="btn btn-b" onclick="runNewsAnalysis()" id="newsBtn" style="font-size:12px;margin-bottom:6px">
+      📰 تحليل الأخبار + GAP + الاتجاه
+    </button>
+    <div style="font-size:9px;color:var(--gdim);text-align:center;margin-bottom:6px">
+      🔍 GPT-4o يبحث في الأخبار الحالية • GAP الافتتاح • التوترات الجيوسياسية
+    </div>
+    <div class="air" id="newsOut" style="color:var(--gdim);font-size:11px;display:none;max-height:250px"></div>
+    <div id="newsBdg" class="bdg bwrn" style="display:none"></div>
   </div>
 
   <!-- AI ANALYSIS -->
@@ -685,7 +699,39 @@ function checkAlerts(p) {
 // ═══════════════════════════════════════════════
 // AUTO SIGNAL
 // ═══════════════════════════════════════════════
+// ══ فحص أوقات السوق ══
+function isMarketOpen() {
+  const now = new Date();
+  const day = now.getUTCDay(); // 0=Sun, 5=Fri, 6=Sat
+  const h   = now.getUTCHours();
+  const m   = now.getUTCMinutes();
+  const mins = h * 60 + m;
+  // مغلق: الجمعة 22:00 GMT → الأحد 23:00 GMT
+  if (day === 6) return false; // السبت مغلق كلياً
+  if (day === 5 && mins >= 22*60) return false; // الجمعة بعد 22:00
+  if (day === 0 && mins < 23*60) return false;  // الأحد قبل 23:00
+  return true;
+}
+
+function getMarketStatus() {
+  if (isMarketOpen()) return { open: true, text: '🟢 السوق مفتوح' };
+  const now = new Date();
+  const day = now.getUTCDay();
+  // حساب وقت الافتتاح القادم
+  let nextOpen = '';
+  if (day === 6) nextOpen = 'الأحد 23:00 GMT';
+  else if (day === 0) nextOpen = 'اليوم 23:00 GMT';
+  else if (day === 5) nextOpen = 'الأحد 23:00 GMT';
+  else nextOpen = 'قريباً';
+  return { open: false, text: `🔴 السوق مغلق — يفتح ${nextOpen}`, nextOpen };
+}
+
 async function autoSignal(dir, p) {
+  // ❌ لا إشارات والسوق مغلق
+  if (!isMarketOpen()) {
+    log(`[SIGNAL] ⏸ السوق مغلق — الإشارة مؤجلة حتى الافتتاح`);
+    return;
+  }
   const data=cdata[curTF];
   if(!data||data.length<20) return;
   const closes=data.map(c=>c.cl);
@@ -718,41 +764,116 @@ async function autoSignal(dir, p) {
 async function sendChartToTelegram(auto=false) {
   const btn=document.getElementById('sendChartBtn');
   if(!auto){btn.textContent='⏳ جاري الإرسال...';btn.disabled=true;}
+  const dir=document.getElementById('sigDir').textContent;
+  const tf=curTF;
 
   try {
-    // التقط الـ canvas
-    const cv=document.getElementById('mc');
-    const imageData=cv.toDataURL('image/png');
-    const base64=imageData.split(',')[1];
+    // ── شارت XAU/USD الرئيسي ──
+    const cvMain=document.getElementById('mc');
+    const xauB64=cvMain.toDataURL('image/png').split(',')[1];
+    const xauCaption=`📸 *XAU/USD — ${tf}*
+💰 السعر: \`$${price.toFixed(2)}\`
+📊 الإشارة: *${dir}*
+📦 OB Sell: ${obSellZones.length>0?obSellZones[obSellZones.length-1].bot.toFixed(2)+'–'+obSellZones[obSellZones.length-1].top.toFixed(2):'---'}
+🧲 OB Buy: ${obBuyZones.length>0?obBuyZones[obBuyZones.length-1].bot.toFixed(2)+'–'+obBuyZones[obBuyZones.length-1].top.toFixed(2):'---'}
+⚡ FVG: ${fvgZones.length>0?fvgZones[fvgZones.length-1].bot.toFixed(2)+'–'+fvgZones[fvgZones.length-1].top.toFixed(2):'---'}
+🎯 TP1: ${document.getElementById('sTP1').textContent} | SL: ${document.getElementById('sSL').textContent}
+⏱ \`${new Date().toUTCString()}\`
+_🥇 Gold AI Bot v3_`;
 
-    const dir=document.getElementById('sigDir').textContent;
-    const caption=`📸 *شارت XAU/USD — ${curTF}*\n` +
-      `💰 السعر: \`$${price.toFixed(2)}\`\n` +
-      `📊 الإشارة: *${dir}*\n` +
-      `📦 OB Sell: ${obSellZones.length>0?obSellZones[obSellZones.length-1].bot.toFixed(2)+'–'+obSellZones[obSellZones.length-1].top.toFixed(2):'---'}\n` +
-      `🧲 OB Buy: ${obBuyZones.length>0?obBuyZones[obBuyZones.length-1].bot.toFixed(2)+'–'+obBuyZones[obBuyZones.length-1].top.toFixed(2):'---'}\n` +
-      `⚡ FVG: ${fvgZones.length>0?fvgZones[fvgZones.length-1].bot.toFixed(2)+'–'+fvgZones[fvgZones.length-1].top.toFixed(2):'---'}\n` +
-      `🎯 TP1: ${document.getElementById('sTP1').textContent}\n` +
-      `🛑 SL: ${document.getElementById('sSL').textContent}\n` +
-      `⏱ \`${new Date().toUTCString()}\`\n_🥇 Gold AI Bot v3_`;
+    await fetch(`${BASE}/api/chart`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:xauB64,caption:xauCaption})});
+    log('[CHART] ✅ XAU شارت أُرسل');
 
-    // إرسال الصورة عبر API الخاص
-    const r=await fetch(`${BASE}/api/chart`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({image:base64,caption})
-    });
+    // ── شارت XAG/USD (فضة) ──
+    const xagChart = await buildMiniChart('XAGUSD', tf);
+    if (xagChart) {
+      await fetch(`${BASE}/api/chart`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:xagChart,caption:`📸 *XAG/USD الفضة — ${tf}*
+🔗 مقارنة مع الذهب
+_🥇 Gold AI Bot v3_`})});
+      log('[CHART] ✅ XAG شارت أُرسل');
+    }
 
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const d=await r.json();
-    if(d.ok){
-      log('[CHART] ✅ شارت أُرسل إلى Telegram');
-      if(!auto){btn.textContent='✅ تم الإرسال';setTimeout(()=>{btn.textContent='📸 إرسال الشارت';btn.disabled=false;},2000);}
-    } else throw new Error(d.error);
+    // ── شارت DXY (الدولار) ──
+    const dxyChart = await buildDXYChart(tf);
+    if (dxyChart) {
+      await fetch(`${BASE}/api/chart`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:dxyChart,caption:`📸 *DXY الدولار — ${tf}*
+📈 DXY صاعد = ذهب هابط
+_🥇 Gold AI Bot v3_`})});
+      log('[CHART] ✅ DXY شارت أُرسل');
+    }
+
+    if(!auto){btn.textContent='✅ 3 شارتات أُرسلت';setTimeout(()=>{btn.textContent='📸 إرسال الشارت';btn.disabled=false;},3000);}
   } catch(e) {
     log(`[CHART] ✗ ${e.message}`);
     if(!auto){btn.textContent='❌ فشل';setTimeout(()=>{btn.textContent='📸 إرسال الشارت';btn.disabled=false;},2000);}
   }
+}
+
+// رسم شارت مصغر لأي رمز
+async function buildMiniChart(sym, tf) {
+  try {
+    const r = await fetch(`${BASE}/api/price?type=candles&tf=${tf}&symbol=${sym}&limit=30`);
+    const d = await r.json();
+    if (!d.candles?.length) return null;
+    const data = d.candles.slice(-30);
+    const mc2  = document.createElement('canvas');
+    mc2.width  = 800; mc2.height = 400;
+    const c2   = mc2.getContext('2d');
+    drawMiniChartOn(c2, mc2.width, mc2.height, data, sym);
+    return mc2.toDataURL('image/png').split(',')[1];
+  } catch(e) { return null; }
+}
+
+async function buildDXYChart(tf) {
+  try {
+    // DXY من Yahoo Finance
+    const r = await fetch(`${BASE}/api/price?type=candles&tf=${tf}&symbol=DX-Y.NYB&limit=30`);
+    const d = await r.json();
+    if (!d.candles?.length) return null;
+    drawMiniChartOn(null, 800, 400, d.candles.slice(-30), 'DXY');
+    // نرسم على canvas مؤقت
+    const mc3=document.createElement('canvas');mc3.width=800;mc3.height=400;
+    const c3=mc3.getContext('2d');
+    drawMiniChartOn(c3,800,400,d.candles.slice(-30),'DXY');
+    return mc3.toDataURL('image/png').split(',')[1];
+  } catch(e) { return null; }
+}
+
+function drawMiniChartOn(ctx2, W, H, data, label) {
+  if(!ctx2||!data||data.length<2) return;
+  ctx2.fillStyle='#0A0800';ctx2.fillRect(0,0,W,H);
+  ctx2.strokeStyle='rgba(255,215,0,.04)';ctx2.lineWidth=.5;
+  for(let i=0;i<6;i++){const y=H*i/6;ctx2.beginPath();ctx2.moveTo(0,y);ctx2.lineTo(W,y);ctx2.stroke();}
+  const allP=data.flatMap(c=>[c.h,c.l]);
+  const minP=Math.min(...allP),maxP=Math.max(...allP),pad=(maxP-minP)*.1;
+  const pMin=minP-pad,pMax=maxP+pad;
+  const toY=p=>H-((p-pMin)/(pMax-pMin))*(H*.88)-H*.05;
+  const mL=10,mR=60,cW=Math.max(3,(W-mL-mR)/data.length-1);
+  // EMA20
+  ctx2.beginPath();ctx2.strokeStyle='#00D4FF';ctx2.lineWidth=1.5;
+  let ema=data[0].cl,k=2/21;
+  data.forEach((c,i)=>{ema=c.cl*k+ema*(1-k);const x=mL+(i/data.length)*(W-mL-mR)+cW/2;i?ctx2.lineTo(x,toY(ema)):ctx2.moveTo(x,toY(ema));});
+  ctx2.stroke();
+  // Candles
+  data.forEach((c,i)=>{
+    const x=mL+(i/data.length)*(W-mL-mR),bull=c.cl>=c.o,cx=x+cW/2;
+    ctx2.strokeStyle=bull?'#00FF88':'#FF2D55';ctx2.lineWidth=1;
+    ctx2.beginPath();ctx2.moveTo(cx,toY(c.h));ctx2.lineTo(cx,toY(c.l));ctx2.stroke();
+    ctx2.fillStyle=bull?'rgba(0,255,136,.8)':'rgba(255,45,85,.8)';
+    const bT=toY(Math.max(c.o,c.cl)),bH=Math.max(2,Math.abs(toY(c.o)-toY(c.cl)));
+    ctx2.fillRect(x+.5,bT,Math.max(2,cW-1),bH);
+  });
+  // Label + Price
+  const lastP=data[data.length-1].cl;
+  ctx2.fillStyle='rgba(255,215,0,.9)';ctx2.fillRect(W-mR+2,toY(lastP)-10,mR-3,20);
+  ctx2.fillStyle='#0A0800';ctx2.font='bold 10px monospace';ctx2.textAlign='left';
+  ctx2.fillText(lastP.toFixed(2),W-mR+5,toY(lastP)+4);
+  // Symbol label
+  ctx2.fillStyle='rgba(255,215,0,.5)';ctx2.font='bold 16px Orbitron,monospace';ctx2.textAlign='left';
+  ctx2.fillText(label,mL+5,25);
+  // Scale
+  ctx2.fillStyle='rgba(255,215,0,.4)';ctx2.font='9px monospace';ctx2.textAlign='left';
+  for(let i=0;i<=5;i++){const p=pMin+(pMax-pMin)*i/5;ctx2.fillText(p.toFixed(2),W-mR+3,toY(p)+3);}
 }
 
 // ═══════════════════════════════════════════════
@@ -874,7 +995,7 @@ async function fetchCandles(tf){
   document.getElementById('cload').style.display='block';
   log(`[CANDLES] Loading ${tf}...`);
   try{
-    const r=await fetch(`${BASE}/api/price?type=candles&tf=${tf}&limit=100`);
+    const r=await fetch(`${BASE}/api/price?type=candles&tf=${tf}&limit=60`);
     const d=await r.json();
     if(!d.candles?.length){log(`[CANDLES] ✗ ${d.error||'empty'}`);return;}
     cdata[tf]=d.candles;ldone[tf]=true;
@@ -900,7 +1021,11 @@ const cv=document.getElementById('mc'),ctx=cv.getContext('2d');
 function drawChart(tf){
   const wrap=document.getElementById('cwrap');
   cv.width=wrap.clientWidth; cv.height=wrap.clientHeight;
-  const W=cv.width,H=cv.height,data=cdata[tf];
+  const W=cv.width,H=cv.height,allData=cdata[tf];
+  if(!allData||allData.length<2)return;
+  // ── ZOOM: عرض فقط آخر 30 شمعة حول السعر الحالي ──
+  const ZOOM = 30;
+  const data = allData.slice(-ZOOM);
   if(!data||data.length<2)return;
 
   // خلفية
@@ -926,7 +1051,7 @@ function drawChart(tf){
     ctx.strokeStyle=`rgba(255,45,85,${alpha+.2})`;ctx.lineWidth=1;
     ctx.strokeRect(mL,toY(ob.top),chartW,toY(ob.bot)-toY(ob.top));
     // Label
-    ctx.fillStyle='rgba(255,45,85,.8)';ctx.font='bold 9px monospace';ctx.textAlign='left';
+    ctx.fillStyle='rgba(255,45,85,.95)';ctx.font='bold 11px monospace';ctx.textAlign='left';
     ctx.fillText(`OB SELL ${ob.bot.toFixed(0)}–${ob.top.toFixed(0)}`,mL+4,toY(ob.top)+12);
   });
 
@@ -937,7 +1062,7 @@ function drawChart(tf){
     ctx.fillRect(mL,toY(ob.top),chartW,toY(ob.bot)-toY(ob.top));
     ctx.strokeStyle=`rgba(0,255,136,${alpha+.15})`;ctx.lineWidth=1;
     ctx.strokeRect(mL,toY(ob.top),chartW,toY(ob.bot)-toY(ob.top));
-    ctx.fillStyle='rgba(0,255,136,.8)';ctx.font='bold 9px monospace';ctx.textAlign='left';
+    ctx.fillStyle='rgba(0,255,136,.95)';ctx.font='bold 11px monospace';ctx.textAlign='left';
     ctx.fillText(`OB BUY ${ob.bot.toFixed(0)}–${ob.top.toFixed(0)}`,mL+4,toY(ob.bot)-3);
   });
 
@@ -949,8 +1074,8 @@ function drawChart(tf){
     ctx.strokeStyle=`rgba(255,150,0,${alpha+.15})`;ctx.lineWidth=.7;ctx.setLineDash([3,3]);
     ctx.strokeRect(mL,toY(fvg.top),chartW,toY(fvg.bot)-toY(fvg.top));
     ctx.setLineDash([]);
-    ctx.fillStyle='rgba(255,150,0,.7)';ctx.font='8px monospace';ctx.textAlign='left';
-    ctx.fillText(`FVG`,mL+4,toY(fvg.top)+10);
+    ctx.fillStyle='rgba(255,150,0,.95)';ctx.font='bold 10px monospace';ctx.textAlign='left';
+    ctx.fillText(`⚡FVG`,mL+4,toY(fvg.top)+10);
   });
 
   // ══ EMA 50 ══
@@ -978,10 +1103,10 @@ function drawChart(tf){
   // ══ خطوط الصفقات المفتوحة ══
   trades.filter(t=>t.status==='OPEN'||t.status==='TP1').forEach(t=>{
     const drawLine=(y,col,dash,label)=>{
-      ctx.setLineDash(dash||[4,4]);ctx.strokeStyle=col;ctx.lineWidth=1.2;
+      ctx.setLineDash(dash||[4,4]);ctx.strokeStyle=col;ctx.lineWidth=1.8;
       ctx.beginPath();ctx.moveTo(mL,y);ctx.lineTo(W-mR,y);ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle=col;ctx.font='bold 9px monospace';ctx.textAlign='right';
+      ctx.fillStyle=col;ctx.font='bold 11px monospace';ctx.textAlign='right';
       ctx.fillText(label,W-mR-2,y-2);
     };
     drawLine(toY(t.entry),'rgba(255,215,0,.9)',[],'📍 Entry');
@@ -1171,6 +1296,10 @@ function updateSessions(){
   set('s-eu','s-eu-st',eu);set('s-us','s-us-st',us);set('s-as','s-as-st',as);
   const best=us&&eu?'أوروبا + أمريكا ⭐':us?'أمريكا':eu?'أوروبا':as?'آسيا':'---';
   document.getElementById('sSess').textContent=best;
+  // تحديث حالة السوق
+  const mkt=getMarketStatus();
+  const mktEl=document.getElementById('mktStatus');
+  if(mktEl){mktEl.textContent=mkt.text;mktEl.className='bdg '+(mkt.open?'bok':'berr');}
 }
 
 // ═══════════════════════════════════════════════
@@ -1255,6 +1384,56 @@ async function tgSendTrade(t,rr){
 
 async function tgNotify(text){
   try{await fetch(`${BASE}/api/telegram`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});}catch(e){}
+}
+
+// ═══════════════════════════════════════════════
+// NEWS ANALYSIS — تحليل الأخبار اللحظية
+// ═══════════════════════════════════════════════
+async function runNewsAnalysis() {
+  const btn  = document.getElementById('newsBtn');
+  const out  = document.getElementById('newsOut');
+  const bdg  = document.getElementById('newsBdg');
+  btn.disabled = true;
+  btn.textContent = '⏳ جاري البحث في الأخبار...';
+  out.style.display = 'block';
+  out.textContent   = '🔍 GPT-4o يبحث في الأخبار الآن...';
+  out.style.color   = 'var(--gdim)';
+  bdg.style.display = 'none';
+  log('[NEWS] Searching live news via GPT-4o web search...');
+
+  const mkt = getMarketStatus();
+  try {
+    const r = await fetch(`${BASE}/api/news`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        price:    price.toFixed(2),
+        session:  document.getElementById('sSess').textContent,
+        gsr:      document.getElementById('m-gsr').textContent,
+        nextOpen: mkt.nextOpen || 'السوق مفتوح'
+      })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d    = await r.json();
+    const text = d.analysis || d.error || 'لا توجد استجابة';
+    out.textContent = text;
+    out.style.color = '#F5E6C8';
+    bdg.className   = 'bdg bok';
+    bdg.textContent = `✅ ${d.model} — تحليل إخباري مكتمل`;
+    bdg.style.display = 'block';
+    log(`[NEWS] ✓ ${d.model} (${text.length} chars)`);
+    // إرسال للتلغرام
+    await tgNotify(`📰 *تحليل الأخبار اللحظية — XAU/USD*\n\n${text.substring(0,1500)}\n\n⏱ \`${new Date().toUTCString()}\`\n_🥇 Gold AI Bot v3_`);
+  } catch(e) {
+    out.textContent   = '⚠️ خطأ: ' + e.message;
+    out.style.color   = 'var(--red)';
+    bdg.className     = 'bdg berr';
+    bdg.textContent   = '❌ Error';
+    bdg.style.display = 'block';
+    log(`[NEWS] ✗ ${e.message}`);
+  }
+  btn.disabled    = false;
+  btn.textContent = '📰 تحليل الأخبار اللحظية';
 }
 
 // ═══════════════════════════════════════════════
