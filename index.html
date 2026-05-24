@@ -18,7 +18,7 @@ body{background:var(--bg);color:#F5E6C8;font-family:'Cairo',sans-serif;min-heigh
 .hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:linear-gradient(90deg,rgba(11,22,41,.98),rgba(13,31,60,.98));border-bottom:1px solid var(--bdrB);position:sticky;top:0;z-index:200;backdrop-filter:blur(10px)}
 .logo{font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:var(--gold2);letter-spacing:2px;text-shadow:0 0 15px rgba(255,215,0,.4)}
 .logo span{color:#FFA500}
-.lp{font-family:'Orbitron',monospace;font-size:26px;font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(255,215,0,.5);transition:color .3s}
+.lp{font-family:'Orbitron',monospace;font-size:26px;font-weight:900;color:#00B4FF;text-shadow:0 0 20px rgba(0,180,255,.5);transition:color .3s}
 .lbdg{display:flex;align-items:center;gap:6px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.4);border-radius:20px;padding:4px 10px;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--gold)}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
@@ -619,12 +619,13 @@ function renderCalendar() {
 async function fetchPrice() {
   try {
     const r=await fetch(`${BASE}/api/price?type=price`);
+    if(!r.ok){log('[PRICE] HTTP '+r.status);return;}
     const d=await r.json();
-    if(!d.price){log(`[PRICE] ✗ ${d.error||'no data'}`);return;}
+    if(!d||!d.price){log(`[PRICE] ✗ ${d?.error||'no data'}`);return;}
     prevP=price||d.price; price=d.price;
     const el=document.getElementById('livePrice');
     el.textContent='$'+price.toFixed(2);
-    el.style.color=price>=prevP?'var(--gold)':'var(--orange)';
+    el.style.color=price>=prevP?'#00B4FF':'#FFA040';
     const chg=price-prevP,pct=prevP?(chg/prevP*100):0,up=chg>=0;
     document.getElementById('priceChg').innerHTML=up
       ?`<span style="color:var(--green)">▲ +${Math.abs(chg).toFixed(2)} (+${Math.abs(pct).toFixed(3)}%)</span>`
@@ -1362,23 +1363,21 @@ function updateSessions(){
   const mktOpen = isMarketOpen();
   // إذا السوق مغلق — كل الجلسات مغلقة
   if(!mktOpen){
-    ['s-eu','s-us','s-as'].forEach(id=>document.getElementById(id).className='sess soff');
-    ['s-eu-st','s-us-st','s-as-st'].forEach(id=>document.getElementById(id).textContent='○ CLOSED');
-    document.getElementById('sSess').textContent='السوق مغلق 🔴';
+    ['s-eu','s-us','s-as'].forEach(id=>{if(document.getElementById(id))document.getElementById(id).className='sess soff';});
+    ['s-eu-st','s-us-st','s-as-st'].forEach(id=>{if(document.getElementById(id))document.getElementById(id).textContent='○ CLOSED';});
+    const sessEl=document.getElementById('sSess');if(sessEl)sessEl.textContent='السوق مغلق 🔴';
     const mktEl=document.getElementById('mktStatus');
-    if(mktEl){
-      const ms=getMarketStatus();
-      mktEl.textContent=ms.text;mktEl.className='bdg berr';
-    }
-    return;
-  }
+    if(mktEl){const ms=getMarketStatus();mktEl.textContent=ms.text;mktEl.className='bdg berr';}
+    // لا return — استمر لتحديث الوقت
+  } else {
   const eu=h>=8&&h<17,us=h>=13&&h<22,as=h<9;
-  const set=(id,stId,on)=>{document.getElementById(id).className='sess '+(on?'son':'soff');document.getElementById(stId).textContent=on?'● OPEN':'○ CLOSED';};
+  const set=(id,stId,on)=>{const el=document.getElementById(id);const el2=document.getElementById(stId);if(el)el.className='sess '+(on?'son':'soff');if(el2)el2.textContent=on?'● OPEN':'○ CLOSED';};
   set('s-eu','s-eu-st',eu);set('s-us','s-us-st',us);set('s-as','s-as-st',as);
   const best=us&&eu?'أوروبا + أمريكا ⭐':us?'أمريكا':eu?'أوروبا':as?'آسيا':'---';
-  document.getElementById('sSess').textContent=best;
-  const mktEl=document.getElementById('mktStatus');
-  if(mktEl){mktEl.textContent='🟢 السوق مفتوح';mktEl.className='bdg bok';}
+  const sessEl2=document.getElementById('sSess');if(sessEl2)sessEl2.textContent=best;
+  const mktEl2=document.getElementById('mktStatus');
+  if(mktEl2){mktEl2.textContent='🟢 السوق مفتوح';mktEl2.className='bdg bok';}
+  } // end else
 }
 
 // ═══════════════════════════════════════════════
