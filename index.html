@@ -6,10 +6,16 @@
 <title>🥇 Gold AI Bot v3 — XAU/USD</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cairo:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{--gold:#FFD700;--gold2:#FFE55C;--gdim:#B8860B;--red:#FF2D55;--green:#00FF88;--blue:#00D4FF;--orange:#FF9500;--yellow:#FFE000;--bg:#080600;--bg2:#0E0B06;--bg3:#141008;--bdr:rgba(255,215,0,0.15);--bdrB:rgba(255,215,0,0.38)}
+:root{
+  --gold:#00B4FF;--gold2:#40CFFF;--gdim:#1A6090;
+  --red:#FF4081;--green:#00E676;--blue:#00B4FF;
+  --orange:#FFA040;--yellow:#F5C842;
+  --bg:#0B1629;--bg2:#0D1F3C;--bg3:#091420;
+  --bdr:rgba(0,180,255,0.15);--bdrB:rgba(0,180,255,0.30)
+}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:#F5E6C8;font-family:'Cairo',sans-serif;min-height:100vh;overflow-x:hidden;background-image:radial-gradient(ellipse at 20% 50%,rgba(255,215,0,.04) 0%,transparent 50%)}
-.hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:rgba(14,11,6,.98);border-bottom:1px solid var(--bdrB);position:sticky;top:0;z-index:200;backdrop-filter:blur(10px)}
+body{background:var(--bg);color:#F5E6C8;font-family:'Cairo',sans-serif;min-height:100vh;overflow-x:hidden;background-image:radial-gradient(ellipse at 20% 50%,rgba(0,100,200,.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(0,60,120,.05) 0%,transparent 40%)}
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:linear-gradient(90deg,rgba(11,22,41,.98),rgba(13,31,60,.98));border-bottom:1px solid var(--bdrB);position:sticky;top:0;z-index:200;backdrop-filter:blur(10px)}
 .logo{font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:var(--gold2);letter-spacing:2px;text-shadow:0 0 15px rgba(255,215,0,.4)}
 .logo span{color:#FFA500}
 .lp{font-family:'Orbitron',monospace;font-size:26px;font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(255,215,0,.5);transition:color .3s}
@@ -18,14 +24,14 @@ body{background:var(--bg);color:#F5E6C8;font-family:'Cairo',sans-serif;min-heigh
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .main{display:grid;grid-template-columns:260px 1fr 270px;height:calc(100vh - 53px)}
 @media(max-width:900px){.main{grid-template-columns:1fr;height:auto}.cpanel{height:420px}}
-.lp2,.rp{background:var(--bg2);overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px}
+.lp2,.rp{background:linear-gradient(180deg,#0D1F3C,#091420);overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:6px}
 .lp2{border-left:1px solid var(--bdr)}.rp{border-right:1px solid var(--bdr)}
 .shdr{display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid var(--bdr);margin-bottom:4px}
 .shdr span{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;color:var(--gdim)}
 .shdr::before{content:'';width:3px;height:11px;border-radius:2px;flex-shrink:0}
 .sg::before{background:var(--gold)}.sr::before{background:var(--red)}.sg2::before{background:var(--green)}.sb::before{background:var(--blue)}.so::before{background:var(--orange)}
 .trow{display:grid;grid-template-columns:95px 1fr;gap:3px;min-height:30px}
-.tlbl{background:linear-gradient(135deg,#1A1200,#2A1E00);border:1px solid rgba(255,215,0,.22);border-radius:4px 0 0 4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--gold);text-align:center;padding:3px}
+.tlbl{background:linear-gradient(135deg,#1A1200,#2A1E00);border:1px solid rgba(0,180,255,.25);border-radius:4px 0 0 4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#00B4FF;text-align:center;padding:3px}
 .tv{border-radius:0 4px 4px 0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;text-align:center;padding:3px 6px;transition:all .3s}
 .tr{background:#5A0000;color:#FFAAAA;border:1px solid var(--red)}.tg{background:#003D1A;color:#88FFBB;border:1px solid #00CC66}.tb{background:#001A40;color:#88DDFF;border:1px solid #0077CC}.tx{background:#1A1500;color:#AA9966;border:1px solid #443300}.tgo{background:#3D2800;color:#FFD700;border:1px solid #CC8800}.to{background:#3D1A00;color:#FFAA44;border:1px solid #FF6600}
 .sess{border-radius:6px;padding:6px 10px;display:flex;justify-content:space-between;align-items:center;font-size:11px;border:1px solid;transition:all .3s}
@@ -134,7 +140,10 @@ canvas{display:block}
 /* CHART SEND BTN */
 .chart-send-btn{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.8);border:1px solid rgba(0,150,255,.5);border-radius:6px;color:var(--blue);padding:6px 12px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;transition:all .2s;z-index:10}
 .chart-send-btn:hover{background:rgba(0,100,200,.3);box-shadow:0 0 10px rgba(0,150,255,.3)}
-::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,215,0,.2);border-radius:2px}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,180,255,.2);border-radius:2px}
+.section-panel{background:rgba(9,20,32,0.8);border:1px solid rgba(0,180,255,0.12);border-radius:6px;padding:8px}
+.row{display:flex;justify-content:space-between;align-items:center;margin:3px 0;font-size:11px}
+.lbl{color:rgba(150,180,220,0.65)}.val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px}
 </style>
 </head>
 <body>
@@ -142,7 +151,7 @@ canvas{display:block}
 <div class="alert-zone" id="alertZone"></div>
 
 <header class="hdr">
-  <div class="logo">XAU<span>/</span>USD <span style="font-size:10px;color:var(--gdim)">GOLD</span></div>
+  <div class="logo" style="font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:#00B4FF;letter-spacing:2px;text-shadow:0 0 15px rgba(0,180,255,.4)">XAU<span style="color:#FFA040">/</span>USD <span style="font-size:10px;color:rgba(0,180,255,.5)">GOLD</span></div>
   <div style="text-align:center">
     <div class="lp" id="livePrice">---.--</div>
     <div style="font-size:11px" id="priceChg"><span style="color:var(--gdim)">جاري التحميل...</span></div>
@@ -160,9 +169,9 @@ canvas{display:block}
   <div style="font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:var(--gdim);text-align:center;padding:4px 0;border-bottom:1px solid var(--bdr);margin-bottom:2px">SIGNAL TABLEAU — XAU/USD</div>
 
   <div class="shdr sg"><span>TRADING SESSIONS</span></div>
-  <div class="sess soff" id="s-as"><div><div style="font-weight:700;font-size:12px">🌏 آسيا</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px">GMT 00:00–09:00</div></div><div id="s-as-st" style="font-size:10px">○ CLOSED</div></div>
-  <div class="sess son" id="s-eu"><div><div style="font-weight:700;font-size:12px">🇪🇺 أوروبا</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px">GMT 08:00–17:00</div></div><div id="s-eu-st" style="font-size:11px;font-weight:700">● OPEN</div></div>
-  <div class="sess soff" id="s-us"><div><div style="font-weight:700;font-size:12px">🇺🇸 أمريكا</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px">GMT 13:30–22:00</div></div><div id="s-us-st" style="font-size:10px">○ CLOSED</div></div>
+  <div class="sess soff" id="s-as"><div><div style="font-weight:700;font-size:12px">🌏 آسيا</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px">GMT 00:00–09:00 | بيروت 03:00–12:00</div></div><div id="s-as-st" style="font-size:10px">○ CLOSED</div></div>
+  <div class="sess son" id="s-eu"><div><div style="font-weight:700;font-size:12px">🇪🇺 أوروبا</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px">GMT 08:00–17:00 | بيروت 11:00–20:00</div></div><div id="s-eu-st" style="font-size:11px;font-weight:700">● OPEN</div></div>
+  <div class="sess soff" id="s-us"><div><div style="font-weight:700;font-size:12px">🇺🇸 أمريكا</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px">GMT 13:30–22:00 | بيروت 16:30–01:00</div></div><div id="s-us-st" style="font-size:10px">○ CLOSED</div></div>
   <div id="mktStatus" class="bdg bok" style="margin-top:4px">🟢 جاري التحقق...</div>
 
   <div class="shdr sg" style="margin-top:4px"><span>TOP-DOWN ANALYSIS</span></div>
@@ -200,9 +209,10 @@ canvas{display:block}
     <div class="stat"><div class="st-n">TP1 ✓</div><div class="st-v" style="color:var(--orange)" id="st-tp1">0</div><div class="st-l">Partial</div></div>
   </div>
 
-  <div class="brow">
-    <button class="btn" onclick="exportTrades()" style="font-size:10px">📤 تصدير</button>
-    <button class="btn" onclick="document.getElementById('impF').click()" style="font-size:10px">📥 استيراد</button>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:4px">
+    <button class="btn" onclick="exportTrades()" style="font-size:10px">💾 حفظ</button>
+    <button class="btn" onclick="document.getElementById('impF').click()" style="font-size:10px">📂 تحميل</button>
+    <button class="btn btn-r" onclick="resetTrades()" style="font-size:10px">🗑 Reset</button>
   </div>
   <input type="file" id="impF" accept=".json" style="display:none" onchange="importTrades(event)">
 </div>
@@ -352,14 +362,52 @@ canvas{display:block}
     <div id="audioStatus" class="bdg bwrn" style="margin-top:4px">اضغط أي زر لتفعيل الصوت</div>
   </div>
 
+  <!-- MASTER SCORE -->
+  <div>
+    <div class="shdr sg"><span>🏆 MASTER SCORE</span></div>
+    <div id="masterScore" style="background:rgba(9,20,32,0.8);border:1px solid rgba(0,180,255,0.25);border-radius:8px;padding:12px">
+      <div style="text-align:center;color:var(--gdim);font-size:10px">جاري تحميل التحليل...</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="shdr sg"><span>📊 VWAP + Volume Profile</span></div>
+    <div id="vwapPanel" class="section-panel"><div style="color:var(--gdim);font-size:10px;text-align:center">جاري...</div></div>
+  </div>
+
+  <div>
+    <div class="shdr sg"><span>📐 Fibonacci Levels</span></div>
+    <div id="fibPanel" class="section-panel"><div style="color:var(--gdim);font-size:10px;text-align:center">جاري...</div></div>
+  </div>
+
+  <div>
+    <div class="shdr sg"><span>⚖️ Premium & Discount</span></div>
+    <div id="pdPanel" class="section-panel"><div style="color:var(--gdim);font-size:10px;text-align:center">جاري...</div></div>
+  </div>
+
+  <div>
+    <div class="shdr sg"><span>🔄 MSS — Market Structure</span></div>
+    <div id="mssPanel" class="section-panel"><div style="color:var(--gdim);font-size:10px;text-align:center">جاري...</div></div>
+  </div>
+
+  <div>
+    <div class="shdr sg"><span>🎯 Kill Zones — Time Based</span></div>
+    <div id="kzPanel" class="section-panel"><div style="color:var(--gdim);font-size:10px;text-align:center">جاري...</div></div>
+  </div>
+
+  <div>
+    <div class="shdr sg"><span>🔗 Correlation XAG + DXY</span></div>
+    <div id="corrPanel" class="section-panel"><div style="color:var(--gdim);font-size:10px;text-align:center">جاري...</div></div>
+  </div>
+
   <!-- NEWS ANALYSIS -->
   <div>
     <div class="shdr sr"><span>📰 تحليل الأخبار اللحظية</span></div>
-    <button class="btn btn-b" onclick="runNewsAnalysis()" id="newsBtn" style="font-size:12px;margin-bottom:6px">
-      📰 تحليل الأخبار + GAP + الاتجاه
+    <button class="btn btn-b" onclick="runNewsAnalysis()" id="newsBtn" style="font-size:12px;margin-bottom:4px">
+      📰 تحليل الأخبار اللحظية الآن
     </button>
     <div style="font-size:9px;color:var(--gdim);text-align:center;margin-bottom:6px">
-      🔍 GPT-4o يبحث في الأخبار الحالية • GAP الافتتاح • التوترات الجيوسياسية
+      🔍 يبحث: ترامب • إيران • فيدرالي • حروب • صفقات سلام • GAP
     </div>
     <div class="air" id="newsOut" style="color:var(--gdim);font-size:11px;display:none;max-height:250px"></div>
     <div id="newsBdg" class="bdg bwrn" style="display:none"></div>
@@ -428,6 +476,16 @@ let obSellZones = [], obBuyZones = [], fvgZones = [], tpLevel = 0;
 let trades = [], tradeN = 0;
 function loadTrades(){try{trades=JSON.parse(localStorage.getItem('gold_trades')||'[]');tradeN=parseInt(localStorage.getItem('gold_tradeN')||'0');}catch(e){trades=[];}}
 function saveTrades(){localStorage.setItem('gold_trades',JSON.stringify(trades));localStorage.setItem('gold_tradeN',tradeN.toString());}
+function resetTrades(){
+  if(!confirm('هل تريد حذف كل الصفقات؟')) return;
+  trades=[];tradeN=0;saveTrades();renderTrades();updateStats();
+  log('[TRADES] Reset done');
+}
+function resetTrades(){
+  if(!confirm('هل تريد حذف كل الصفقات؟ لا يمكن التراجع')) return;
+  trades=[];tradeN=0;saveTrades();renderTrades();updateStats();
+  log('[TRADES] 🗑 Reset — all trades cleared');
+}
 function exportTrades(){const b=new Blob([JSON.stringify({trades,tradeN},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`gold_trades_${new Date().toISOString().slice(0,10)}.json`;a.click();}
 function importTrades(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);trades=d.trades||[];tradeN=d.tradeN||0;saveTrades();renderTrades();updateStats();log(`[IMPORT] ${trades.length} trades`);}catch(err){alert('ملف غير صالح');}};r.readAsText(f);}
 
@@ -475,15 +533,21 @@ function showAlert(type, text) {
 // ═══════════════════════════════════════════════
 // ECONOMIC CALENDAR — أحداث ثابتة + countdown
 // ═══════════════════════════════════════════════
+// GMT+3 بيروت
+function toBeirut(gmt) {
+  const [h,m] = gmt.split(':').map(Number);
+  const bh = (h + 3) % 24;
+  return `${String(bh).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
 const EVENTS = [
-  { name:'🇺🇸 CPI y/y',       time:'14:30', impact:'high', days:0 },
-  { name:'🇺🇸 FOMC Minutes',   time:'18:00', impact:'high', days:1 },
-  { name:'🇺🇸 NFP',            time:'13:30', impact:'high', days:4 },
-  { name:'🇺🇸 Fed Chair Speech',time:'17:00', impact:'high', days:4 },
-  { name:'🇨🇳 Industrial Output',time:'02:00',impact:'med',  days:2 },
-  { name:'🇪🇺 ECB Minutes',    time:'11:30', impact:'med',  days:3 },
-  { name:'🇺🇸 PPI m/m',        time:'13:30', impact:'med',  days:3 },
-  { name:'🇺🇸 Jobless Claims',  time:'13:30', impact:'low',  days:2 }
+  { name:'🇺🇸 CPI y/y',        time:'14:30', impact:'high', days:0 },
+  { name:'🇺🇸 FOMC Minutes',    time:'18:00', impact:'high', days:1 },
+  { name:'🇺🇸 NFP',             time:'13:30', impact:'high', days:4 },
+  { name:'🇺🇸 Fed Chair Speech', time:'17:00', impact:'high', days:4 },
+  { name:'🇨🇳 Industrial Output',time:'02:00', impact:'med',  days:2 },
+  { name:'🇪🇺 ECB Minutes',     time:'11:30', impact:'med',  days:3 },
+  { name:'🇺🇸 PPI m/m',         time:'13:30', impact:'med',  days:3 },
+  { name:'🇺🇸 Jobless Claims',   time:'13:30', impact:'low',  days:2 }
 ];
 
 let calAlerted = {};
@@ -537,7 +601,7 @@ function renderCalendar() {
     html += `<div class="cal-event cal-${ev.impact}">
       <div>
         <div class="cal-name">${ev.name}</div>
-        <div class="cal-time">${ev.time} GMT • ${label}</div>
+        <div class="cal-time">${ev.time} GMT | ${toBeirut(ev.time)} • ${label}</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
         <span style="font-size:9px;font-weight:700;color:${impColor}">${impText}</span>
@@ -653,6 +717,7 @@ function detectOBandFVG(data) {
 // ═══════════════════════════════════════════════
 let lastAlertT=0, lastAlertP=0;
 function checkAlerts(p) {
+  if(!isMarketOpen()) return; // ❌ لا تنبيهات والسوق مغلق
   if(!cdata[curTF].length) return;
   if(Date.now()-lastAlertT<120000) return;
   detectOBandFVG(cdata[curTF]);
@@ -701,15 +766,13 @@ function checkAlerts(p) {
 // ═══════════════════════════════════════════════
 // ══ فحص أوقات السوق ══
 function isMarketOpen() {
-  const now = new Date();
-  const day = now.getUTCDay(); // 0=Sun, 5=Fri, 6=Sat
-  const h   = now.getUTCHours();
-  const m   = now.getUTCMinutes();
-  const mins = h * 60 + m;
-  // مغلق: الجمعة 22:00 GMT → الأحد 23:00 GMT
+  const now  = new Date();
+  const day  = now.getUTCDay(); // 0=Sun, 5=Fri, 6=Sat
+  const mins = now.getUTCHours() * 60 + now.getUTCMinutes();
+  // مغلق: الجمعة 22:00 GMT → الأحد 22:00 GMT
   if (day === 6) return false; // السبت مغلق كلياً
-  if (day === 5 && mins >= 22*60) return false; // الجمعة بعد 22:00
-  if (day === 0 && mins < 23*60) return false;  // الأحد قبل 23:00
+  if (day === 5 && mins >= 22*60) return false; // الجمعة بعد 22:00 GMT (01:00 بيروت)
+  if (day === 0 && mins < 22*60) return false;  // الأحد قبل  22:00 GMT (01:00 بيروت)
   return true;
 }
 
@@ -717,12 +780,11 @@ function getMarketStatus() {
   if (isMarketOpen()) return { open: true, text: '🟢 السوق مفتوح' };
   const now = new Date();
   const day = now.getUTCDay();
-  // حساب وقت الافتتاح القادم
   let nextOpen = '';
-  if (day === 6) nextOpen = 'الأحد 23:00 GMT';
-  else if (day === 0) nextOpen = 'اليوم 23:00 GMT';
-  else if (day === 5) nextOpen = 'الأحد 23:00 GMT';
-  else nextOpen = 'قريباً';
+  if (day === 6)                   nextOpen = 'الأحد 22:00 GMT — الاثنين 01:00 بيروت';
+  else if (day === 0)              nextOpen = 'اليوم 22:00 GMT — 01:00 بيروت';
+  else if (day === 5)              nextOpen = 'الأحد 22:00 GMT — الاثنين 01:00 بيروت';
+  else                             nextOpen = 'قريباً';
   return { open: false, text: `🔴 السوق مغلق — يفتح ${nextOpen}`, nextOpen };
 }
 
@@ -809,39 +871,39 @@ _🥇 Gold AI Bot v3_`})});
   }
 }
 
-// رسم شارت مصغر لأي رمز
+// رسم شارت XAG من MetaAPI
 async function buildMiniChart(sym, tf) {
   try {
-    const r = await fetch(`${BASE}/api/price?type=candles&tf=${tf}&symbol=${sym}&limit=30`);
+    const r = await fetch(`${BASE}/api/price?type=candles&tf=${tf}&symbol=${sym}&limit=20`);
     const d = await r.json();
     if (!d.candles?.length) return null;
-    const data = d.candles.slice(-30);
-    const mc2  = document.createElement('canvas');
-    mc2.width  = 800; mc2.height = 400;
-    const c2   = mc2.getContext('2d');
-    drawMiniChartOn(c2, mc2.width, mc2.height, data, sym);
+    const mc2=document.createElement('canvas');
+    mc2.width=800;mc2.height=400;
+    drawMiniChartOn(mc2.getContext('2d'),800,400,d.candles.slice(-20),sym+' / USD');
     return mc2.toDataURL('image/png').split(',')[1];
-  } catch(e) { return null; }
+  } catch(e) { log('[CHART] XAG error: '+e.message); return null; }
 }
 
+// DXY من Yahoo Finance — رمز صحيح DX=F
 async function buildDXYChart(tf) {
   try {
-    // DXY من Yahoo Finance
-    const r = await fetch(`${BASE}/api/price?type=candles&tf=${tf}&symbol=DX-Y.NYB&limit=30`);
-    const d = await r.json();
-    if (!d.candles?.length) return null;
-    drawMiniChartOn(null, 800, 400, d.candles.slice(-30), 'DXY');
-    // نرسم على canvas مؤقت
-    const mc3=document.createElement('canvas');mc3.width=800;mc3.height=400;
-    const c3=mc3.getContext('2d');
-    drawMiniChartOn(c3,800,400,d.candles.slice(-30),'DXY');
+    const intMap={M5:'5m',M15:'15m',M30:'30m',H1:'1h',H4:'1h'};
+    const rngMap={M5:'5d',M15:'5d',M30:'5d',H1:'1mo',H4:'1mo'};
+    const iv=intMap[tf]||'15m', rg=rngMap[tf]||'5d';
+    const url=`https://query1.finance.yahoo.com/v8/finance/chart/DX%3DF?interval=${iv}&range=${rg}&includePrePost=false`;
+    const r=await fetch(`${BASE}/api/yahoo?url=${encodeURIComponent(url)}`);
+    const d=await r.json();
+    if(!d.candles?.length) return null;
+    const mc3=document.createElement('canvas');
+    mc3.width=800;mc3.height=400;
+    drawMiniChartOn(mc3.getContext('2d'),800,400,d.candles.slice(-20),'DXY (الدولار)');
     return mc3.toDataURL('image/png').split(',')[1];
-  } catch(e) { return null; }
+  } catch(e) { log('[CHART] DXY error: '+e.message); return null; }
 }
 
 function drawMiniChartOn(ctx2, W, H, data, label) {
   if(!ctx2||!data||data.length<2) return;
-  ctx2.fillStyle='#0A0800';ctx2.fillRect(0,0,W,H);
+  ctx2.fillStyle='#0A1628';ctx2.fillRect(0,0,W,H);
   ctx2.strokeStyle='rgba(255,215,0,.04)';ctx2.lineWidth=.5;
   for(let i=0;i<6;i++){const y=H*i/6;ctx2.beginPath();ctx2.moveTo(0,y);ctx2.lineTo(W,y);ctx2.stroke();}
   const allP=data.flatMap(c=>[c.h,c.l]);
@@ -1024,15 +1086,15 @@ function drawChart(tf){
   const W=cv.width,H=cv.height,allData=cdata[tf];
   if(!allData||allData.length<2)return;
   // ── ZOOM: عرض فقط آخر 30 شمعة حول السعر الحالي ──
-  const ZOOM = 30;
+  const ZOOM = 20; // 20 شمعة فقط — أوضح وأكبر
   const data = allData.slice(-ZOOM);
   if(!data||data.length<2)return;
 
   // خلفية
-  ctx.fillStyle='#0A0800'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#0A1628'; ctx.fillRect(0,0,W,H); // Bloomberg Navy chart
 
   // grid
-  ctx.strokeStyle='rgba(255,215,0,.04)';ctx.lineWidth=.5;
+  ctx.strokeStyle='rgba(0,180,255,.08)';ctx.lineWidth=.5;
   for(let i=0;i<8;i++){const y=H*i/8;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
   for(let i=0;i<10;i++){const x=W*i/10;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
 
@@ -1040,8 +1102,8 @@ function drawChart(tf){
   const minP=Math.min(...allP),maxP=Math.max(...allP),pad=(maxP-minP)*.12;
   const pMin=minP-pad,pMax=maxP+pad;
   const toY=p=>H-((p-pMin)/(pMax-pMin))*(H*.88)-H*.06;
-  const mL=14,mR=66,chartW=W-mL-mR;
-  const cW=Math.max(1.5,chartW/data.length-.8);
+  const mL=14,mR=70,chartW=W-mL-mR;
+  const cW=Math.max(4,chartW/data.length-1.5); // شمعات أعرض
 
   // ══ رسم OB SELL zones (أحمر) ══
   obSellZones.forEach((ob,i)=>{
@@ -1227,6 +1289,12 @@ function computeIndicators(){
   document.getElementById('sigQual').textContent=score+'/10';
   updateSigCard(dir,conf,atr,atH,score,d1bull,aligned,inOBSell,inOBBuy);
   updateLevels(price);
+  // ── Run Advanced Analysis ──
+  try {
+    const masterResult = runMasterAnalysis(data, price);
+    if (masterResult) updateAdvancedUI(masterResult);
+    updateCorrelationUI();
+  } catch(e) { log('[ADV] '+e.message); }
 }
 
 function updateSigCard(dir,conf,atr,atH,score,d1bull,aligned,inOBSell,inOBBuy){
@@ -1288,18 +1356,29 @@ function updateLevels(p){
 // SESSIONS
 // ═══════════════════════════════════════════════
 function updateSessions(){
-  const now=new Date(),h=now.getUTCHours();
-  const t=`${String(h).padStart(2,'0')}:${String(now.getUTCMinutes()).padStart(2,'0')}:${String(now.getUTCSeconds()).padStart(2,'0')} GMT`;
+  const now=new Date(),h=now.getUTCHours(),m=now.getUTCMinutes(),s=now.getUTCSeconds();
+  const t=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} GMT`;
   document.getElementById('srvTime').textContent=t;
+  const mktOpen = isMarketOpen();
+  // إذا السوق مغلق — كل الجلسات مغلقة
+  if(!mktOpen){
+    ['s-eu','s-us','s-as'].forEach(id=>document.getElementById(id).className='sess soff');
+    ['s-eu-st','s-us-st','s-as-st'].forEach(id=>document.getElementById(id).textContent='○ CLOSED');
+    document.getElementById('sSess').textContent='السوق مغلق 🔴';
+    const mktEl=document.getElementById('mktStatus');
+    if(mktEl){
+      const ms=getMarketStatus();
+      mktEl.textContent=ms.text;mktEl.className='bdg berr';
+    }
+    return;
+  }
   const eu=h>=8&&h<17,us=h>=13&&h<22,as=h<9;
   const set=(id,stId,on)=>{document.getElementById(id).className='sess '+(on?'son':'soff');document.getElementById(stId).textContent=on?'● OPEN':'○ CLOSED';};
   set('s-eu','s-eu-st',eu);set('s-us','s-us-st',us);set('s-as','s-as-st',as);
   const best=us&&eu?'أوروبا + أمريكا ⭐':us?'أمريكا':eu?'أوروبا':as?'آسيا':'---';
   document.getElementById('sSess').textContent=best;
-  // تحديث حالة السوق
-  const mkt=getMarketStatus();
   const mktEl=document.getElementById('mktStatus');
-  if(mktEl){mktEl.textContent=mkt.text;mktEl.className='bdg '+(mkt.open?'bok':'berr');}
+  if(mktEl){mktEl.textContent='🟢 السوق مفتوح';mktEl.className='bdg bok';}
 }
 
 // ═══════════════════════════════════════════════
@@ -1447,6 +1526,703 @@ function log(msg){
   if(el.children.length>100)el.removeChild(el.firstChild);
 }
 
+// ═══════════════════════════════════════════════════════════
+// ADVANCED ANALYSIS ENGINE
+// Volume Profile + VWAP + Fibonacci + Kill Zones + MSS
+// Premium/Discount + Correlation
+// ═══════════════════════════════════════════════════════════
+
+// ── 1. VWAP + Volume Profile ─────────────────────────────
+function computeVWAP(data) {
+  if (!data || data.length < 2) return { vwap: 0, poc: 0, vah: 0, val: 0 };
+  let cumTPV = 0, cumVol = 0;
+  const buckets = {};
+  data.forEach(c => {
+    const tp  = (c.h + c.l + c.cl) / 3;
+    const vol = c.v || 1;
+    cumTPV += tp * vol;
+    cumVol += vol;
+    // Volume Profile buckets (round to 2 decimal)
+    const key = Math.round(tp * 10) / 10;
+    buckets[key] = (buckets[key] || 0) + vol;
+  });
+  const vwap = cumVol > 0 ? cumTPV / cumVol : data[data.length-1].cl;
+  // POC — Point of Control (highest volume price)
+  let maxVol = 0, poc = vwap;
+  Object.entries(buckets).forEach(([p, v]) => { if (v > maxVol) { maxVol = v; poc = parseFloat(p); } });
+  // VAH/VAL — Value Area (70% of volume)
+  const totalVol = Object.values(buckets).reduce((a,b)=>a+b,0);
+  const sortedBuckets = Object.entries(buckets).sort((a,b)=>parseFloat(b[0])-parseFloat(a[0]));
+  let target = totalVol * 0.7, accum = 0, vah = poc, val = poc;
+  let hi = sortedBuckets.findIndex(([p])=>parseFloat(p)>=poc);
+  let lo = hi;
+  while (accum < target && (hi >= 0 || lo < sortedBuckets.length)) {
+    const addHi = hi >= 0 ? sortedBuckets[hi][1] : 0;
+    const addLo = lo < sortedBuckets.length ? sortedBuckets[lo][1] : 0;
+    if (addHi >= addLo && hi >= 0) { accum += addHi; vah = parseFloat(sortedBuckets[hi][0]); hi--; }
+    else if (lo < sortedBuckets.length) { accum += addLo; val = parseFloat(sortedBuckets[lo][0]); lo++; }
+  }
+  return { vwap: parseFloat(vwap.toFixed(2)), poc: parseFloat(poc.toFixed(2)), vah: parseFloat(vah.toFixed(2)), val: parseFloat(val.toFixed(2)) };
+}
+
+// ── 2. Fibonacci Levels ───────────────────────────────────
+function computeFibonacci(data) {
+  if (!data || data.length < 10) return null;
+  const recent = data.slice(-50);
+  const highs  = recent.map(c => c.h);
+  const lows   = recent.map(c => c.l);
+  const swingH = Math.max(...highs);
+  const swingL = Math.min(...lows);
+  const range  = swingH - swingL;
+  const hiIdx  = highs.indexOf(swingH);
+  const loIdx  = lows.indexOf(swingL);
+  const isBullMove = loIdx < hiIdx; // Low came before High = bullish move
+  return {
+    swingH, swingL, range, isBullMove,
+    fib236: parseFloat((swingH - range * 0.236).toFixed(2)),
+    fib382: parseFloat((swingH - range * 0.382).toFixed(2)),
+    fib500: parseFloat((swingH - range * 0.500).toFixed(2)),
+    fib618: parseFloat((swingH - range * 0.618).toFixed(2)),
+    fib786: parseFloat((swingH - range * 0.786).toFixed(2)),
+    ext127: parseFloat((swingH + range * 0.272).toFixed(2)),
+    ext162: parseFloat((swingH + range * 0.618).toFixed(2))
+  };
+}
+
+// ── 3. Premium & Discount Zones ──────────────────────────
+function computePremiumDiscount(data, currentPrice) {
+  if (!data || data.length < 10) return null;
+  const recent = data.slice(-50);
+  const high   = Math.max(...recent.map(c => c.h));
+  const low    = Math.min(...recent.map(c => c.l));
+  const range  = high - low;
+  const mid    = low + range * 0.5;
+  const eq     = low + range * 0.5;   // Equilibrium (50%)
+  const pct    = range > 0 ? ((currentPrice - low) / range) * 100 : 50;
+  return {
+    high, low, mid, eq, range, pct: parseFloat(pct.toFixed(1)),
+    isPremium:  currentPrice > eq,
+    isDiscount: currentPrice < eq,
+    zone: pct > 70 ? 'PREMIUM 🔴' : pct < 30 ? 'DISCOUNT 🟢' : 'EQUILIBRIUM 🟡',
+    zoneColor: pct > 70 ? 'var(--red)' : pct < 30 ? 'var(--green)' : 'var(--yellow)'
+  };
+}
+
+// ── 4. Market Structure Shift (MSS) ──────────────────────
+function detectMSS(data) {
+  if (!data || data.length < 10) return null;
+  const closes = data.map(c => c.cl);
+  const highs  = data.map(c => c.h);
+  const lows   = data.map(c => c.l);
+  const n      = closes.length;
+
+  // BOS — Break of Structure
+  const prevHigh = Math.max(...highs.slice(-10, -1));
+  const prevLow  = Math.min(...lows.slice(-10, -1));
+  const lastHigh = highs[n-1];
+  const lastLow  = lows[n-1];
+  const lastClose = closes[n-1];
+
+  const bos_bull  = lastClose > prevHigh; // كسر أعلى قمة → صاعد
+  const bos_bear  = lastClose < prevLow;  // كسر أدنى قاع → هابط
+
+  // CHoCH — Change of Character
+  const prevPrevHigh = Math.max(...highs.slice(-20, -10));
+  const prevPrevLow  = Math.min(...lows.slice(-20, -10));
+  const choch_bull   = bos_bear && lastClose > prevPrevHigh; // انعكاس من هابط لصاعد
+  const choch_bear   = bos_bull && lastClose < prevPrevLow;  // انعكاس من صاعد لهابط
+
+  // MSS — أقوى من BOS
+  const mss = choch_bull || choch_bear;
+
+  return {
+    bos_bull, bos_bear,
+    choch_bull, choch_bear,
+    mss,
+    signal: mss ? (choch_bull ? 'MSS BULL 🟢' : 'MSS BEAR 🔴') :
+            bos_bull ? 'BOS ↑ 🟢' : bos_bear ? 'BOS ↓ 🔴' : 'NO MSS ⚪',
+    color:  mss ? (choch_bull ? 'var(--green)' : 'var(--red)') :
+            bos_bull ? 'var(--green)' : bos_bear ? 'var(--red)' : 'var(--gdim)',
+    strength: mss ? 'قوي' : (bos_bull || bos_bear) ? 'متوسط' : 'ضعيف'
+  };
+}
+
+// ── 5. Kill Zones (Time-Based) ────────────────────────────
+function getKillZone() {
+  const now  = new Date();
+  const h    = now.getUTCHours();
+  const m    = now.getUTCMinutes();
+  const mins = h * 60 + m;
+  // Beirut = GMT+3
+  const bh   = (h + 3) % 24;
+  const bm   = m;
+  const bTime = `${String(bh).padStart(2,'0')}:${String(bm).padStart(2,'0')}`;
+
+  const zones = [
+    { name:'Asian Kill Zone',        start:0*60,   end:3*60,   b_start:'03:00', b_end:'06:00', color:'#A78BFA', desc:'سيولة آسيا — حذر' },
+    { name:'London Open Kill Zone',  start:7*60,   end:10*60,  b_start:'10:00', b_end:'13:00', color:'#00E676', desc:'أفضل وقت للذهب ⭐' },
+    { name:'NY Open Kill Zone',      start:12*60,  end:15*60,  b_start:'15:00', b_end:'18:00', color:'#00B4FF', desc:'تقلب عالٍ — فرص ⭐' },
+    { name:'London Close',           start:15*60,  end:17*60,  b_start:'18:00', b_end:'20:00', color:'#FFA040', desc:'إغلاق مراكز أوروبية' },
+    { name:'Power of 3 (NY Mid)',    start:14*60,  end:16*60,  b_start:'17:00', b_end:'19:00', color:'#F5C842', desc:'Manipulation → Distribution' },
+  ];
+
+  let active = null, next = null;
+  for (const z of zones) {
+    if (mins >= z.start && mins < z.end) { active = z; break; }
+  }
+  if (!active) {
+    next = zones.find(z => z.start > mins) || zones[0];
+  }
+  return {
+    active,
+    next,
+    bTime,
+    isKillZone: !!active,
+    bestTrade:  (mins >= 7*60 && mins < 10*60) || (mins >= 12*60 && mins < 15*60)
+  };
+}
+
+// ── 6. Correlation Filter ─────────────────────────────────
+let xagCandles = [], dxyCandles = [];
+
+async function fetchCorrelation(tf) {
+  try {
+    // XAG من MetaAPI
+    const r1 = await fetch(`${BASE}/api/price?type=candles&tf=${tf}&symbol=XAGUSD&limit=30`);
+    const d1 = await r1.json();
+    if (d1.candles?.length) xagCandles = d1.candles;
+
+    // DXY من Yahoo proxy
+    const intMap = {M5:'5m',M15:'15m',M30:'30m',H1:'1h',H4:'1h'};
+    const rngMap = {M5:'5d',M15:'5d',M30:'5d',H1:'1mo',H4:'1mo'};
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/DX%3DF?interval=${intMap[tf]||'15m'}&range=${rngMap[tf]||'5d'}`;
+    const r2 = await fetch(`${BASE}/api/yahoo?url=${encodeURIComponent(url)}`);
+    const d2 = await r2.json();
+    if (d2.candles?.length) dxyCandles = d2.candles;
+
+    updateCorrelationUI();
+  } catch(e) { log('[CORR] Error: ' + e.message); }
+}
+
+function computeCorrelation() {
+  const xag = cdata[curTF];
+  if (!xag || !xag.length || !xagCandles.length || !dxyCandles.length) return null;
+
+  // XAG direction (last 10)
+  const xagRecent = xagCandles.slice(-10);
+  const xagDir    = xagRecent[xagRecent.length-1].cl > xagRecent[0].cl ? 'up' : 'down';
+
+  // DXY direction (last 10)
+  const dxyRecent = dxyCandles.slice(-10);
+  const dxyDir    = dxyRecent[dxyRecent.length-1].cl > dxyRecent[0].cl ? 'up' : 'down';
+
+  // XAU direction
+  const xauRecent = xag.slice(-10);
+  const xauDir    = xauRecent[xauRecent.length-1].cl > xauRecent[0].cl ? 'up' : 'down';
+
+  // XAG leads XAU (Silver leads Gold)
+  const xagLeadsXau = xagDir === xauDir;
+
+  // DXY inverse (DXY up = Gold down)
+  const dxyConfirms = (dxyDir === 'up' && xauDir === 'down') ||
+                      (dxyDir === 'down' && xauDir === 'up');
+
+  const dxyXagPrice = dxyCandles[dxyCandles.length-1]?.cl || 0;
+  const xagPrice    = xagCandles[xagCandles.length-1]?.cl || 0;
+
+  return {
+    xagDir, dxyDir, xauDir,
+    xagLeadsXau,
+    dxyConfirms,
+    dxyPrice: dxyXagPrice.toFixed(3),
+    xagPrice: xagPrice.toFixed(3),
+    signal: dxyConfirms && xagLeadsXau ? 'قوي ✅' : dxyConfirms || xagLeadsXau ? 'متوسط 🟡' : 'ضعيف ⚠️',
+    color:  dxyConfirms && xagLeadsXau ? 'var(--green)' : dxyConfirms || xagLeadsXau ? 'var(--yellow)' : 'var(--red)',
+    dxyImpact: dxyDir === 'up' ? '↑ DXY → ↓ ذهب 🔴' : '↓ DXY → ↑ ذهب 🟢',
+    xagSignal: xagDir === 'up' ? '↑ XAG يقود الذهب 🟢' : '↓ XAG يقود الذهب 🔴'
+  };
+}
+
+function updateCorrelationUI() {
+  const corr = computeCorrelation();
+  if (!corr) return;
+  const el = document.getElementById('corrPanel');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="row"><span class="lbl">DXY</span><span class="val" style="color:${corr.dxyDir==='up'?'var(--red)':'var(--green)'}">${corr.dxyPrice} ${corr.dxyDir==='up'?'↑':'↓'}</span></div>
+    <div class="row"><span class="lbl">XAG فضة</span><span class="val" style="color:${corr.xagDir==='up'?'var(--green)':'var(--red)'}">${corr.xagPrice} ${corr.xagDir==='up'?'↑':'↓'}</span></div>
+    <div class="row"><span class="lbl">تأثير DXY</span><span class="val" style="font-size:9px">${corr.dxyImpact}</span></div>
+    <div class="row"><span class="lbl">قيادة XAG</span><span class="val" style="font-size:9px">${corr.xagSignal}</span></div>
+    <div class="row" style="border-top:1px solid var(--bdr);margin-top:4px;padding-top:4px"><span class="lbl">تأكيد الإشارة</span><span class="val" style="color:${corr.color}">${corr.signal}</span></div>`;
+}
+
+// ── MASTER ANALYSIS — يجمع كل التحليلات ──────────────────
+function runMasterAnalysis(data, currentPrice) {
+  if (!data || data.length < 14) return null;
+
+  const vwapData   = computeVWAP(data);
+  const fib        = computeFibonacci(data);
+  const pd         = computePremiumDiscount(data, currentPrice);
+  const mss        = detectMSS(data);
+  const kz         = getKillZone();
+  const corr       = computeCorrelation();
+
+  // ══ Scoring System (0-100) ══
+  let score = 50, reasons = [];
+
+  // Premium/Discount (weight: 20)
+  if (pd) {
+    if (pd.isDiscount) { score += 10; reasons.push('✅ Discount Zone — شراء مفضل'); }
+    else if (pd.isPremium) { score -= 10; reasons.push('⚠️ Premium Zone — بيع مفضل'); }
+  }
+
+  // VWAP (weight: 15)
+  if (vwapData.vwap > 0) {
+    const aboveVWAP = currentPrice > vwapData.vwap;
+    const abovePOC  = currentPrice > vwapData.poc;
+    if (aboveVWAP && abovePOC) { score += 8; reasons.push('✅ فوق VWAP و POC'); }
+    else if (!aboveVWAP && !abovePOC) { score -= 8; reasons.push('⚠️ تحت VWAP و POC'); }
+  }
+
+  // MSS (weight: 20)
+  if (mss) {
+    if (mss.mss && mss.choch_bull) { score += 15; reasons.push('🔥 MSS صاعد — انعكاس قوي'); }
+    else if (mss.mss && mss.choch_bear) { score -= 15; reasons.push('🔥 MSS هابط — انعكاس قوي'); }
+    else if (mss.bos_bull) { score += 8; reasons.push('✅ BOS صاعد'); }
+    else if (mss.bos_bear) { score -= 8; reasons.push('⚠️ BOS هابط'); }
+  }
+
+  // Kill Zone (weight: 15)
+  if (kz.bestTrade) { score += 10; reasons.push('⭐ في Kill Zone الأفضل'); }
+  else if (!kz.isKillZone) { score -= 5; reasons.push('😴 خارج Kill Zones'); }
+
+  // Fibonacci (weight: 15)
+  if (fib) {
+    const nearFib618 = Math.abs(currentPrice - fib.fib618) < fib.range * 0.02;
+    const nearFib382 = Math.abs(currentPrice - fib.fib382) < fib.range * 0.02;
+    if (nearFib618) { score += 10; reasons.push('✅ عند Fib 61.8% — مستوى قوي'); }
+    else if (nearFib382) { score += 6; reasons.push('✅ عند Fib 38.2%'); }
+  }
+
+  // Correlation (weight: 15)
+  if (corr) {
+    if (corr.dxyConfirms && corr.xagLeadsXau) { score += 10; reasons.push('✅ DXY + XAG يؤكدان الاتجاه'); }
+    else if (!corr.dxyConfirms) { score -= 8; reasons.push('⚠️ DXY يعارض الاتجاه'); }
+  }
+
+  score = Math.max(0, Math.min(100, score));
+  const finalDir = score >= 65 ? 'BUY' : score <= 35 ? 'SELL' : 'WAIT';
+  const confidence = Math.round(Math.abs(score - 50) * 2);
+
+  return {
+    score, finalDir, confidence,
+    vwap: vwapData, fib, pd, mss, kz, corr,
+    reasons,
+    quality: score >= 75 ? 'A+ ممتاز' : score >= 60 ? 'A جيد' : score >= 45 ? 'B متوسط' : 'C ضعيف',
+    qualityColor: score >= 75 ? 'var(--green)' : score >= 60 ? '#00B4FF' : score >= 45 ? 'var(--yellow)' : 'var(--red)'
+  };
+}
+
+
+// ── 1. VWAP + Volume Profile ─────────────────────────────
+function computeVWAP(data) {
+  if (!data || data.length < 2) return { vwap: 0, poc: 0, vah: 0, val: 0 };
+  let cumTPV = 0, cumVol = 0;
+  const buckets = {};
+  data.forEach(c => {
+    const tp  = (c.h + c.l + c.cl) / 3;
+    const vol = c.v || 1;
+    cumTPV += tp * vol;
+    cumVol += vol;
+    // Volume Profile buckets (round to 2 decimal)
+    const key = Math.round(tp * 10) / 10;
+    buckets[key] = (buckets[key] || 0) + vol;
+  });
+  const vwap = cumVol > 0 ? cumTPV / cumVol : data[data.length-1].cl;
+  // POC — Point of Control (highest volume price)
+  let maxVol = 0, poc = vwap;
+  Object.entries(buckets).forEach(([p, v]) => { if (v > maxVol) { maxVol = v; poc = parseFloat(p); } });
+  // VAH/VAL — Value Area (70% of volume)
+  const totalVol = Object.values(buckets).reduce((a,b)=>a+b,0);
+  const sortedBuckets = Object.entries(buckets).sort((a,b)=>parseFloat(b[0])-parseFloat(a[0]));
+  let target = totalVol * 0.7, accum = 0, vah = poc, val = poc;
+  let hi = sortedBuckets.findIndex(([p])=>parseFloat(p)>=poc);
+  let lo = hi;
+  while (accum < target && (hi >= 0 || lo < sortedBuckets.length)) {
+    const addHi = hi >= 0 ? sortedBuckets[hi][1] : 0;
+    const addLo = lo < sortedBuckets.length ? sortedBuckets[lo][1] : 0;
+    if (addHi >= addLo && hi >= 0) { accum += addHi; vah = parseFloat(sortedBuckets[hi][0]); hi--; }
+    else if (lo < sortedBuckets.length) { accum += addLo; val = parseFloat(sortedBuckets[lo][0]); lo++; }
+  }
+  return { vwap: parseFloat(vwap.toFixed(2)), poc: parseFloat(poc.toFixed(2)), vah: parseFloat(vah.toFixed(2)), val: parseFloat(val.toFixed(2)) };
+}
+
+// ── 2. Fibonacci Levels ───────────────────────────────────
+function computeFibonacci(data) {
+  if (!data || data.length < 10) return null;
+  const recent = data.slice(-50);
+  const highs  = recent.map(c => c.h);
+  const lows   = recent.map(c => c.l);
+  const swingH = Math.max(...highs);
+  const swingL = Math.min(...lows);
+  const range  = swingH - swingL;
+  const hiIdx  = highs.indexOf(swingH);
+  const loIdx  = lows.indexOf(swingL);
+  const isBullMove = loIdx < hiIdx; // Low came before High = bullish move
+  return {
+    swingH, swingL, range, isBullMove,
+    fib236: parseFloat((swingH - range * 0.236).toFixed(2)),
+    fib382: parseFloat((swingH - range * 0.382).toFixed(2)),
+    fib500: parseFloat((swingH - range * 0.500).toFixed(2)),
+    fib618: parseFloat((swingH - range * 0.618).toFixed(2)),
+    fib786: parseFloat((swingH - range * 0.786).toFixed(2)),
+    ext127: parseFloat((swingH + range * 0.272).toFixed(2)),
+    ext162: parseFloat((swingH + range * 0.618).toFixed(2))
+  };
+}
+
+// ── 3. Premium & Discount Zones ──────────────────────────
+function computePremiumDiscount(data, currentPrice) {
+  if (!data || data.length < 10) return null;
+  const recent = data.slice(-50);
+  const high   = Math.max(...recent.map(c => c.h));
+  const low    = Math.min(...recent.map(c => c.l));
+  const range  = high - low;
+  const mid    = low + range * 0.5;
+  const eq     = low + range * 0.5;   // Equilibrium (50%)
+  const pct    = range > 0 ? ((currentPrice - low) / range) * 100 : 50;
+  return {
+    high, low, mid, eq, range, pct: parseFloat(pct.toFixed(1)),
+    isPremium:  currentPrice > eq,
+    isDiscount: currentPrice < eq,
+    zone: pct > 70 ? 'PREMIUM 🔴' : pct < 30 ? 'DISCOUNT 🟢' : 'EQUILIBRIUM 🟡',
+    zoneColor: pct > 70 ? 'var(--red)' : pct < 30 ? 'var(--green)' : 'var(--yellow)'
+  };
+}
+
+// ── 4. Market Structure Shift (MSS) ──────────────────────
+function detectMSS(data) {
+  if (!data || data.length < 10) return null;
+  const closes = data.map(c => c.cl);
+  const highs  = data.map(c => c.h);
+  const lows   = data.map(c => c.l);
+  const n      = closes.length;
+
+  // BOS — Break of Structure
+  const prevHigh = Math.max(...highs.slice(-10, -1));
+  const prevLow  = Math.min(...lows.slice(-10, -1));
+  const lastHigh = highs[n-1];
+  const lastLow  = lows[n-1];
+  const lastClose = closes[n-1];
+
+  const bos_bull  = lastClose > prevHigh; // كسر أعلى قمة → صاعد
+  const bos_bear  = lastClose < prevLow;  // كسر أدنى قاع → هابط
+
+  // CHoCH — Change of Character
+  const prevPrevHigh = Math.max(...highs.slice(-20, -10));
+  const prevPrevLow  = Math.min(...lows.slice(-20, -10));
+  const choch_bull   = bos_bear && lastClose > prevPrevHigh; // انعكاس من هابط لصاعد
+  const choch_bear   = bos_bull && lastClose < prevPrevLow;  // انعكاس من صاعد لهابط
+
+  // MSS — أقوى من BOS
+  const mss = choch_bull || choch_bear;
+
+  return {
+    bos_bull, bos_bear,
+    choch_bull, choch_bear,
+    mss,
+    signal: mss ? (choch_bull ? 'MSS BULL 🟢' : 'MSS BEAR 🔴') :
+            bos_bull ? 'BOS ↑ 🟢' : bos_bear ? 'BOS ↓ 🔴' : 'NO MSS ⚪',
+    color:  mss ? (choch_bull ? 'var(--green)' : 'var(--red)') :
+            bos_bull ? 'var(--green)' : bos_bear ? 'var(--red)' : 'var(--gdim)',
+    strength: mss ? 'قوي' : (bos_bull || bos_bear) ? 'متوسط' : 'ضعيف'
+  };
+}
+
+// ── 5. Kill Zones (Time-Based) ────────────────────────────
+function getKillZone() {
+  const now  = new Date();
+  const h    = now.getUTCHours();
+  const m    = now.getUTCMinutes();
+  const mins = h * 60 + m;
+  // Beirut = GMT+3
+  const bh   = (h + 3) % 24;
+  const bm   = m;
+  const bTime = `${String(bh).padStart(2,'0')}:${String(bm).padStart(2,'0')}`;
+
+  const zones = [
+    { name:'Asian Kill Zone',        start:0*60,   end:3*60,   b_start:'03:00', b_end:'06:00', color:'#A78BFA', desc:'سيولة آسيا — حذر' },
+    { name:'London Open Kill Zone',  start:7*60,   end:10*60,  b_start:'10:00', b_end:'13:00', color:'#00E676', desc:'أفضل وقت للذهب ⭐' },
+    { name:'NY Open Kill Zone',      start:12*60,  end:15*60,  b_start:'15:00', b_end:'18:00', color:'#00B4FF', desc:'تقلب عالٍ — فرص ⭐' },
+    { name:'London Close',           start:15*60,  end:17*60,  b_start:'18:00', b_end:'20:00', color:'#FFA040', desc:'إغلاق مراكز أوروبية' },
+    { name:'Power of 3 (NY Mid)',    start:14*60,  end:16*60,  b_start:'17:00', b_end:'19:00', color:'#F5C842', desc:'Manipulation → Distribution' },
+  ];
+
+  let active = null, next = null;
+  for (const z of zones) {
+    if (mins >= z.start && mins < z.end) { active = z; break; }
+  }
+  if (!active) {
+    next = zones.find(z => z.start > mins) || zones[0];
+  }
+  return {
+    active,
+    next,
+    bTime,
+    isKillZone: !!active,
+    bestTrade:  (mins >= 7*60 && mins < 10*60) || (mins >= 12*60 && mins < 15*60)
+  };
+}
+
+// ── 6. Correlation Filter ─────────────────────────────────
+let xagCandles = [], dxyCandles = [];
+
+async function fetchCorrelation(tf) {
+  try {
+    // XAG من MetaAPI
+    const r1 = await fetch(`${BASE}/api/price?type=candles&tf=${tf}&symbol=XAGUSD&limit=30`);
+    const d1 = await r1.json();
+    if (d1.candles?.length) xagCandles = d1.candles;
+
+    // DXY من Yahoo proxy
+    const intMap = {M5:'5m',M15:'15m',M30:'30m',H1:'1h',H4:'1h'};
+    const rngMap = {M5:'5d',M15:'5d',M30:'5d',H1:'1mo',H4:'1mo'};
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/DX%3DF?interval=${intMap[tf]||'15m'}&range=${rngMap[tf]||'5d'}`;
+    const r2 = await fetch(`${BASE}/api/yahoo?url=${encodeURIComponent(url)}`);
+    const d2 = await r2.json();
+    if (d2.candles?.length) dxyCandles = d2.candles;
+
+    updateCorrelationUI();
+  } catch(e) { log('[CORR] Error: ' + e.message); }
+}
+
+function computeCorrelation() {
+  const xag = cdata[curTF];
+  if (!xag || !xag.length || !xagCandles.length || !dxyCandles.length) return null;
+
+  // XAG direction (last 10)
+  const xagRecent = xagCandles.slice(-10);
+  const xagDir    = xagRecent[xagRecent.length-1].cl > xagRecent[0].cl ? 'up' : 'down';
+
+  // DXY direction (last 10)
+  const dxyRecent = dxyCandles.slice(-10);
+  const dxyDir    = dxyRecent[dxyRecent.length-1].cl > dxyRecent[0].cl ? 'up' : 'down';
+
+  // XAU direction
+  const xauRecent = xag.slice(-10);
+  const xauDir    = xauRecent[xauRecent.length-1].cl > xauRecent[0].cl ? 'up' : 'down';
+
+  // XAG leads XAU (Silver leads Gold)
+  const xagLeadsXau = xagDir === xauDir;
+
+  // DXY inverse (DXY up = Gold down)
+  const dxyConfirms = (dxyDir === 'up' && xauDir === 'down') ||
+                      (dxyDir === 'down' && xauDir === 'up');
+
+  const dxyXagPrice = dxyCandles[dxyCandles.length-1]?.cl || 0;
+  const xagPrice    = xagCandles[xagCandles.length-1]?.cl || 0;
+
+  return {
+    xagDir, dxyDir, xauDir,
+    xagLeadsXau,
+    dxyConfirms,
+    dxyPrice: dxyXagPrice.toFixed(3),
+    xagPrice: xagPrice.toFixed(3),
+    signal: dxyConfirms && xagLeadsXau ? 'قوي ✅' : dxyConfirms || xagLeadsXau ? 'متوسط 🟡' : 'ضعيف ⚠️',
+    color:  dxyConfirms && xagLeadsXau ? 'var(--green)' : dxyConfirms || xagLeadsXau ? 'var(--yellow)' : 'var(--red)',
+    dxyImpact: dxyDir === 'up' ? '↑ DXY → ↓ ذهب 🔴' : '↓ DXY → ↑ ذهب 🟢',
+    xagSignal: xagDir === 'up' ? '↑ XAG يقود الذهب 🟢' : '↓ XAG يقود الذهب 🔴'
+  };
+}
+
+function updateCorrelationUI() {
+  const corr = computeCorrelation();
+  if (!corr) return;
+  const el = document.getElementById('corrPanel');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="row"><span class="lbl">DXY</span><span class="val" style="color:${corr.dxyDir==='up'?'var(--red)':'var(--green)'}">${corr.dxyPrice} ${corr.dxyDir==='up'?'↑':'↓'}</span></div>
+    <div class="row"><span class="lbl">XAG فضة</span><span class="val" style="color:${corr.xagDir==='up'?'var(--green)':'var(--red)'}">${corr.xagPrice} ${corr.xagDir==='up'?'↑':'↓'}</span></div>
+    <div class="row"><span class="lbl">تأثير DXY</span><span class="val" style="font-size:9px">${corr.dxyImpact}</span></div>
+    <div class="row"><span class="lbl">قيادة XAG</span><span class="val" style="font-size:9px">${corr.xagSignal}</span></div>
+    <div class="row" style="border-top:1px solid var(--bdr);margin-top:4px;padding-top:4px"><span class="lbl">تأكيد الإشارة</span><span class="val" style="color:${corr.color}">${corr.signal}</span></div>`;
+}
+
+// ── MASTER ANALYSIS — يجمع كل التحليلات ──────────────────
+function runMasterAnalysis(data, currentPrice) {
+  if (!data || data.length < 14) return null;
+
+  const vwapData   = computeVWAP(data);
+  const fib        = computeFibonacci(data);
+  const pd         = computePremiumDiscount(data, currentPrice);
+  const mss        = detectMSS(data);
+  const kz         = getKillZone();
+  const corr       = computeCorrelation();
+
+  // ══ Scoring System (0-100) ══
+  let score = 50, reasons = [];
+
+  // Premium/Discount (weight: 20)
+  if (pd) {
+    if (pd.isDiscount) { score += 10; reasons.push('✅ Discount Zone — شراء مفضل'); }
+    else if (pd.isPremium) { score -= 10; reasons.push('⚠️ Premium Zone — بيع مفضل'); }
+  }
+
+  // VWAP (weight: 15)
+  if (vwapData.vwap > 0) {
+    const aboveVWAP = currentPrice > vwapData.vwap;
+    const abovePOC  = currentPrice > vwapData.poc;
+    if (aboveVWAP && abovePOC) { score += 8; reasons.push('✅ فوق VWAP و POC'); }
+    else if (!aboveVWAP && !abovePOC) { score -= 8; reasons.push('⚠️ تحت VWAP و POC'); }
+  }
+
+  // MSS (weight: 20)
+  if (mss) {
+    if (mss.mss && mss.choch_bull) { score += 15; reasons.push('🔥 MSS صاعد — انعكاس قوي'); }
+    else if (mss.mss && mss.choch_bear) { score -= 15; reasons.push('🔥 MSS هابط — انعكاس قوي'); }
+    else if (mss.bos_bull) { score += 8; reasons.push('✅ BOS صاعد'); }
+    else if (mss.bos_bear) { score -= 8; reasons.push('⚠️ BOS هابط'); }
+  }
+
+  // Kill Zone (weight: 15)
+  if (kz.bestTrade) { score += 10; reasons.push('⭐ في Kill Zone الأفضل'); }
+  else if (!kz.isKillZone) { score -= 5; reasons.push('😴 خارج Kill Zones'); }
+
+  // Fibonacci (weight: 15)
+  if (fib) {
+    const nearFib618 = Math.abs(currentPrice - fib.fib618) < fib.range * 0.02;
+    const nearFib382 = Math.abs(currentPrice - fib.fib382) < fib.range * 0.02;
+    if (nearFib618) { score += 10; reasons.push('✅ عند Fib 61.8% — مستوى قوي'); }
+    else if (nearFib382) { score += 6; reasons.push('✅ عند Fib 38.2%'); }
+  }
+
+  // Correlation (weight: 15)
+  if (corr) {
+    if (corr.dxyConfirms && corr.xagLeadsXau) { score += 10; reasons.push('✅ DXY + XAG يؤكدان الاتجاه'); }
+    else if (!corr.dxyConfirms) { score -= 8; reasons.push('⚠️ DXY يعارض الاتجاه'); }
+  }
+
+  score = Math.max(0, Math.min(100, score));
+  const finalDir = score >= 65 ? 'BUY' : score <= 35 ? 'SELL' : 'WAIT';
+  const confidence = Math.round(Math.abs(score - 50) * 2);
+
+  return {
+    score, finalDir, confidence,
+    vwap: vwapData, fib, pd, mss, kz, corr,
+    reasons,
+    quality: score >= 75 ? 'A+ ممتاز' : score >= 60 ? 'A جيد' : score >= 45 ? 'B متوسط' : 'C ضعيف',
+    qualityColor: score >= 75 ? 'var(--green)' : score >= 60 ? '#00B4FF' : score >= 45 ? 'var(--yellow)' : 'var(--red)'
+  };
+}
+
+// ── تحديث UI بالتحليل الكامل ─────────────────────────────
+function updateAdvancedUI(analysis) {
+  if (!analysis) return;
+  const { vwap, fib, pd, mss, kz, score, finalDir, confidence, reasons, quality, qualityColor } = analysis;
+
+  // VWAP Panel
+  const vwapEl = document.getElementById('vwapPanel');
+  if (vwapEl && vwap) {
+    vwapEl.innerHTML = `
+      <div class="row"><span class="lbl">VWAP</span><span class="val" style="color:${price>vwap.vwap?'var(--green)':'var(--red)'}">${vwap.vwap}</span></div>
+      <div class="row"><span class="lbl">POC</span><span class="val" style="color:var(--yellow)">${vwap.poc}</span></div>
+      <div class="row"><span class="lbl">VAH</span><span class="val" style="color:var(--red)">${vwap.vah}</span></div>
+      <div class="row"><span class="lbl">VAL</span><span class="val" style="color:var(--green)">${vwap.val}</span></div>
+      <div class="row"><span class="lbl">الوضع</span><span class="val" style="color:${price>vwap.vwap?'var(--green)':'var(--red)'}">${price>vwap.vwap?'فوق VWAP ↑':'تحت VWAP ↓'}</span></div>`;
+  }
+
+  // Fibonacci Panel
+  const fibEl = document.getElementById('fibPanel');
+  if (fibEl && fib) {
+    const fmt = v => '$'+v.toFixed(2);
+    const near = (v) => Math.abs(price-v) < fib.range*0.015 ? ' 👈' : '';
+    fibEl.innerHTML = `
+      <div class="row"><span class="lbl">Ext 1.618</span><span class="val" style="color:var(--gold2)">${fmt(fib.ext162)}${near(fib.ext162)}</span></div>
+      <div class="row"><span class="lbl">Ext 1.272</span><span class="val" style="color:var(--gold2)">${fmt(fib.ext127)}${near(fib.ext127)}</span></div>
+      <div class="row"><span class="lbl">Swing High</span><span class="val" style="color:var(--red)">${fmt(fib.swingH)}</span></div>
+      <div class="row"><span class="lbl">23.6%</span><span class="val">${fmt(fib.fib236)}${near(fib.fib236)}</span></div>
+      <div class="row"><span class="lbl">38.2%</span><span class="val" style="color:var(--yellow)">${fmt(fib.fib382)}${near(fib.fib382)}</span></div>
+      <div class="row"><span class="lbl">50.0% ⚖️</span><span class="val" style="color:var(--blue)">${fmt(fib.fib500)}${near(fib.fib500)}</span></div>
+      <div class="row"><span class="lbl">61.8% 🎯</span><span class="val" style="color:var(--green);font-weight:900">${fmt(fib.fib618)}${near(fib.fib618)}</span></div>
+      <div class="row"><span class="lbl">78.6%</span><span class="val" style="color:var(--green)">${fmt(fib.fib786)}${near(fib.fib786)}</span></div>
+      <div class="row"><span class="lbl">Swing Low</span><span class="val" style="color:var(--green)">${fmt(fib.swingL)}</span></div>`;
+  }
+
+  // Premium/Discount Panel
+  const pdEl = document.getElementById('pdPanel');
+  if (pdEl && pd) {
+    const barWidth = pd.pct + '%';
+    pdEl.innerHTML = `
+      <div style="margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--gdim);margin-bottom:3px">
+          <span>Discount 🟢</span><span>EQ ⚖️</span><span>Premium 🔴</span>
+        </div>
+        <div style="height:8px;background:linear-gradient(90deg,var(--green),var(--yellow),var(--red));border-radius:4px;position:relative">
+          <div style="position:absolute;top:-3px;left:${Math.min(96,Math.max(2,pd.pct))}%;width:3px;height:14px;background:#fff;border-radius:2px;transform:translateX(-50%)"></div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;text-align:center;margin-top:4px;color:${pd.zoneColor};font-weight:700">${pd.zone} — ${pd.pct}%</div>
+      </div>
+      <div class="row"><span class="lbl">أعلى النطاق</span><span class="val" style="color:var(--red)">$${pd.high.toFixed(2)}</span></div>
+      <div class="row"><span class="lbl">Equilibrium</span><span class="val" style="color:var(--blue)">$${pd.eq.toFixed(2)}</span></div>
+      <div class="row"><span class="lbl">أدنى النطاق</span><span class="val" style="color:var(--green)">$${pd.low.toFixed(2)}</span></div>
+      <div class="row"><span class="lbl">التوصية</span><span class="val" style="color:${pd.zoneColor}">${pd.isDiscount?'شراء مفضل ↑':pd.isPremium?'بيع مفضل ↓':'محايد ↔'}</span></div>`;
+  }
+
+  // MSS Panel
+  const mssEl = document.getElementById('mssPanel');
+  if (mssEl && mss) {
+    mssEl.innerHTML = `
+      <div class="row"><span class="lbl">MSS</span><span class="val" style="color:${mss.color}">${mss.signal}</span></div>
+      <div class="row"><span class="lbl">القوة</span><span class="val">${mss.strength}</span></div>
+      <div class="row"><span class="lbl">BOS صاعد</span><span class="val" style="color:${mss.bos_bull?'var(--green)':'var(--gdim)'}">${mss.bos_bull?'✅ نعم':'—'}</span></div>
+      <div class="row"><span class="lbl">BOS هابط</span><span class="val" style="color:${mss.bos_bear?'var(--red)':'var(--gdim)'}">${mss.bos_bear?'🔴 نعم':'—'}</span></div>
+      <div class="row"><span class="lbl">CHoCH</span><span class="val" style="color:${mss.choch_bull||mss.choch_bear?'var(--yellow)':'var(--gdim)'}">${mss.choch_bull?'↑ صاعد':mss.choch_bear?'↓ هابط':'لا يوجد'}</span></div>`;
+  }
+
+  // Kill Zone Panel
+  const kzEl = document.getElementById('kzPanel');
+  if (kzEl) {
+    const zones = [
+      { name:'Asian KZ',    gmt:'00:00–03:00', b:'03:00–06:00', color:'#A78BFA' },
+      { name:'London KZ ⭐', gmt:'07:00–10:00', b:'10:00–13:00', color:'var(--green)' },
+      { name:'NY Open KZ ⭐',gmt:'12:00–15:00', b:'15:00–18:00', color:'var(--blue)' },
+      { name:'London Close', gmt:'15:00–17:00', b:'18:00–20:00', color:'var(--orange)' },
+    ];
+    kzEl.innerHTML = zones.map(z => {
+      const isActive = kz.active?.name?.includes(z.name.replace(' ⭐',''));
+      return `<div class="row" style="${isActive?'background:rgba(0,180,255,0.08);border-radius:3px;padding:2px 4px;':''}">`+
+        `<span class="lbl" style="color:${isActive?z.color:'var(--gdim)'}">${z.name}</span>`+
+        `<span class="val" style="font-size:9px;color:${isActive?z.color:'var(--gdim)'}">${z.gmt}<br><span style="color:rgba(255,255,255,0.4)">${z.b}</span></span>`+
+        `</div>`;
+    }).join('') +
+    `<div class="row" style="border-top:1px solid var(--bdr);margin-top:4px;padding-top:4px">`+
+    `<span class="lbl">الوضع الآن</span>`+
+    `<span class="val" style="color:${kz.bestTrade?'var(--green)':kz.isKillZone?'var(--yellow)':'var(--gdim)'}">`+
+    `${kz.bestTrade?'⭐ Kill Zone مثالي':kz.isKillZone?'🟡 Kill Zone نشط':'😴 خارج KZ'}</span></div>`;
+  }
+
+  // Master Score
+  const scoreEl = document.getElementById('masterScore');
+  if (scoreEl) {
+    scoreEl.innerHTML = `
+      <div style="text-align:center;margin-bottom:8px">
+        <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--gdim);letter-spacing:2px">MASTER SCORE</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:900;color:${qualityColor}">${score}</div>
+        <div style="font-size:10px;color:${qualityColor}">${quality}</div>
+      </div>
+      <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;margin-bottom:8px">
+        <div style="height:100%;width:${score}%;background:linear-gradient(90deg,var(--red),var(--yellow),var(--green));border-radius:3px"></div>
+      </div>
+      <div style="font-family:'Orbitron',monospace;font-size:16px;font-weight:900;text-align:center;color:${finalDir==='BUY'?'var(--green)':finalDir==='SELL'?'var(--red)':'var(--yellow)'}">
+        ${finalDir} ${confidence}%
+      </div>
+      <div style="margin-top:8px;font-size:9px;line-height:1.6;color:var(--gdim)">
+        ${reasons.slice(0,4).join('<br>')}
+      </div>`;
+  }
+}
+
+
 // ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
@@ -1466,9 +2242,11 @@ fetchPrice();
 setInterval(fetchPrice,10000);
 fetchCandles('M15'); // M15 افتراضي
 setTimeout(()=>fetchCandles('M5'),2000);
+setTimeout(()=>fetchCorrelation(curTF),8000); // Correlation
 setTimeout(()=>fetchCandles('M30'),4000);
 setTimeout(()=>fetchCandles('H1'),6000);
-setInterval(()=>{fetchCandles(curTF);renderCalendar();},60000);
+setInterval(()=>{fetchCandles(curTF);renderCalendar();try{const kz=getKillZone();const a=runMasterAnalysis(cdata[curTF],price);if(a)updateAdvancedUI(a);}catch(e){}},60000);
+setInterval(()=>fetchCorrelation(curTF),300000); // correlation كل 5 دقائق
 renderTrades();updateStats();
 </script>
 </body>
