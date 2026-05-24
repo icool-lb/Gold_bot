@@ -1036,6 +1036,265 @@ function updateSpark(tf){
   var te=document.getElementById(tdm[tf]);
   if(te){te.textContent=bull?'↑ BULL':'↓ BEAR';te.className='mitr '+(bull?'bull':'bear');}
 }
+
+// ══ INDICATORS ══
+function computeInds(){
+  var data=cdata[curTF];if(!data||data.length<14)return;
+  var cls=data.map(function(c){return c.cl;}),n=cls.length;
+  var g=0,l=0;
+  for(var i=n-14;i<n;i++){var dd=cls[i]-cls[i-1];dd>0?g+=dd:l-=dd;}
+  var rsi=100-(100/(1+g/(l||.001)));
+  var s=function(id,v,col){var e=document.getElementById(id);if(e){e.textContent=v;if(col)e.style.color=col;}};
+  s('i-rsi',rsi.toFixed(1),rsi>70?'var(--red)':rsi<30?'var(--green)':'var(--orange)');
+  s('i-rsi-s',rsi>70?'OB':rsi<30?'OS':'NEUT',rsi>70?'var(--red)':rsi<30?'var(--green)':'var(--orange)');
+  var e12=cls[0],e26=cls[0];
+  cls.forEach(function(p){e12=p*2/13+e12*(1-2/13);e26=p*2/27+e26*(1-2/27);});
+  var macd=e12-e26;
+  s('i-macd',macd.toFixed(2),macd>0?'var(--green)':'var(--red)');
+  s('i-macd-s',macd>0?'BUY':'SELL',macd>0?'var(--green)':'var(--red)');
+  var e50=cls[0],e200=cls[0];
+  cls.forEach(function(p){e50=p*2/51+e50*(1-2/51);e200=p*2/201+e200*(1-2/201);});
+  s('i-e50',e50.toFixed(2));s('i-e50-s',gPrice>e50?'↑ ABOVE':'↓ BELOW',gPrice>e50?'var(--green)':'var(--red)');
+  s('i-e200',e200.toFixed(2));s('i-e200-s',gPrice>e200?'↑ ABOVE':'↓ BELOW',gPrice>e200?'var(--green)':'var(--red)');
+  var vwap=cls.slice(-20).reduce(function(a,b){return a+b;},0)/20;
+  s('i-vwap',vwap.toFixed(2));s('i-vwap-s',gPrice>vwap?'ABOVE':'BELOW',gPrice>vwap?'var(--green)':'var(--red)');
+  var atr=calcATR(data);
+  s('i-atr2',atr.toFixed(2));s('m-atr',atr.toFixed(2));s('t-atr',atr.toFixed(2));
+  var d1b=gPrice>e200,h4b=macd>0,h1b=gPrice>e50;
+  var aligned=(d1b&&h4b&&h1b)||(!d1b&&!h4b&&!h1b);
+  function setTV(id,txt,cls2){var el=document.getElementById(id);if(el){el.textContent=txt;el.className='tv '+cls2;}}
+  setTV('t-d1',d1b?'صاعد ↑':'هابط ↓',d1b?'tg':'tr');
+  setTV('t-h4',h4b?'صاعد ↑':'هابط ↓',h4b?'tg':'tr');
+  setTV('t-h1',h1b?'صاعد ↑':'هابط ↓',h1b?'tg':'tr');
+  setTV('t-align',aligned?'✅ متوافق':'❌ تعارض',aligned?'tg':'tr');
+  var bos=cls[n-1]>Math.max.apply(null,cls.slice(-10,-1));
+  var atH=gPrice>Math.max.apply(null,data.map(function(c){return c.h;}).slice(-20))*.998;
+  var bearC=data[n-1].cl<data[n-1].o;
+  var inOS=obSell.some(function(ob){return gPrice>=ob.bot*.999&&gPrice<=ob.top*1.001;});
+  var inOB=obBuy.some(function(ob){return gPrice>=ob.bot*.999&&gPrice<=ob.top*1.001;});
+  function setSch(id,txt,col){var el=document.getElementById(id);if(el){el.textContent=txt;el.style.color=col;}}
+  setSch('sch-ict',bos?'BUY 🟢':'SELL 🔴',bos?'var(--green)':'var(--red)');
+  setSch('sch-wyk',macd>0?'ACCUM 🟢':'DIST 🟠',macd>0?'var(--green)':'var(--orange)');
+  setSch('sch-ell',d1b?'W3 🟢':'W5 END 🔴',d1b?'var(--green)':'var(--red)');
+  setSch('sch-sd',inOS?'OB SELL 🔴':inOB?'OB BUY 🟢':atH?'SUPPLY 🔴':'DEMAND 🟢',inOS||atH?'var(--red)':'var(--green)');
+  setSch('sch-pa',bearC?'BEAR 🔴':'BULL 🟢',bearC?'var(--red)':'var(--green)');
+  setSch('sch-td',aligned?(d1b?'BULL ✓':'BEAR ✓'):'MIXED ✗',aligned?'var(--green)':'var(--red)');
+  var score=[bos,macd>0,d1b,h1b,!atH,!bearC,gPrice>vwap,aligned,inOB&&!inOS].filter(Boolean).length;
+  var conf=Math.min(90,Math.round(40+score*7));
+  var dir=score>=6?'BUY':score<=2?'SELL':'WAIT';
+  var trEl=document.getElementById('t-rate');if(trEl){trEl.textContent=score+'/10';trEl.className='tv '+(score>=6?'tg':score<=3?'tr':'tx');}
+  var sqEl=document.getElementById('sigQual');if(sqEl)sqEl.textContent=score+'/10';
+  updateSigCard(dir,conf,atr,atH,score,d1b,aligned,inOS,inOB);
+  updateLevels(gPrice);
+  try{var ms=masterScore(data,gPrice);if(ms)updateAdvUI(ms);}catch(e){log('[ADV] '+e.message);}
+}
+
+function updateSigCard(dir,conf,atr,atH,score,d1b,aligned,inOS,inOB){
+  if(!gPrice)return;
+  var fmt=function(v){return '$'+v.toFixed(2);};
+  var isBuy=dir==='BUY';
+  var card=document.getElementById('sigCard');if(card)card.className='sc '+(dir==='BUY'?'sbuy':dir==='SELL'?'ssell':'swait');
+  var sd=document.getElementById('sigDir');if(sd){sd.textContent=dir;sd.className='sdir '+(dir==='BUY'?'dbuy':dir==='SELL'?'dsell':'dwait');}
+  var sc=document.getElementById('sigConf');if(sc)sc.textContent=conf+'%';
+  var rH=gPrice*1.005,rL=gPrice*0.995;
+  if(obSell.length)rH=obSell[obSell.length-1].bot;
+  if(obBuy.length)rL=obBuy[obBuy.length-1].top;
+  var sl=isBuy?gPrice-atr*.5:gPrice+atr*.5;
+  var tp1=isBuy?Math.min(rH,gPrice+atr*.8):Math.max(rL,gPrice-atr*.8);
+  var tp2=isBuy?gPrice+atr*1.5:gPrice-atr*1.5;
+  var rr=Math.abs(tp1-gPrice)/Math.abs(sl-gPrice);
+  var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v;};
+  set('sEnt',fmt(gPrice));set('sSL',fmt(sl));set('sTP1',fmt(tp1));set('sTP2',fmt(tp2));set('sRR','1:'+rr.toFixed(2));
+  var warn=!aligned?'⚠️ تعارض':!d1b&&dir==='BUY'?'⛔ ضد D1':d1b&&dir==='SELL'?'⛔ ضد D1':rr<1.5?'⚠️ R:R ضعيف':inOS&&dir==='SELL'?'✅ OB SELL':inOB&&dir==='BUY'?'✅ OB BUY':score>=7?'✅ إشارة قوية':'🔶 متوسطة';
+  set('sigWarn',warn);
+  function setT(id,txt,cls){var el=document.getElementById(id);if(el){el.textContent=txt;el.className='tv '+cls;}}
+  setT('t-zone',inOS?'OB SELL ⛔':inOB?'OB BUY ✅':atH?'عرض':'طلب',inOS||atH?'tr':inOB?'tg':'tx');
+  setT('t-dec',!aligned||rr<1.5?'انتظر':dir==='BUY'?'شراء':'بيع',!aligned||rr<1.5?'tx':dir==='BUY'?'tg':'tr');
+  setT('t-ent',rr>=1.5&&aligned&&dir!=='WAIT'?'مسموح':'Blocked',rr>=1.5&&aligned&&dir!=='WAIT'?'tg':'tr');
+  set('t-tgt',fmt(tp1));
+}
+
+function updateLevels(p){
+  var fmt=function(v){return '$'+v.toFixed(2);};
+  var lOS=obSell.length?obSell[obSell.length-1]:null;
+  var lOB=obBuy.length?obBuy[obBuy.length-1]:null;
+  var bFVG=fvgZ.find(function(f){return f.type==='bull';});
+  var bFVGs=fvgZ.find(function(f){return f.type==='bear';});
+  var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v;};
+  set('lR2',lOS?fmt(lOS.top):'---');
+  set('lR1',bFVGs?fmt(bFVGs.top):'---');
+  set('lCur','$'+p.toFixed(2));
+  set('lS1',bFVG?fmt(bFVG.bot):'---');
+  set('lS2',lOB?fmt(lOB.bot):'---');
+}
+
+// ══ TF SWITCH ══
+function setTF(el,tf){
+  document.querySelectorAll('.tft').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.minic').forEach(function(c){c.classList.remove('active');});
+  el.classList.add('active');
+  var mc=document.getElementById('mc-'+tf);if(mc)mc.classList.add('active');
+  curTF=tf;
+  if(!ldone[tf])fetchCandles(tf);
+  else{detectZones(cdata[tf]);drawChart(tf);computeInds();}
+}
+
+// ══ AI ══
+function selM(m){
+  aiModel=m;
+  var mc=document.getElementById('mb-c');var mo=document.getElementById('mb-o');
+  if(mc)mc.classList.toggle('sel',m==='claude');
+  if(mo)mo.classList.toggle('sel',m==='openai');
+}
+
+async function runAI(){
+  var btn=document.getElementById('aiBtn'),out=document.getElementById('aiOut'),bdg=document.getElementById('aiBdg');
+  if(btn){btn.disabled=true;btn.textContent='⏳ جاري...';}
+  if(out){out.textContent='';out.style.display='none';}if(bdg)bdg.style.display='none';
+  var data=cdata[curTF];
+  var h=data?data.map(function(c){return c.h;}):[];
+  var l=data?data.map(function(c){return c.l;}):[];
+  var atr=calcATR(data||[]);
+  var ep=aiModel==='claude'?BASE+'/api/analyze':BASE+'/api/openai';
+  try{
+    var r=await fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      symbol:'XAUUSD',price:gPrice.toFixed(2),
+      bid:document.getElementById('m-bid')?document.getElementById('m-bid').textContent:'',
+      ask:document.getElementById('m-ask')?document.getElementById('m-ask').textContent:'',
+      spread:document.getElementById('m-spread')?document.getElementById('m-spread').textContent:'',
+      rsi:document.getElementById('i-rsi')?document.getElementById('i-rsi').textContent:'',
+      macd:document.getElementById('i-macd')?document.getElementById('i-macd').textContent:'',
+      ema50:document.getElementById('i-e50')?document.getElementById('i-e50').textContent:'',
+      ema200:document.getElementById('i-e200')?document.getElementById('i-e200').textContent:'',
+      atr:atr.toFixed(2),
+      highH1:h.length?Math.max.apply(null,h.slice(-10)).toFixed(2):'',
+      lowH1:l.length?Math.min.apply(null,l.slice(-10)).toFixed(2):'',
+      highH4:h.length?Math.max.apply(null,h.slice(-30)).toFixed(2):'',
+      lowH4:l.length?Math.min.apply(null,l.slice(-30)).toFixed(2):'',
+      session:document.getElementById('sSess')?document.getElementById('sSess').textContent:'',
+      dxy:'104.2',gsr:document.getElementById('m-gsr')?document.getElementById('m-gsr').textContent:'',
+      trend:document.getElementById('t-d1')?document.getElementById('t-d1').textContent:''
+    })});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    var d=await r.json();
+    var txt=d.analysis||d.error||'---';
+    if(out){out.textContent=txt;out.style.color='#E8F4FF';out.style.display='block';}
+    if(bdg){bdg.className='bdg bok';bdg.textContent='✅ '+d.model;bdg.style.display='block';}
+    log('[AI] ✓ '+d.model);
+  }catch(e){
+    if(out){out.textContent='⚠️ '+e.message;out.style.color='var(--red)';out.style.display='block';}
+    if(bdg){bdg.className='bdg berr';bdg.textContent='❌';bdg.style.display='block';}
+  }
+  if(btn){btn.disabled=false;btn.textContent='🤖 تحليل Top-Down الآن';}
+}
+
+async function runNews(){
+  var btn=document.getElementById('newsBtn'),out=document.getElementById('newsOut'),bdg=document.getElementById('newsBdg');
+  if(btn){btn.disabled=true;btn.textContent='⏳ جاري البحث...';}
+  if(out){out.textContent='🔍 GPT-4o يبحث...';out.style.color='var(--gdim)';out.style.display='block';}
+  if(bdg)bdg.style.display='none';
+  try{
+    var r=await fetch(BASE+'/api/news',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      price:gPrice.toFixed(2),
+      session:document.getElementById('sSess')?document.getElementById('sSess').textContent:'',
+      gsr:document.getElementById('m-gsr')?document.getElementById('m-gsr').textContent:'',
+      nextOpen:getNextOpen()
+    })});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    var d=await r.json();
+    if(out){out.textContent=d.analysis||'---';out.style.color='#E8F4FF';}
+    if(bdg){bdg.className='bdg bok';bdg.textContent='✅ '+d.model;bdg.style.display='block';}
+    tgNotify('📰 *تحليل أخبار*
+'+(d.analysis||'').substring(0,500));
+    log('[NEWS] ✓');
+  }catch(e){
+    if(out){out.textContent='⚠️ '+e.message;out.style.color='var(--red)';}
+    if(bdg){bdg.className='bdg berr';bdg.textContent='❌';bdg.style.display='block';}
+  }
+  if(btn){btn.disabled=false;btn.textContent='📰 تحليل الأخبار + GAP';}
+}
+
+// ══ CHART SEND ══
+async function sendChart(){
+  var btn=document.getElementById('sendBtn');if(btn){btn.textContent='⏳...';btn.disabled=true;}
+  try{
+    var b64=cv.toDataURL('image/png').split(',')[1];
+    var dir=document.getElementById('sigDir')?document.getElementById('sigDir').textContent:'---';
+    var cap='📸 *XAU/USD — '+curTF+'*
+💰 $'+gPrice.toFixed(2)+'
+📊 '+dir+'
+⏱ '+new Date().toUTCString()+'
+_🥇 Gold AI Bot_';
+    var r=await fetch(BASE+'/api/chart',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:b64,caption:cap})});
+    var d=await r.json();
+    if(d.ok){log('[CHART] ✅');if(btn)btn.textContent='✅ تم';}
+    else throw new Error(d.error||'error');
+  }catch(e){log('[CHART] ✗ '+e.message);if(btn)btn.textContent='❌';}
+  setTimeout(function(){if(btn){btn.textContent='📸 إرسال الشارت';btn.disabled=false;}},2000);
+}
+
+// ══ TELEGRAM ══
+async function tgSend(type){
+  var logEl=document.getElementById('tgLog');
+  if(logEl){logEl.style.display='block';logEl.className='bdg bwrn';logEl.textContent='⏳...';}
+  var msg=type==='test'
+    ?'🥇 *Test Gold Bot*
+💰 $'+gPrice.toFixed(2)+'
+'+new Date().toUTCString()
+    :'📊 *إشارة XAU/USD*
+'+(document.getElementById('sigDir')?document.getElementById('sigDir').textContent:'')+' @ $'+gPrice.toFixed(2)+'
+SL:'+(document.getElementById('sSL')?document.getElementById('sSL').textContent:'')+' TP1:'+(document.getElementById('sTP1')?document.getElementById('sTP1').textContent:'');
+  try{
+    var r=await fetch(BASE+'/api/telegram',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})});
+    var d=await r.json();
+    if(d.ok){if(logEl){logEl.className='bdg bok';logEl.textContent='✅ تم';}}
+    else throw new Error(d.error);
+  }catch(e){if(logEl){logEl.className='bdg berr';logEl.textContent='❌ '+e.message;}}
+}
+async function tgSendTrade(t,rr){
+  var isBuy=t.direction==='BUY';
+  var msg=(isBuy?'🟢':'🔴')+' *إشارة #'+t.id+'*
+'+t.direction+' $'+t.entry+'
+SL:$'+t.sl+' TP1:$'+t.tp1+'
+1:'+rr.toFixed(2)+'
+'+t.reason;
+  try{await fetch(BASE+'/api/telegram',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})});}catch(e){}
+}
+async function tgNotify(txt){
+  try{await fetch(BASE+'/api/telegram',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:txt})});}catch(e){}
+}
+
+// ══ LOG ══
+function log(msg){
+  var el=document.getElementById('sysLog');if(!el)return;
+  var d=document.createElement('div');
+  d.innerHTML='<span>['+new Date().toUTCString().split(' ')[4]+']</span> '+msg;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+  if(el.children.length>80)el.removeChild(el.firstChild);
+}
+
+// ══ INIT ══
+window.addEventListener('resize',function(){drawChart(curTF);});
+if('speechSynthesis' in window){
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};
+}
+loadTrades();
+updateSessions();
+setInterval(updateSessions,1000);
+setInterval(renderCalendar,60000);
+log('[BOOT] Gold AI Bot — Bloomberg Navy');
+renderCalendar();
+fetchPrice();
+setInterval(fetchPrice,10000);
+fetchCandles('M15');
+setTimeout(function(){fetchCandles('M5');},2000);
+setTimeout(function(){fetchCandles('M30');},4000);
+setTimeout(function(){fetchCandles('H1');},6000);
+setInterval(function(){fetchCandles(curTF);renderCalendar();},60000);
+renderTrades();
+updateStats();
+
 </script>
 </body>
 </html>
