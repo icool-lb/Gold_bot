@@ -1168,12 +1168,25 @@ async function fetchCandles(tf){
     if(!d.candles?.length){log(`[CANDLES] ✗ ${d.error||'empty'}`);return;}
     // فرز وتنظيف البيانات عند الاستلام
     const raw = d.candles;
+    // احتفظ فقط بآخر 48 ساعة لتجنب الشمعات القديمة المشوهة
+    const cutoff = Date.now() - (48 * 60 * 60 * 1000);
     const cleanCandles = raw
       .filter(c => c.o > 0 && c.cl > 0 && c.h > 0 && c.l > 0)
+      .filter(c => !c.t || c.t >= cutoff)
       .sort((a,b) => (a.t||0)-(b.t||0));
-    cdata[tf]=cleanCandles;ldone[tf]=true;
+    // إزالة outliers: احذف أي شمعة تبعد أكثر من 2% عن الـ median
+    if(cleanCandles.length > 5) {
+      const mids = cleanCandles.map(x=>(x.h+x.l)/2).sort((a,b)=>a-b);
+      const med  = mids[Math.floor(mids.length/2)];
+      const maxD = med * 0.02;
+      const filtered = cleanCandles.filter(x=>Math.abs((x.h+x.l)/2-med)<=maxD);
+      cdata[tf] = filtered.length >= 5 ? filtered : cleanCandles;
+    } else {
+      cdata[tf] = cleanCandles;
+    }
+    ldone[tf]=true;
     document.getElementById('cload').style.display='none';
-    log(`[CANDLES] ✓ ${tf}: ${cleanCandles.length}/${raw.length} (${d.source})`);
+    log(`[CANDLES] ✓ ${tf}: ${cdata[tf].length}/${raw.length} (${d.source})`);
     detectOBandFVG(cdata[tf]);
     if(tf===curTF)drawChart(tf);
     updateSpark(tf);
@@ -1182,8 +1195,42 @@ async function fetchCandles(tf){
 }
 
 function updateLastCandle(p){
-  Object.keys(cdata).forEach(tf=>{if(cdata[tf].length>0){const l=cdata[tf][cdata[tf].length-1];l.cl=p;l.h=Math.max(l.h,p);l.l=Math.min(l.l,p);}});
-  if(ldone[curTF])drawChart(curTF);
+  const now = Date.now();
+  // مدة كل timeframe بالمللي ثانية
+  const tfMs = {M5:5*60000, M15:15*60000, M30:30*60000, H1:60*60000, H4:240*60000};
+
+  Object.keys(cdata).forEach(function(tf){
+    const data = cdata[tf];
+    if(!data || !data.length) return;
+
+    const last    = data[data.length-1];
+    const period  = tfMs[tf] || 15*60000;
+    // وقت انتهاء الشمعة الحالية
+    const candleEnd = (last.t || 0) + period;
+
+    if(now >= candleEnd) {
+      // ── شمعة جديدة: أنشئ شمعة جديدة بدلاً من تعديل القديمة ──
+      const newCandle = {
+        t:  Math.floor(now / period) * period,
+        o:  p,   // Open = السعر الحالي
+        h:  p,
+        l:  p,
+        cl: p,
+        v:  1
+      };
+      data.push(newCandle);
+      // احتفظ بآخر 80 شمعة فقط
+      if(data.length > 80) data.shift();
+      log('[CANDLE] New ' + tf + ' candle opened @ $' + p.toFixed(2));
+    } else {
+      // ── نفس الشمعة: عدّل فقط High/Low/Close ──
+      last.cl = p;
+      last.h  = Math.max(last.h, p);
+      last.l  = Math.min(last.l, p);
+    }
+  });
+
+  if(ldone[curTF]) drawChart(curTF);
 }
 
 // ═══════════════════════════════════════════════
@@ -1252,12 +1299,20 @@ function drawChart(tf){
   for(let i=0;i<8;i++){const y=H*i/8;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
   for(let i=0;i<10;i++){const x=W*i/10;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
 
-  const allP=data.flatMap(c=>[c.h,c.l]);
-  const minP=Math.min(...allP),maxP=Math.max(...allP),pad=(maxP-minP)*.12;
-  const pMin=minP-pad,pMax=maxP+pad;
-  const toY=p=>H-((p-pMin)/(pMax-pMin))*(H*.88)-H*.06;
+  // ── Y Scale بالـ Percentile — يتجاهل الـ outliers ──
+  const allPrices = data.flatMap(c=>[c.h,c.l]).sort((a,b)=>a-b);
+  const p5  = allPrices[Math.floor(allPrices.length*0.05)];  // 5th percentile
+  const p95 = allPrices[Math.floor(allPrices.length*0.95)];  // 95th percentile
+  const rng = p95 - p5;
+  const pad = rng * 0.15;
+  const pMin = p5 - pad;
+  const pMax = p95 + pad;
+  const toY = p => {
+    const clamped = Math.max(pMin - pad*2, Math.min(pMax + pad*2, p));
+    return H - ((clamped - pMin) / (pMax - pMin)) * (H * 0.88) - H * 0.06;
+  };
   const mL=14,mR=70,chartW=W-mL-mR;
-  const cW=Math.max(4,chartW/data.length-1.5); // شمعات أعرض
+  const cW=Math.max(4,chartW/data.length-1.5);
 
   // ══ رسم OB SELL zones (أحمر) ══
   // OB Sell — شفاف جداً لا يغطي الشمعات
