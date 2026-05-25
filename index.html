@@ -1166,24 +1166,13 @@ async function fetchCandles(tf){
     const r=await fetch(`${BASE}/api/price?type=candles&tf=${tf}&limit=60`);
     const d=await r.json();
     if(!d.candles?.length){log(`[CANDLES] ✗ ${d.error||'empty'}`);return;}
-    // فرز وتنظيف البيانات عند الاستلام
+    // فرز وتنظيف بسيط فقط
     const raw = d.candles;
-    // احتفظ فقط بآخر 48 ساعة لتجنب الشمعات القديمة المشوهة
-    const cutoff = Date.now() - (48 * 60 * 60 * 1000);
     const cleanCandles = raw
-      .filter(c => c.o > 0 && c.cl > 0 && c.h > 0 && c.l > 0)
-      .filter(c => !c.t || c.t >= cutoff)
+      .filter(c => c.o > 0 && c.cl > 0 && c.h > 0 && c.l > 0
+               && c.h >= c.l && !isNaN(c.o) && !isNaN(c.cl))
       .sort((a,b) => (a.t||0)-(b.t||0));
-    // إزالة outliers: احذف أي شمعة تبعد أكثر من 2% عن الـ median
-    if(cleanCandles.length > 5) {
-      const mids = cleanCandles.map(x=>(x.h+x.l)/2).sort((a,b)=>a-b);
-      const med  = mids[Math.floor(mids.length/2)];
-      const maxD = med * 0.02;
-      const filtered = cleanCandles.filter(x=>Math.abs((x.h+x.l)/2-med)<=maxD);
-      cdata[tf] = filtered.length >= 5 ? filtered : cleanCandles;
-    } else {
-      cdata[tf] = cleanCandles;
-    }
+    cdata[tf] = cleanCandles;
     ldone[tf]=true;
     document.getElementById('cload').style.display='none';
     log(`[CANDLES] ✓ ${tf}: ${cdata[tf].length}/${raw.length} (${d.source})`);
@@ -1299,18 +1288,15 @@ function drawChart(tf){
   for(let i=0;i<8;i++){const y=H*i/8;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
   for(let i=0;i<10;i++){const x=W*i/10;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
 
-  // ── Y Scale بالـ Percentile — يتجاهل الـ outliers ──
+  // ── Y Scale بالـ Percentile ──
   const allPrices = data.flatMap(c=>[c.h,c.l]).sort((a,b)=>a-b);
-  const p5  = allPrices[Math.floor(allPrices.length*0.05)];  // 5th percentile
-  const p95 = allPrices[Math.floor(allPrices.length*0.95)];  // 95th percentile
-  const rng = p95 - p5;
-  const pad = rng * 0.15;
+  const p5  = allPrices[Math.floor(allPrices.length*0.05)];
+  const p95 = allPrices[Math.floor(allPrices.length*0.95)];
+  const rng = (p95 - p5) || 1;
+  const pad = rng * 0.20;
   const pMin = p5 - pad;
   const pMax = p95 + pad;
-  const toY = p => {
-    const clamped = Math.max(pMin - pad*2, Math.min(pMax + pad*2, p));
-    return H - ((clamped - pMin) / (pMax - pMin)) * (H * 0.88) - H * 0.06;
-  };
+  const toY = p => H - ((p - pMin) / (pMax - pMin)) * (H * 0.88) - H * 0.06;
   const mL=14,mR=70,chartW=W-mL-mR;
   const cW=Math.max(4,chartW/data.length-1.5);
 
