@@ -66,7 +66,13 @@ export default async function handler(req, res) {
         l:  parseFloat((q.low?.[i]   || 0).toFixed(3)),
         cl: parseFloat((q.close?.[i] || 0).toFixed(3)),
         v:  parseInt(q.volume?.[i]   || 0)
-      })).filter(c => c.o > 0 && c.cl > 0);
+      })).filter(c => 
+        c.o > 0 && c.cl > 0 && c.h > 0 && c.l > 0 &&
+        c.h >= c.l && c.h >= c.o && c.h >= c.cl &&
+        c.l <= c.o && c.l <= c.cl &&
+        !isNaN(c.o) && !isNaN(c.cl)
+      )
+      .sort((a,b) => a.t - b.t); // ترتيب زمني مضمون
 
       return res.status(200).json({ candles, symbol, tf, count: candles.length, source: 'yahoo-finance', ts: Date.now() });
     } catch(e) {
