@@ -66,13 +66,22 @@ export default async function handler(req, res) {
         l:  parseFloat((q.low?.[i]   || 0).toFixed(3)),
         cl: parseFloat((q.close?.[i] || 0).toFixed(3)),
         v:  parseInt(q.volume?.[i]   || 0)
-      })).filter(c => 
+      })).filter(c =>
         c.o > 0 && c.cl > 0 && c.h > 0 && c.l > 0 &&
         c.h >= c.l && c.h >= c.o && c.h >= c.cl &&
         c.l <= c.o && c.l <= c.cl &&
-        !isNaN(c.o) && !isNaN(c.cl)
+        !isNaN(c.o) && !isNaN(c.cl) &&
+        (c.h - c.l) > 0.01 // شمعة لها جسم حقيقي
       )
-      .sort((a,b) => a.t - b.t); // ترتيب زمني مضمون
+      .sort((a,b) => a.t - b.t)
+      .filter((c, i, arr) => {
+        // إزالة outliers بالـ median
+        if(arr.length < 5) return true;
+        const mids = arr.map(x => (x.h + x.l) / 2).sort((a,b)=>a-b);
+        const med  = mids[Math.floor(mids.length / 2)];
+        const maxDev = med * 0.025; // 2.5% حد أقصى
+        return Math.abs((c.h + c.l) / 2 - med) <= maxDev;
+      });
 
       return res.status(200).json({ candles, symbol, tf, count: candles.length, source: 'yahoo-finance', ts: Date.now() });
     } catch(e) {
