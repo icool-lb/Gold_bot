@@ -437,6 +437,36 @@ canvas{display:block}
     <div id="tradeHistory"><div style="text-align:center;color:var(--gdim);font-size:10px;padding:8px">لا توجد نتائج بعد</div></div>
   </div>
 
+
+  <!-- دليل التحليل -->
+  <div>
+    <div class="shdr sg"><span>📖 دليل قراءة المؤشرات</span></div>
+    <div style="background:rgba(9,20,32,.8);border:1px solid rgba(0,180,255,.15);border-radius:6px;padding:10px;font-size:10px;line-height:1.8;color:rgba(200,220,255,.8)">
+      <div style="font-weight:700;color:#00B4FF;margin-bottom:4px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">RSI 14</div>
+      <div>>70 = تشبع شراء ← انتظر هبوط | <30 = تشبع بيع ← فرصة شراء | 40–60 = محايد</div>
+      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">MACD</div>
+      <div>فوق الصفر = زخم صاعد ✅ | تحت الصفر = زخم هابط | تقاطع = إشارة تحول</div>
+      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">EMA 50 / 200</div>
+      <div>السعر فوق EMA = صاعد | EMA50 يقطع EMA200 للأعلى = Golden Cross 🟢 | العكس = Death Cross 🔴</div>
+      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">OB — Order Block</div>
+      <div>OB Sell = منطقة مؤسسية للبيع | OB Buy = منطقة مؤسسية للشراء | ادخل عند الارتداد منها</div>
+      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">FVG — Fair Value Gap</div>
+      <div>فجوة سعرية يملأها السوق لاحقاً | Bull FVG = دعم | Bear FVG = مقاومة</div>
+      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">Premium & Discount</div>
+      <div>>70% = Premium → بيع مفضل | <30% = Discount → شراء مفضل | 50% = EQ محايد</div>
+      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">MSS — BOS / CHoCH</div>
+      <div>BOS = كسر هيكل → استمرار | CHoCH = تغيير طابع → انعكاس محتمل 🔄</div>
+      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">Kill Zones ⭐</div>
+      <div>London 07–10 GMT = أفضل وقت للذهب | NY 12–15 GMT = تقلب عالٍ | تجنب Asia</div>
+      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">VWAP + POC</div>
+      <div>فوق VWAP = مشترون مسيطرون | POC = أكثر سعر تداولاً = دعم/مقاومة قوي</div>
+      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">Fibonacci 🎯</div>
+      <div>61.8% = Golden Ratio ← أقوى مستوى | 38.2% = ارتداد طبيعي | 50% = منتصف النطاق</div>
+      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">Master Score</div>
+      <div>75–100 = A+ ادخل بثقة | 60–74 = A جيد | 45–59 = B انتظر تأكيد | <45 = C تجنب</div>
+    </div>
+  </div>
+
   <!-- TELEGRAM -->
   <div>
     <div class="shdr sb"><span>TELEGRAM BOT</span></div>
@@ -488,25 +518,86 @@ function importTrades(e){const f=e.target.files[0];if(!f)return;const r=new File
 // ═══════════════════════════════════════════════
 // AUDIO
 // ═══════════════════════════════════════════════
+// ══ AUDIO ENGINE — iOS Compatible ══
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch(e) {}
+  }
+  return audioCtx;
+}
+
+// نغمة تنبيه بسيطة (لا تحتاج صوت عربي)
+function playBeep(freq=880, dur=0.15, type='sine') {
+  try {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = freq;
+    osc.type = type;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+
+function playAlert(type) {
+  // BUY: نغمتان صاعدتان
+  if (type === 'buy')   { playBeep(660,.12); setTimeout(()=>playBeep(880,.2),150); }
+  // SELL: نغمتان هابطتان  
+  else if(type==='sell'){ playBeep(880,.12); setTimeout(()=>playBeep(550,.2),150); }
+  // TRADE: ثلاث نغمات
+  else if(type==='trade'){ playBeep(660,.1); setTimeout(()=>playBeep(780,.1),120); setTimeout(()=>playBeep(1000,.2),240); }
+  // NEWS: نغمة طويلة
+  else if(type==='news'){ playBeep(440,.3,'triangle'); }
+  // TP: احتفالي
+  else if(type==='tp')  { playBeep(660,.1); setTimeout(()=>playBeep(880,.1),100); setTimeout(()=>playBeep(1100,.3),200); }
+  else { playBeep(660,.2); }
+}
+
 function speak(text) {
   try {
     audioEnabled = true;
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang='ar-SA'; u.rate=0.9; u.pitch=1; u.volume=1;
-    const voices=window.speechSynthesis.getVoices();
-    const ar=voices.find(v=>v.lang.startsWith('ar'));
-    if(ar) u.voice=ar;
-    window.speechSynthesis.speak(u);
-    document.getElementById('audioStatus').className='bdg bok';
-    document.getElementById('audioStatus').textContent='✅ الصوت يعمل — '+text;
-  } catch(e){
-    document.getElementById('audioStatus').className='bdg berr';
-    document.getElementById('audioStatus').textContent='❌ خطأ في الصوت: '+e.message;
+    // تشغيل النغمة المناسبة
+    if(text.includes('شراء'))       playAlert('buy');
+    else if(text.includes('بيع'))   playAlert('sell');
+    else if(text.includes('صفقة')) playAlert('trade');
+    else if(text.includes('هدف'))  playAlert('tp');
+    else if(text.includes('خبر'))  playAlert('news');
+    else                             playBeep(660,.15);
+
+    // محاولة TTS (اختياري — لا يسبب خطأ إذا فشل)
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang   = 'ar-SA';
+      u.rate   = 0.9;
+      u.volume = 0.8;
+      const voices = window.speechSynthesis.getVoices();
+      const ar = voices.find(v => v.lang && v.lang.startsWith('ar'));
+      if (ar) u.voice = ar;
+      window.speechSynthesis.speak(u);
+    }
+
+    const el = document.getElementById('audioStatus');
+    if (el) { el.className='bdg bok'; el.textContent='🔊 '+text.substring(0,30); }
+  } catch(e) {
+    const el = document.getElementById('audioStatus');
+    if (el) { el.className='bdg berr'; el.textContent='❌ '+e.message; }
   }
 }
 
 function testSound(type) {
+  // تفعيل AudioContext بضغطة المستخدم (مطلوب iOS)
+  getAudioCtx();
   const map={
     buy:'منطقة شراء — Order Block',
     sell:'منطقة بيع — Order Block',
@@ -514,9 +605,10 @@ function testSound(type) {
     trade:'انتبه صفقة جديدة',
     tp:'تحقق الهدف'
   };
+  playAlert(type);
   speak(map[type]||type);
   showAlert(type==='buy'?'buy':type==='sell'?'sell':type==='trade'?'trade':'news',
-    type==='buy'?'🟢 منطقة شراء':type==='sell'?'🔴 منطقة بيع':type==='news'?'📰 خبر قريب':'🔔 اختبار');
+    type==='buy'?'🟢 منطقة شراء':type==='sell'?'🔴 منطقة بيع':type==='news'?'📰 خبر قريب':'🔔 '+map[type]);
 }
 
 function showAlert(type, text) {
@@ -799,6 +891,12 @@ async function autoSignal(dir, p) {
   const d1bull=p>e200, h1bull=p>e50, isBuy=dir==='BUY';
   if(isBuy&&!d1bull){log(`[SIGNAL] ❌ BUY مرفوض — D1 هابط`);return;}
   if(!isBuy&&d1bull){log(`[SIGNAL] ❌ SELL مرفوض — D1 صاعد`);return;}
+  // منع BUY في Premium Zone (>70%) و SELL في Discount (<30%)
+  const _pd = computePremiumDiscount(data, p);
+  if(_pd) {
+    if(isBuy && _pd.pct > 70){log('[SIGNAL] ❌ BUY مرفوض — Premium Zone '+_pd.pct+'%');return;}
+    if(!isBuy && _pd.pct < 30){log('[SIGNAL] ❌ SELL مرفوض — Discount Zone '+_pd.pct+'%');return;}
+  }
   const atr=calcATR(data);
   const sl=isBuy?p-atr*.5:p+atr*.5;
   // TP عند أقرب OB أو FVG
@@ -1103,8 +1201,9 @@ function drawChart(tf){
   const cW=Math.max(4,chartW/data.length-1.5); // شمعات أعرض
 
   // ══ رسم OB SELL zones (أحمر) ══
-  obSellZones.forEach((ob,i)=>{
-    const alpha=i===obSellZones.length-1?0.20:0.10; // الأحدث أوضح
+  // رسم آخر OB Sell واحد فقط
+  obSellZones.slice(-1).forEach((ob,i)=>{
+    const alpha=0.22;
     ctx.fillStyle=`rgba(255,45,85,${alpha})`;
     ctx.fillRect(mL,toY(ob.top),chartW,toY(ob.bot)-toY(ob.top));
     ctx.strokeStyle=`rgba(255,45,85,${alpha+.2})`;ctx.lineWidth=1;
@@ -1115,8 +1214,9 @@ function drawChart(tf){
   });
 
   // ══ رسم OB BUY zones (أخضر) ══
-  obBuyZones.forEach((ob,i)=>{
-    const alpha=i===obBuyZones.length-1?0.18:0.09;
+  // رسم آخر OB Buy واحد فقط
+  obBuyZones.slice(-1).forEach((ob,i)=>{
+    const alpha=0.20;
     ctx.fillStyle=`rgba(0,255,136,${alpha})`;
     ctx.fillRect(mL,toY(ob.top),chartW,toY(ob.bot)-toY(ob.top));
     ctx.strokeStyle=`rgba(0,255,136,${alpha+.15})`;ctx.lineWidth=1;
@@ -1276,16 +1376,35 @@ function computeIndicators(){
   document.getElementById('sch-ict').textContent=bos?'BUY 🟢':'SELL 🔴';document.getElementById('sch-ict').style.color=bos?'var(--green)':'var(--red)';
   document.getElementById('sch-wyk').textContent=macd>0?'ACCUM 🟢':'DIST 🟠';document.getElementById('sch-wyk').style.color=macd>0?'var(--green)':'var(--orange)';
   document.getElementById('sch-ell').textContent=d1bull?'W3 🟢':'W5 END 🔴';document.getElementById('sch-ell').style.color=d1bull?'var(--green)':'var(--red)';
-  document.getElementById('sch-sd').textContent=inOBSell?'OB SELL 🔴':inOBBuy?'OB BUY 🟢':atH?'SUPPLY 🔴':'DEMAND 🟢';
-  document.getElementById('sch-sd').style.color=inOBSell||atH?'var(--red)':'var(--green)';
+  // Supply/Demand يعتمد على Premium/Discount + OB
+  const _pdSD = computePremiumDiscount(data, price);
+  const sdSignal = inOBSell?'OB SELL 🔴': inOBBuy?'OB BUY 🟢': (_pdSD&&_pdSD.pct>70)?'SUPPLY 🔴': (_pdSD&&_pdSD.pct<30)?'DEMAND 🟢': atH?'SUPPLY 🔴':'DEMAND 🟢';
+  const sdBear = inOBSell || (!!_pdSD&&_pdSD.pct>70) || atH;
+  document.getElementById('sch-sd').textContent=sdSignal;
+  document.getElementById('sch-sd').style.color=sdBear?'var(--red)':'var(--green)';
   document.getElementById('sch-pa').textContent=bearC?'BEAR 🔴':'BULL 🟢';document.getElementById('sch-pa').style.color=bearC?'var(--red)':'var(--green)';
   const score=[bos,macd>0,d1bull,h1bull,!atH,!bearC,price>vwap,aligned,inOBBuy&&!inOBSell].filter(Boolean).length;
   const conf=Math.min(90,Math.round(40+score*7));
   const dir=score>=6?'BUY':score<=2?'SELL':'WAIT';
+  // حساب RR للتحقق قبل الإشارة
+  const _atr=calcATR(data);
+  const _sl=dir==='BUY'?price-_atr*.5:price+_atr*.5;
+  const _rH=obSellZones.length?obSellZones[obSellZones.length-1].bot:price*1.005;
+  const _rL=obBuyZones.length?obBuyZones[obBuyZones.length-1].top:price*.995;
+  const _tp1=dir==='BUY'?Math.min(_rH,price+_atr*.8):Math.max(_rL,price-_atr*.8);
+  const rr=Math.abs(_tp1-price)/Math.abs(_sl-price);
   document.getElementById('t-rate').textContent=score+'/10';document.getElementById('t-rate').className='tv '+(score>=6?'tg':score<=3?'tr':'tx');
   document.getElementById('sigQual').textContent=score+'/10';
   updateSigCard(dir,conf,atr,atH,score,d1bull,aligned,inOBSell,inOBBuy);
   updateLevels(price);
+  // ── Auto Signal من الإشارة المحسوبة ──
+  if(isMarketOpen() && dir !== 'WAIT' && conf >= 60 && aligned && rr >= 1.5) {
+    const now = Date.now();
+    if(now - lastAlertT > 300000) { // كل 5 دقائق فقط
+      lastAlertT = now;
+      autoSignal(dir, price);
+    }
+  }
   // ── Run Advanced Analysis ──
   try {
     const masterResult = runMasterAnalysis(data, price);
@@ -1931,6 +2050,17 @@ function updateAdvancedUI(analysis) {
 // INIT
 // ═══════════════════════════════════════════════
 window.addEventListener('resize',()=>drawChart(curTF));
+// iOS Audio: تفعيل عند أول لمس
+document.addEventListener('touchstart', function initAudio() {
+  getAudioCtx();
+  if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+  document.removeEventListener('touchstart', initAudio);
+}, {once:true});
+document.addEventListener('click', function initAudioClick() {
+  getAudioCtx();
+  if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+  document.removeEventListener('click', initAudioClick);
+}, {once:true});
 if('speechSynthesis' in window){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();}
 loadTrades();
 updateSessions();
