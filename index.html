@@ -1211,19 +1211,35 @@ function drawChart(tf){
   }
   // فلتر الفجوات الكبيرة — احذف شمعات بعيدة جداً عن متوسط السعر
   const lastPrice = unique.length > 0 ? unique[unique.length-1].cl : 0;
-  // فلتر الشمعات: OHLC منطقية وقريبة من السعر الحالي
-  const filtered = lastPrice > 0
-    ? unique.filter(c2 => {
-        const pct = Math.abs(c2.cl - lastPrice) / lastPrice;
-        const valid = c2.h >= c2.l && c2.h >= c2.o && c2.h >= c2.cl 
-                   && c2.l <= c2.o && c2.l <= c2.cl
-                   && !isNaN(c2.o) && !isNaN(c2.cl)
-                   && pct < 0.03; // 3% فرق كحد أقصى
-        return valid;
-      })
-    : unique;
-  // إذا فُقدت كل الشمعات بعد الفلتر — ارجع للـ unique
-  const finalData = filtered.length >= 5 ? filtered : unique.slice(-ZOOM);
+  // ── فلتر الشمعات بالـ Median ──
+  // احسب الـ median لإزالة الـ outliers
+  if(unique.length > 0) {
+    const closes = unique.map(c2 => c2.cl).sort((a,b) => a-b);
+    const med = closes[Math.floor(closes.length/2)];
+    // احذف أي شمعة تبعد أكثر من 2% عن الـ median
+    const threshold = med * 0.02;
+    var filtered = unique.filter(c2 => {
+      const valid =
+        c2.h > 0 && c2.l > 0 && c2.o > 0 && c2.cl > 0 &&
+        c2.h >= c2.l && c2.h >= c2.o && c2.h >= c2.cl &&
+        c2.l <= c2.o && c2.l <= c2.cl &&
+        Math.abs(c2.cl - med) <= threshold &&
+        Math.abs(c2.h  - med) <= threshold * 2 &&
+        (c2.h - c2.l) < med * 0.015; // حجم الشمعة أقل من 1.5%
+      return valid;
+    });
+    // إذا فُقد أكثر من 50% من الشمعات — ارجع للـ unique مع فلتر OHLC فقط
+    if(filtered.length < unique.length * 0.5) {
+      filtered = unique.filter(c2 =>
+        c2.h > 0 && c2.l > 0 && c2.o > 0 && c2.cl > 0 &&
+        c2.h >= c2.l && c2.h >= c2.o && c2.h >= c2.cl &&
+        c2.l <= c2.o && c2.l <= c2.cl
+      );
+    }
+  } else {
+    var filtered = unique;
+  }
+  const finalData = filtered.length >= 5 ? filtered : unique;
   const ZOOM = 20;
   const data = finalData.slice(-ZOOM);
   if(!data||data.length<2)return;
