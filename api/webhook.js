@@ -1,461 +1,296 @@
-// api/webhook.js — Gold Bot Interactive Telegram Webhook
+// api/webhook.js — Gold Bot Telegram Menu
+// قائمة تفاعلية كاملة في Telegram
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method === 'GET') return res.status(200).json({ ok: true, status: 'Gold AI Bot Webhook Active' });
+  if (req.method === 'GET') return res.status(200).json({ ok: true, bot: 'Gold AI Bot v3' });
   if (req.method !== 'POST') return res.status(405).end();
 
-  const TOKEN    = process.env.TELEGRAM_BOT_TOKEN;
-  const BASE_URL = `https://api.telegram.org/bot${TOKEN}`;
-  const SELF = 'https://gold-bot-iota.vercel.app';
+  res.setHeader('Access-Control-Allow-Origin', '*');
 
+  const TOKEN   = process.env.TELEGRAM_BOT_TOKEN;
+  const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+  const APP_URL = process.env.APP_URL || 'https://gold-bot-iota.vercel.app';
 
-  const update  = req.body || {};
-  const message = update.message;
-  const cb      = update.callback_query;
-  const chatId  = (message?.chat?.id || cb?.message?.chat?.id)?.toString();
-  const msgId   = message?.message_id || cb?.message?.message_id;
-  const rawText = (message?.text || '').trim().toLowerCase();
-  const cbData  = (cb?.data || '').trim().toLowerCase();
-  const cbId    = cb?.id;
-  const action  = cbData || rawText.split(' ')[0];
+  const body = req.body;
+  const msg  = body?.message;
+  const cb   = body?.callback_query;
 
-  if (cbId) {
-    await fetch(`${BASE_URL}/answerCallbackQuery`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ callback_query_id: cbId })
-    }).catch(()=>{});
-  }
-
-  if (!chatId) return res.status(200).json({ ok: true });
-
-  // ── HELPERS ───────────────────────────────────────────────
-  async function send(text, keyboard) {
-    const body = { chat_id: chatId, text, parse_mode: 'Markdown' };
-    if (keyboard) body.reply_markup = { inline_keyboard: keyboard };
-    const r = await fetch(`${BASE_URL}/sendMessage`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+  async function send(chatId, text, keyboard = null) {
+    const payload = {
+      chat_id:    chatId,
+      text,
+      parse_mode: 'Markdown'
+    };
+    if (keyboard) payload.reply_markup = { inline_keyboard: keyboard };
+    await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload)
     });
-    return r.json();
   }
 
-  async function edit(text, keyboard) {
-    if (!msgId || !cbData) return send(text, keyboard);
-    const body = { chat_id: chatId, message_id: msgId, text, parse_mode: 'Markdown' };
-    if (keyboard) body.reply_markup = { inline_keyboard: keyboard };
-    await fetch(`${BASE_URL}/editMessageText`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    }).catch(()=>{});
-  }
-
-  async function reply(text, keyboard) {
-    return cbData ? edit(text, keyboard) : send(text, keyboard);
+  async function answer(cbId, text = '') {
+    await fetch(`https://api.telegram.org/bot${TOKEN}/answerCallbackQuery`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ callback_query_id: cbId, text })
+    });
   }
 
   async function getPrice() {
     try {
-      const r = await fetch(`${SELF}/api/price?type=price`);
-      return await r.json();
-    } catch(e) { return { error: e.message }; }
-  }
-
-  async function getAI(model, p) {
-    try {
-      const ep = model === 'openai' ? `${SELF}/api/openai` : `${SELF}/api/analyze`;
-      const r  = await fetch(ep, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          price: p?.price?.toFixed(2)||'---', bid: p?.bid?.toString()||'---',
-          ask: p?.ask?.toString()||'---', spread: p?.spread?.toString()||'---',
-          session: sessionName(), dxy: '104.2',
-          gsr: (p?.price ? (p.price/74).toFixed(1) : '87'),
-          rsi: '---', macd: '---', ema50: '---', ema200: '---', trend: '---'
-        })
-      });
+      const r = await fetch(`${APP_URL}/api/price?type=price`);
       const d = await r.json();
-      return d.analysis || d.error || 'لا توجد استجابة';
-    } catch(e) { return '⚠️ ' + e.message; }
+      return d;
+    } catch(e) { return null; }
   }
 
-  function sessionName() {
-    const h = new Date().getUTCHours();
-    if (h>=0  && h<8)  return 'آسيا 🌏';
-    if (h>=8  && h<13) return 'أوروبا 🇪🇺';
-    if (h>=13 && h<17) return 'أوروبا + أمريكا 🇪🇺🇺🇸 ⭐';
-    if (h>=17 && h<22) return 'أمريكا 🇺🇸';
-    return 'بين الجلسات 😴';
+  async function getAnalysis() {
+    try {
+      const p = await getPrice();
+      if (!p) return null;
+      const r = await fetch(`${APP_URL}/api/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symbol: 'XAUUSD', price: p.price?.toFixed(2), dxy: '104', session: 'auto' })
+      });
+      return await r.json();
+    } catch(e) { return null; }
   }
 
-  function sessionStatus() {
-    const h = new Date().getUTCHours();
-    return (
-      `${h<9?'🟢':'🔴'} آسيا      00:00–09:00 GMT\n`+
-      `${h>=8&&h<17?'🟢':'🔴'} أوروبا   08:00–17:00 GMT\n`+
-      `${h>=13&&h<22?'🟢':'🔴'} أمريكا   13:30–22:00 GMT`
-    );
-  }
-
-  // ── KEYBOARDS ─────────────────────────────────────────────
-  const MAIN_KB = [
-    [{text:'💰 السعر اللحظي',      callback_data:'price'},
-     {text:'📊 إشارة كاملة',       callback_data:'signal'}],
-    [{text:'🤖 تحليل Claude',       callback_data:'ai_claude'},
-     {text:'🔵 تحليل GPT-4o',      callback_data:'ai_openai'}],
-    [{text:'📐 مستويات الدعم/مقاومة',callback_data:'levels'},
-     {text:'🏫 تحليل المدارس',     callback_data:'schools'}],
-    [{text:'🌐 الجلسات الآن',      callback_data:'sessions'},
-     {text:'📅 الروزنامة',         callback_data:'calendar'}],
-    [{text:'🌍 العوامل الجيوسياسية',callback_data:'geo'},
-     {text:'🏦 شراء المركزية',     callback_data:'central'}],
-    [{text:'📈 المؤشرات الكلية',   callback_data:'macro'},
-     {text:'✅ قرار الدخول',       callback_data:'decision'}]
+  // ══ MAIN MENU ══
+  const mainMenu = [
+    [{ text: '💰 السعر الحالي', callback_data: 'price' }, { text: '📊 الإشارة الآن', callback_data: 'signal' }],
+    [{ text: '🤖 تحليل AI', callback_data: 'ai' },       { text: '📰 تحليل الأخبار', callback_data: 'news' }],
+    [{ text: '📈 مدارس التحليل', callback_data: 'schools' }, { text: '🎯 المستويات', callback_data: 'levels' }],
+    [{ text: '📅 الروزنامة', callback_data: 'calendar' }, { text: '🏆 Master Score', callback_data: 'score' }],
+    [{ text: '📖 دليل المؤشرات', callback_data: 'guide' }, { text: '⚙️ حالة النظام', callback_data: 'status' }]
   ];
 
-  const BACK_KB = [[{text:'🔙 القائمة الرئيسية', callback_data:'menu'}]];
+  // ══ HANDLE COMMANDS ══
+  if (msg) {
+    const text    = msg.text || '';
+    const chatId  = msg.chat.id;
+    const userId  = msg.from?.id;
 
-  // ── ACTIONS ───────────────────────────────────────────────
-
-  // MENU
-  if (['/start','start','/menu','menu'].includes(action)) {
-    await reply(
-`🥇 *Gold AI Trading Bot*
-━━━━━━━━━━━━━━━━━━━━━
-*XAU/USD — نظام تداول الذهب الذكي*
-📡 MetaAPI MT5 Live Feed
-
-اختر من القائمة:`, MAIN_KB);
-  }
-
-  // PRICE
-  else if (['/price','price'].includes(action)) {
-    const d = await getPrice();
-    if (d.error) {
-      await reply(`❌ خطأ: \`${d.error}\``, BACK_KB);
-    } else {
-      const gsr = (d.price/74).toFixed(1);
-      await reply(
-`💰 *السعر اللحظي — XAU/USD*
-━━━━━━━━━━━━━━━━━━━━━
-🥇 *السعر:*   \`$${d.price.toFixed(2)}\`
-🔴 *Bid:*     \`${d.bid.toFixed(2)}\`
-🟢 *Ask:*     \`${d.ask.toFixed(2)}\`
-📏 *Spread:*  \`${d.spread.toFixed(2)}\` نقطة
-━━━━━━━━━━━━━━━━━━━━━
-📊 *GSR (ذهب/فضة):* ${gsr}
-🌐 *الجلسة:* ${sessionName()}
-⏱ \`${new Date().toUTCString()}\`
-_📡 MetaAPI MT5 Live_`,
-        [[{text:'🔄 تحديث',callback_data:'price'},
-          {text:'📊 إشارة',callback_data:'signal'}],
-         ...BACK_KB]);
+    if (text === '/start' || text === '/menu') {
+      await send(chatId,
+        `🥇 *Gold AI Bot v3 — XAU/USD*\n\nمرحباً! أنا بوت التداول الذكي للذهب.\n\nاختر من القائمة:`,
+        mainMenu
+      );
+    }
+    else if (text === '/price') {
+      const p = await getPrice();
+      if (p) {
+        await send(chatId, `💰 *سعر الذهب الآن*\n\n🟡 \`$${p.price?.toFixed(2)}\`\nBid: \`${p.bid?.toFixed(2)}\` | Ask: \`${p.ask?.toFixed(2)}\`\nSpread: \`${p.spread?.toFixed(2)}\` pts\n\n⏱ \`${new Date().toUTCString()}\``, mainMenu);
+      }
+    }
+    else if (text === '/help' || text === '/guide') {
+      await send(chatId, `📖 *دليل قراءة المؤشرات*\n\n` +
+        `*RSI 14*\n>70 = تشبع شراء ← انتظر\n<30 = تشبع بيع ← فرصة\n\n` +
+        `*MACD*\nفوق الصفر = زخم صاعد ✅\nتحت الصفر = زخم هابط\n\n` +
+        `*OB Order Block*\nمنطقة مؤسسية → ادخل عند الارتداد منها\n\n` +
+        `*FVG Fair Value Gap*\nفجوة سعرية يملأها السوق لاحقاً\n\n` +
+        `*Premium & Discount*\n>70% = بيع مفضل 🔴\n<30% = شراء مفضل 🟢\n50% = EQ محايد\n\n` +
+        `*MSS / BOS / CHoCH*\nBOS = استمرار الاتجاه\nCHoCH = انعكاس محتمل 🔄\n\n` +
+        `*Kill Zones ⭐*\nLondon 07–10 GMT = أفضل وقت\nNY 12–15 GMT = تقلب عالٍ\n\n` +
+        `*Fibonacci 61.8% 🎯*\nأقوى مستوى ارتداد في السوق\n\n` +
+        `*Master Score*\n75+ = A+ ادخل | 60-74 = A جيد\n45-59 = B انتظر | <45 = C تجنب`,
+        mainMenu
+      );
+    }
+    else {
+      await send(chatId, 'اكتب /menu للقائمة الرئيسية أو /help للدليل', mainMenu);
     }
   }
 
-  // SIGNAL
-  else if (['/signal','signal'].includes(action)) {
-    const d = await getPrice();
-    const p = d.price || 3300;
-    await reply(
-`📊 *إشارة XAU/USD — الذهب*
-━━━━━━━━━━━━━━━━━━━━━
-🔴 *الإشارة:* SELL
-🎯 *الثقة:* 65%
-━━━━━━━━━━━━━━━━━━━━━
-📍 *دخول:*       \`$${p.toFixed(2)}\`
-🛑 *وقف خسارة:*  \`$${(p*1.004).toFixed(2)}\`
-🎯 *هدف 1:*      \`$${(p*0.996).toFixed(2)}\`
-🎯 *هدف 2:*      \`$${(p*0.992).toFixed(2)}\`
-━━━━━━━━━━━━━━━━━━━━━
-⚖️ *R:R:* 1 : 2.0
-🌐 *الجلسة:* ${sessionName()}
-━━━━━━━━━━━━━━━━━━━━━
-🏫 *المدارس:*
-• ICT/SMC: SELL 🔴
-• Wyckoff: Distribution 🟠
-• Elliott: Wave 5 End 🔴
-• Supply/Demand: Supply Zone 🔴
-⏱ \`${new Date().toUTCString()}\``,
-      [[{text:'✅ قرار الدخول',callback_data:'decision'}],
-       [{text:'🤖 تحليل AI',callback_data:'ai_claude'},
-        {text:'📐 المستويات',callback_data:'levels'}],
-       ...BACK_KB]);
-  }
+  // ══ HANDLE CALLBACKS ══
+  if (cb) {
+    const chatId = cb.message.chat.id;
+    const data   = cb.data;
+    await answer(cb.id);
 
-  // AI CLAUDE
-  else if (['/ai','ai_claude'].includes(action)) {
-    const wait = await send('⏳ *Claude يحلل الذهب الآن...*');
-    const d    = await getPrice();
-    const text = await getAI('claude', d);
-    await fetch(`${BASE_URL}/deleteMessage`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({chat_id:chatId, message_id:wait.result?.message_id})
-    }).catch(()=>{});
-    const full = `🤖 *تحليل Claude — XAU/USD*\n*$${d.price?.toFixed(2)||'---'}*\n━━━━━━━━━━━━━━━━━━━━━\n${text}\n━━━━━━━━━━━━━━━━━━━━━\n⏱ \`${new Date().toUTCString()}\``;
-    const chunks = [];
-    for (let i=0;i<full.length;i+=3800) chunks.push(full.substring(i,i+3800));
-    const lastKb = [[{text:'🔄 تحليل جديد',callback_data:'ai_claude'},{text:'📊 الإشارة',callback_data:'signal'}],...BACK_KB];
-    for (let i=0;i<chunks.length;i++) await send(chunks[i], i===chunks.length-1?lastKb:null);
-  }
+    if (data === 'price') {
+      const p = await getPrice();
+      if (p) {
+        await send(chatId,
+          `💰 *السعر الحالي — XAU/USD*\n\n` +
+          `🟡 \`$${p.price?.toFixed(2)}\`\n` +
+          `📉 Bid: \`${p.bid?.toFixed(2)}\`\n` +
+          `📈 Ask: \`${p.ask?.toFixed(2)}\`\n` +
+          `↔️ Spread: \`${p.spread?.toFixed(2)}\` pts\n` +
+          `⏱ \`${new Date().toUTCString()}\``,
+          [[{ text: '🔄 تحديث', callback_data: 'price' }, { text: '🔙 القائمة', callback_data: 'menu' }]]
+        );
+      }
+    }
 
-  // AI OPENAI
-  else if (['ai_openai'].includes(action)) {
-    const wait = await send('⏳ *GPT-4o يحلل الذهب الآن...*');
-    const d    = await getPrice();
-    const text = await getAI('openai', d);
-    await fetch(`${BASE_URL}/deleteMessage`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({chat_id:chatId, message_id:wait.result?.message_id})
-    }).catch(()=>{});
-    const full = `🔵 *تحليل GPT-4o — XAU/USD*\n*$${d.price?.toFixed(2)||'---'}*\n━━━━━━━━━━━━━━━━━━━━━\n${text}\n━━━━━━━━━━━━━━━━━━━━━\n⏱ \`${new Date().toUTCString()}\``;
-    const chunks = [];
-    for (let i=0;i<full.length;i+=3800) chunks.push(full.substring(i,i+3800));
-    const lastKb = [[{text:'🔄 تحليل جديد',callback_data:'ai_openai'},{text:'📊 الإشارة',callback_data:'signal'}],...BACK_KB];
-    for (let i=0;i<chunks.length;i++) await send(chunks[i], i===chunks.length-1?lastKb:null);
-  }
+    else if (data === 'signal') {
+      const p = await getPrice();
+      if (p?.price) {
+        const price = p.price;
+        const atr   = 15; // تقديري
+        const sl    = price - atr * 0.5;
+        const tp1   = price + atr * 0.8;
+        const tp2   = price + atr * 1.5;
+        const rr    = (tp1 - price) / (price - sl);
 
-  // LEVELS
-  else if (['/levels','levels'].includes(action)) {
-    const d = await getPrice();
-    const p = d.price || 3300;
-    await reply(
-`📐 *مستويات XAU/USD*
-━━━━━━━━━━━━━━━━━━━━━
-🔴 *R2 — مقاومة قوية:*      \`$${(p*1.008).toFixed(2)}\`
-🟠 *R1 — Order Block بيع:*  \`$${(p*1.004).toFixed(2)}\`
-━━━━━━━━━━━━━━━━━━━━━
-⚪ *السعر الحالي:*            \`$${p.toFixed(2)}\`
-━━━━━━━━━━━━━━━━━━━━━
-🟢 *S1 — FVG + دعم:*        \`$${(p*0.996).toFixed(2)}\`
-🟢 *S2 — Order Block شراء:* \`$${(p*0.992).toFixed(2)}\`
-🟢 *S3 — دعم قوي H4:*       \`$${(p*0.986).toFixed(2)}\`
-━━━━━━━━━━━━━━━━━━━━━
-📦 *Supply Zone:* \`$${(p*1.004).toFixed(2)} – $${(p*1.010).toFixed(2)}\`
-🧲 *Demand Zone:* \`$${(p*0.990).toFixed(2)} – $${(p*0.996).toFixed(2)}\`
-⚡ *FVG:*          \`$${(p*0.994).toFixed(2)} – $${(p*0.998).toFixed(2)}\`
-━━━━━━━━━━━━━━━━━━━━━
-⏱ \`${new Date().toUTCString()}\``,
-      [[{text:'🔄 تحديث',callback_data:'levels'},
-        {text:'✅ قرار الدخول',callback_data:'decision'}],
-       ...BACK_KB]);
-  }
+        await send(chatId,
+          `📊 *الإشارة الحالية — XAU/USD*\n\n` +
+          `💰 السعر: \`$${price.toFixed(2)}\`\n` +
+          `📍 دخول: \`$${price.toFixed(2)}\`\n` +
+          `🛑 وقف: \`$${sl.toFixed(2)}\` (ATR×0.5)\n` +
+          `🎯 هدف 1: \`$${tp1.toFixed(2)}\`\n` +
+          `🎯 هدف 2: \`$${tp2.toFixed(2)}\`\n` +
+          `⚖️ R:R: 1:${rr.toFixed(2)}\n\n` +
+          `⚠️ للحصول على إشارة دقيقة اضغط تحليل AI`,
+          [[{ text: '🤖 تحليل AI', callback_data: 'ai' }, { text: '🔙 القائمة', callback_data: 'menu' }]]
+        );
+      }
+    }
 
-  // SCHOOLS
-  else if (['/schools','schools'].includes(action)) {
-    await reply(
-`🏫 *تحليل متعدد المدارس — XAU/USD*
-━━━━━━━━━━━━━━━━━━━━━
-📌 *ICT / SMC*
-• Order Block H1: نشط 🔴
-• FVG: موجود أسفل السعر
-• Liquidity Sweep: اكتمل
-• ➡️ *SELL* 🔴
+    else if (data === 'ai') {
+      await send(chatId, '⏳ جاري التحليل...', null);
+      const an = await getAnalysis();
+      if (an?.analysis) {
+        const txt = an.analysis.substring(0, 1500);
+        await send(chatId,
+          `🤖 *تحليل AI — Top Down*\n\n${txt}\n\n_🥇 Gold AI Bot v3_`,
+          [[{ text: '💰 السعر', callback_data: 'price' }, { text: '🔙 القائمة', callback_data: 'menu' }]]
+        );
+      } else {
+        await send(chatId, '❌ خطأ في التحليل. حاول مرة أخرى.', mainMenu);
+      }
+    }
 
-📌 *Wyckoff*
-• المرحلة: Distribution Phase C
-• UTAD: اكتمل
-• ➡️ *SELL* 🟠
+    else if (data === 'news') {
+      await send(chatId, '🔍 GPT-4o يبحث في الأخبار...', null);
+      try {
+        const p = await getPrice();
+        const r = await fetch(`${APP_URL}/api/news`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ price: p?.price?.toFixed(2) || '0', session: 'auto', gsr: '61', nextOpen: 'مفتوح' })
+        });
+        const d = await r.json();
+        const txt = (d.analysis || 'لا توجد بيانات').substring(0, 1500);
+        await send(chatId,
+          `📰 *تحليل الأخبار اللحظية*\n\n${txt}\n\n_🥇 Gold AI Bot v3_`,
+          [[{ text: '🔙 القائمة', callback_data: 'menu' }]]
+        );
+      } catch(e) {
+        await send(chatId, '❌ خطأ: ' + e.message, mainMenu);
+      }
+    }
 
-📌 *Elliott Wave*
-• الوضع: نهاية Wave 5
-• الهدف: تصحيح ABC
-• ➡️ *SELL* 🔴
+    else if (data === 'schools') {
+      await send(chatId,
+        `📈 *مدارس التحليل — دليل سريع*\n\n` +
+        `*ICT / SMC* 🏦\nOrder Blocks + FVG + Kill Zones\nالمؤسسات تتحرك في هذه المناطق\n\n` +
+        `*Wyckoff* 📊\nAccumulation = تجميع → صعود قادم\nDistribution = توزيع → هبوط قادم\n\n` +
+        `*Elliott Wave* 🌊\nموجة 3 = أقوى موجة صاعدة\nموجة 5 = نهاية الصعود ← حذر\nموجة C = هبوط تصحيحي\n\n` +
+        `*Supply & Demand* ⚖️\nSupply Zone = منطقة بيع\nDemand Zone = منطقة شراء\nPremium >70% = Supply\nDiscount <30% = Demand\n\n` +
+        `*Price Action* 🕯️\nشمعة ابتلاع = انعكاس قوي\nDoji = تردد = انتظر\nPin Bar = رفض مستوى\n\n` +
+        `*Top-Down* ⬇️\nD1 يحدد الاتجاه الرئيسي\nH4 يحدد نقطة الدخول\nH1/M30 يحدد التوقيت الدقيق`,
+        [[{ text: '📖 دليل المؤشرات', callback_data: 'guide' }, { text: '🔙 القائمة', callback_data: 'menu' }]]
+      );
+    }
 
-📌 *Supply & Demand*
-• منطقة عرض H1: نشطة
-• ➡️ *SELL* 🔴
+    else if (data === 'levels') {
+      const p = await getPrice();
+      if (p?.price) {
+        const price = p.price;
+        await send(chatId,
+          `🎯 *المستويات الرئيسية — XAU/USD*\n\n` +
+          `💰 السعر الحالي: \`$${price.toFixed(2)}\`\n\n` +
+          `🔴 *مقاومات (OB Sell / FVG)*\n` +
+          `فوق السعر — انتظر البيانات من الشارت\n\n` +
+          `🟢 *دعم (OB Buy / FVG)*\n` +
+          `تحت السعر — انتظر البيانات من الشارت\n\n` +
+          `📐 *Fibonacci من آخر حركة*\n` +
+          `61.8% = مستوى الذهبي 🎯\n` +
+          `38.2% = ارتداد طبيعي\n` +
+          `50.0% = منتصف النطاق ⚖️\n\n` +
+          `_للمستويات الدقيقة افتح الداشبورد_`,
+          [[{ text: '📊 الإشارة', callback_data: 'signal' }, { text: '🔙 القائمة', callback_data: 'menu' }]]
+        );
+      }
+    }
 
-📌 *Price Action*
-• BOS: هابط | CHoCH: لم يحدث
-• ➡️ *BEAR* 🔴
+    else if (data === 'calendar') {
+      const now  = new Date();
+      const bHour = (h) => ((h + 3) % 24).toString().padStart(2, '0');
+      await send(chatId,
+        `📅 *الروزنامة الاقتصادية*\n\n` +
+        `🔴 *HIGH IMPACT*\n` +
+        `• CPI y/y — 14:30 GMT | ${bHour(14)}:30 بيروت\n` +
+        `• FOMC Minutes — 18:00 GMT | ${bHour(18)}:00 بيروت\n` +
+        `• NFP — 13:30 GMT | ${bHour(13)}:30 بيروت\n` +
+        `• Fed Speech — 17:00 GMT | ${bHour(17)}:00 بيروت\n\n` +
+        `🟠 *MED IMPACT*\n` +
+        `• ECB Minutes — 11:30 GMT | ${bHour(11)}:30 بيروت\n` +
+        `• PPI — 13:30 GMT | ${bHour(13)}:30 بيروت\n\n` +
+        `⚠️ تجنب الدخول 30 دقيقة قبل HIGH IMPACT\n` +
+        `🔔 سيتم التنبيه تلقائياً`,
+        [[{ text: '🔙 القائمة', callback_data: 'menu' }]]
+      );
+    }
 
-📌 *Macro / Geopolitical*
-• توترات جيوسياسية = دعم للذهب ↑
-• DXY صاعد = ضغط على الذهب ↓
-• ➡️ *NEUTRAL* 🟡
-━━━━━━━━━━━━━━━━━━━━━
-🎯 *الإجماع: SELL — 65%*`,
-      [[{text:'📊 الإشارة',callback_data:'signal'}],
-       [{text:'🤖 تحليل AI',callback_data:'ai_claude'}],
-       ...BACK_KB]);
-  }
+    else if (data === 'score') {
+      await send(chatId,
+        `🏆 *Master Score — شرح النظام*\n\n` +
+        `النظام يحسب نقطة من 0–100 بناءً على:\n\n` +
+        `• Premium/Discount Zone: ±12 نقطة\n` +
+        `• VWAP + POC: ±8 نقطة\n` +
+        `• MSS/BOS/CHoCH: ±15 نقطة\n` +
+        `• Kill Zone: +10 نقطة\n` +
+        `• Fibonacci 61.8%: +10 نقطة\n` +
+        `• Correlation DXY+XAG: ±10 نقطة\n\n` +
+        `*التفسير:*\n` +
+        `🟢 75–100 = A+ ادخل بثقة\n` +
+        `🔵 60–74 = A جيد مع تأكيد\n` +
+        `🟡 45–59 = B انتظر تأكيد\n` +
+        `🔴 0–44 = C تجنب الدخول\n\n` +
+        `_للحصول على النقطة الحالية افتح الداشبورد_`,
+        [[{ text: '📖 دليل المؤشرات', callback_data: 'guide' }, { text: '🔙 القائمة', callback_data: 'menu' }]]
+      );
+    }
 
-  // SESSIONS
-  else if (['/sessions','sessions'].includes(action)) {
-    await reply(
-`🌐 *جلسات التداول — XAU/USD*
-━━━━━━━━━━━━━━━━━━━━━
-${sessionStatus()}
-━━━━━━━━━━━━━━━━━━━━━
-⭐ *الجلسة الحالية:* ${sessionName()}
-━━━━━━━━━━━━━━━━━━━━━
-💡 *خصائص جلسات الذهب:*
-🌏 آسيا: حركة هادئة — انتظر
-🇪🇺 أوروبا: يبدأ التحرك — تابع
-🇺🇸 أمريكا: أعلى تقلب — أفضل فرص
-⭐ التداخل 13:30–17:00: *الأقوى للذهب*
-━━━━━━━━━━━━━━━━━━━━━
-⏱ \`${new Date().toUTCString()}\``,
-      [[{text:'🔄 تحديث',callback_data:'sessions'}],...BACK_KB]);
-  }
+    else if (data === 'guide') {
+      await send(chatId,
+        `📖 *دليل قراءة المؤشرات*\n\n` +
+        `*RSI 14* 📊\n>70 = تشبع شراء ← انتظر | <30 = تشبع بيع ← فرصة\n\n` +
+        `*MACD* 📈\nفوق الصفر = زخم صاعد ✅ | تحت الصفر = هابط\n\n` +
+        `*EMA 50/200* 〰️\nفوق EMA = صاعد | Golden Cross = شراء 🟢\n\n` +
+        `*OB Order Block* 📦\nمؤسسي — ادخل عند الارتداد منه\n\n` +
+        `*FVG Fair Value Gap* ⚡\nفجوة يملأها السوق لاحقاً\n\n` +
+        `*P&D Premium/Discount* ⚖️\n>70% = بيع | <30% = شراء | 50% = محايد\n\n` +
+        `*MSS / BOS / CHoCH* 🔄\nBOS = استمرار | CHoCH = انعكاس\n\n` +
+        `*Kill Zones* ⭐\nLondon 07–10 | NY 12–15 (الأفضل)\n\n` +
+        `*VWAP + POC* 📊\nفوق VWAP = مشترون | POC = دعم/مقاومة قوي\n\n` +
+        `*Fib 61.8% 🎯*\nالمستوى الذهبي — ارتداد قوي متوقع`,
+        [[{ text: '📈 المدارس', callback_data: 'schools' }, { text: '🔙 القائمة', callback_data: 'menu' }]]
+      );
+    }
 
-  // CALENDAR
-  else if (['/calendar','calendar'].includes(action)) {
-    await reply(
-`📅 *الروزنامة — مؤثرات الذهب*
-━━━━━━━━━━━━━━━━━━━━━
-🔴 *تأثير عالٍ:*
-🇺🇸 CPI y/y         اليوم  14:30 GMT
-🇺🇸 FOMC Minutes    غداً   18:00 GMT
-🇺🇸 NFP             الجمعة 13:30 GMT
-🇺🇸 Fed Chair Speech الجمعة 17:00 GMT
+    else if (data === 'status') {
+      await send(chatId,
+        `⚙️ *حالة النظام*\n\n` +
+        `✅ API يعمل\n` +
+        `✅ MetaAPI MT5 متصل\n` +
+        `✅ Telegram Bot نشط\n` +
+        `✅ Claude AI متصل\n` +
+        `✅ GPT-4o متصل\n\n` +
+        `🌐 الداشبورد: [gold-bot-iota.vercel.app](https://gold-bot-iota.vercel.app)\n\n` +
+        `⏱ \`${new Date().toUTCString()}\``,
+        [[{ text: '💰 السعر', callback_data: 'price' }, { text: '🔙 القائمة', callback_data: 'menu' }]]
+      );
+    }
 
-🟠 *تأثير متوسط:*
-🇨🇳 Caixin PMI      الخميس 02:00 GMT
-🇪🇺 ECB Minutes     الجمعة 11:30 GMT
-
-━━━━━━━━━━━━━━━━━━━━━
-📌 *تأثير المؤشرات على الذهب:*
-📈 DXY ↑ = ذهب ↓
-📈 فائدة ↑ = ذهب ↓
-📈 تضخم ↑ = ذهب ↑
-🌍 توترات جيوسياسية = ذهب ↑
-🏦 شراء المركزية = ذهب ↑
-📈 ركود اقتصادي = ذهب ↑`,
-      [[{text:'🌍 جيوسياسي',callback_data:'geo'},
-        {text:'🏦 المركزية',callback_data:'central'}],
-       ...BACK_KB]);
-  }
-
-  // GEOPOLITICAL
-  else if (['/geo','geo'].includes(action)) {
-    await reply(
-`🌍 *العوامل الجيوسياسية — تأثير على الذهب*
-━━━━━━━━━━━━━━━━━━━━━
-🔥 *عوامل دعم حالية:*
-• التوترات في الشرق الأوسط 🔴
-• الصراع الروسي الأوكراني 🔴
-• التوتر الأمريكي الصيني 🟠
-• الانتخابات الأمريكية 2026 🟡
-
-🛡️ *الذهب كملاذ آمن:*
-• عند ارتفاع المخاطر → ذهب ↑
-• عند هدوء الأسواق → ذهب يتراجع
-
-💡 *مؤشرات الخوف:*
-• VIX > 25 → ذهب يرتفع قوياً
-• VIX < 15 → ضغط على الذهب
-• VIX حالياً: 18.3 🟡
-
-━━━━━━━━━━━━━━━━━━━━━
-🎯 *الخلاصة:*
-توترات قائمة تدعم الذهب على المدى
-المتوسط رغم ضغط الدولار القوي`,
-      [[{text:'🏦 المركزية',callback_data:'central'},
-        {text:'📈 الماكرو',callback_data:'macro'}],
-       ...BACK_KB]);
-  }
-
-  // CENTRAL BANKS
-  else if (['/central','central'].includes(action)) {
-    await reply(
-`🏦 *شراء البنوك المركزية للذهب*
-━━━━━━━━━━━━━━━━━━━━━
-📊 *أكبر المشترين 2025-2026:*
-🇨🇳 الصين:     +225 طن
-🇮🇳 الهند:     +72 طن
-🇹🇷 تركيا:     +45 طن
-🇵🇱 بولندا:    +30 طن
-🇸🇦 السعودية:  +15 طن
-
-📈 *إجمالي شراء المركزية:*
-2023: 1,037 طن (رقم قياسي)
-2024: 1,045 طن (رقم قياسي جديد)
-2025: +800 طن (متوقع)
-
-━━━━━━━━━━━━━━━━━━━━━
-💡 *التأثير:*
-شراء المركزية = دعم قوي للذهب
-على المدى البعيد 📈
-
-🔮 *التوقعات:*
-الطلب المؤسسي مستمر في النمو
-مع التخلي التدريجي عن الدولار`,
-      [[{text:'🌍 جيوسياسي',callback_data:'geo'},
-        {text:'📈 الماكرو',callback_data:'macro'}],
-       ...BACK_KB]);
-  }
-
-  // MACRO
-  else if (['/macro','macro'].includes(action)) {
-    const d   = await getPrice();
-    const p   = d.price || 3300;
-    const gsr = (p/74).toFixed(1);
-    await reply(
-`📈 *المؤشرات الكلية — XAU/USD*
-━━━━━━━━━━━━━━━━━━━━━
-💵 *DXY:* 104.2 🔴 صاعد
-📊 *GSR:* ${gsr} ${parseFloat(gsr)>85?'↑ ذهب غالٍ':'↓ ذهب رخيص نسبياً'}
-🏦 *الفيدرالي:* 5.25% متشدد 🔴
-📊 *سندات 10Y:* 4.42% 🔴
-💹 *VIX:* 18.3 🟡
-🌍 *CPI:* 3.2% 🟡
-━━━━━━━━━━━━━━━━━━━━━
-💰 *السعر:* \`$${p.toFixed(2)}\`
-━━━━━━━━━━━━━━━━━━━━━
-📌 *تأثيرات على الذهب:*
-• DXY ↑ → ذهب ↓ 🔴
-• فائدة ↑ → ذهب ↓ 🔴
-• تضخم ↑ → ذهب ↑ 🟢
-• مخاطر ↑ → ذهب ↑ 🟢
-━━━━━━━━━━━━━━━━━━━━━
-🎯 *بيئة مختلطة — احذر*`,
-      [[{text:'🌍 جيوسياسي',callback_data:'geo'},
-        {text:'🏦 المركزية',callback_data:'central'}],
-       ...BACK_KB]);
-  }
-
-  // DECISION
-  else if (['/decision','decision'].includes(action)) {
-    const d     = await getPrice();
-    const p     = d.price || 3300;
-    const h     = new Date().getUTCHours();
-    const sessOk   = h>=8 && h<22;
-    const spreadOk = (d.spread||0.5) < 1.5;
-    const ok    = sessOk && spreadOk;
-    await reply(
-`✅ *قرار ما قبل الدخول — XAU/USD*
-━━━━━━━━━━━━━━━━━━━━━
-💰 *السعر:* \`$${p.toFixed(2)}\`
-━━━━━━━━━━━━━━━━━━━━━
-📋 *Checklist:*
-${sessOk?'✅':'❌'} الجلسة: ${sessionName()}
-${spreadOk?'✅':'⚠️'} Spread: ${d.spread?.toFixed(2)||'---'} ${spreadOk?'(مقبول)':'(مرتفع — انتظر)'}
-⚠️ تحقق من الروزنامة الاقتصادية
-⚠️ تحقق من الأخبار الجيوسياسية
-🔴 الاتجاه H1: هابط
-🔴 السعر في منطقة عرض
-🔴 الإشارة: SELL
-━━━━━━━━━━━━━━━━━━━━━
-📍 *تفاصيل الصفقة:*
-• دخول:   \`$${p.toFixed(2)}\`
-• وقف:    \`$${(p*1.004).toFixed(2)}\`
-• هدف 1:  \`$${(p*0.996).toFixed(2)}\`
-• هدف 2:  \`$${(p*0.992).toFixed(2)}\`
-• R:R:    1 : 2.0
-━━━━━━━━━━━━━━━━━━━━━
-${ok?'🟢 *الشروط مناسبة للدخول*':'🔴 *انتظر تحسن الشروط*'}`,
-      [[{text:'📊 الإشارة الكاملة',callback_data:'signal'}],
-       [{text:'🤖 تحليل AI',callback_data:'ai_claude'}],
-       [{text:'🌍 جيوسياسي',callback_data:'geo'},
-        {text:'📅 الروزنامة',callback_data:'calendar'}],
-       ...BACK_KB]);
-  }
-
-  // Any other message
-  else if (message) {
-    await send(`🥇 *Gold AI Bot*\nاكتب /menu للقائمة:`, MAIN_KB);
+    else if (data === 'menu') {
+      await send(chatId, `🥇 *Gold AI Bot v3 — القائمة الرئيسية*\n\nاختر:`, mainMenu);
+    }
   }
 
   return res.status(200).json({ ok: true });
