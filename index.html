@@ -889,13 +889,24 @@ async function autoSignal(dir, p) {
   let e200=closes[0],k200=2/201;closes.forEach(x=>{e200=x*k200+e200*(1-k200);});
   let e50=closes[0],k50=2/51;closes.forEach(x=>{e50=x*k50+e50*(1-k50);});
   const d1bull=p>e200, h1bull=p>e50, isBuy=dir==='BUY';
-  if(isBuy&&!d1bull){log(`[SIGNAL] ❌ BUY مرفوض — D1 هابط`);return;}
-  if(!isBuy&&d1bull){log(`[SIGNAL] ❌ SELL مرفوض — D1 صاعد`);return;}
+  if(isBuy && !d1bull){
+    log('[SIGNAL] ❌ BUY مرفوض — D1 هابط'); return;
+  }
+  if(!isBuy && d1bull) {
+    // السماح ببيع تصحيحي إذا في Premium + OB Sell
+    const _pdA = computePremiumDiscount(data, p);
+    const inOBS = obSellZones.some(ob=>p>=ob.bot*.999&&p<=ob.top*1.001);
+    const allowSell = _pdA && _pdA.pct >= 70 && (inOBS || !d1bull);
+    if(!allowSell){
+      log('[SIGNAL] ❌ SELL مرفوض — D1 صاعد بدون تأكيد Premium+OB'); return;
+    }
+    log('[SIGNAL] ⚠️ SELL تصحيحي — Premium '+(_pdA?_pdA.pct:'?')+'% + '+( inOBS?'OB Sell':'D1 هابط'));
+  }
   // منع BUY في Premium Zone (>70%) و SELL في Discount (<30%)
   const _pd = computePremiumDiscount(data, p);
   if(_pd) {
-    if(isBuy && _pd.pct > 70){log('[SIGNAL] ❌ BUY مرفوض — Premium Zone '+_pd.pct+'%');return;}
-    if(!isBuy && _pd.pct < 30){log('[SIGNAL] ❌ SELL مرفوض — Discount Zone '+_pd.pct+'%');return;}
+    if(isBuy && _pd.pct >= 75){log('[SIGNAL] ❌ BUY مرفوض — Premium '+_pd.pct+'% ('+_pd.zone+')');return;}
+    if(!isBuy && _pd.pct <= 25){log('[SIGNAL] ❌ SELL مرفوض — Discount '+_pd.pct+'% ('+_pd.zone+')');return;}
   }
   const atr=calcATR(data);
   const sl=isBuy?p-atr*.5:p+atr*.5;
@@ -1155,9 +1166,14 @@ async function fetchCandles(tf){
     const r=await fetch(`${BASE}/api/price?type=candles&tf=${tf}&limit=60`);
     const d=await r.json();
     if(!d.candles?.length){log(`[CANDLES] ✗ ${d.error||'empty'}`);return;}
-    cdata[tf]=d.candles;ldone[tf]=true;
+    // فرز وتنظيف البيانات عند الاستلام
+    const raw = d.candles;
+    const cleanCandles = raw
+      .filter(c => c.o > 0 && c.cl > 0 && c.h > 0 && c.l > 0)
+      .sort((a,b) => (a.t||0)-(b.t||0));
+    cdata[tf]=cleanCandles;ldone[tf]=true;
     document.getElementById('cload').style.display='none';
-    log(`[CANDLES] ✓ ${tf}: ${d.candles.length} (${d.source})`);
+    log(`[CANDLES] ✓ ${tf}: ${cleanCandles.length}/${raw.length} (${d.source})`);
     detectOBandFVG(cdata[tf]);
     if(tf===curTF)drawChart(tf);
     updateSpark(tf);
@@ -1180,9 +1196,36 @@ function drawChart(tf){
   cv.width=wrap.clientWidth; cv.height=wrap.clientHeight;
   const W=cv.width,H=cv.height,allData=cdata[tf];
   if(!allData||allData.length<2)return;
-  // ── ZOOM: عرض فقط آخر 30 شمعة حول السعر الحالي ──
-  const ZOOM = 20; // 20 شمعة فقط — أوضح وأكبر
-  const data = allData.slice(-ZOOM);
+  // ── ZOOM: آخر 20 شمعة مرتبة بالوقت ──
+  // فرز بالـ timestamp أولاً
+  const sorted = allData.slice().sort((a,b) => (a.t||0)-(b.t||0));
+  // إزالة الشمعات المكررة أو ذات الـ timestamp الصفري
+  const unique = [];
+  const seen = new Set();
+  for(const c2 of sorted) {
+    const key = c2.t || (c2.o+'_'+c2.cl);
+    if(!seen.has(key) && c2.o > 0 && c2.cl > 0) {
+      seen.add(key);
+      unique.push(c2);
+    }
+  }
+  // فلتر الفجوات الكبيرة — احذف شمعات بعيدة جداً عن متوسط السعر
+  const lastPrice = unique.length > 0 ? unique[unique.length-1].cl : 0;
+  // فلتر الشمعات: OHLC منطقية وقريبة من السعر الحالي
+  const filtered = lastPrice > 0
+    ? unique.filter(c2 => {
+        const pct = Math.abs(c2.cl - lastPrice) / lastPrice;
+        const valid = c2.h >= c2.l && c2.h >= c2.o && c2.h >= c2.cl 
+                   && c2.l <= c2.o && c2.l <= c2.cl
+                   && !isNaN(c2.o) && !isNaN(c2.cl)
+                   && pct < 0.03; // 3% فرق كحد أقصى
+        return valid;
+      })
+    : unique;
+  // إذا فُقدت كل الشمعات بعد الفلتر — ارجع للـ unique
+  const finalData = filtered.length >= 5 ? filtered : unique.slice(-ZOOM);
+  const ZOOM = 20;
+  const data = finalData.slice(-ZOOM);
   if(!data||data.length<2)return;
 
   // خلفية
@@ -1201,40 +1244,38 @@ function drawChart(tf){
   const cW=Math.max(4,chartW/data.length-1.5); // شمعات أعرض
 
   // ══ رسم OB SELL zones (أحمر) ══
-  // رسم آخر OB Sell واحد فقط
+  // OB Sell — شفاف جداً لا يغطي الشمعات
   obSellZones.slice(-1).forEach((ob,i)=>{
-    const alpha=0.22;
-    ctx.fillStyle=`rgba(255,45,85,${alpha})`;
+    ctx.fillStyle='rgba(255,45,85,0.07)';
     ctx.fillRect(mL,toY(ob.top),chartW,toY(ob.bot)-toY(ob.top));
-    ctx.strokeStyle=`rgba(255,45,85,${alpha+.2})`;ctx.lineWidth=1;
+    ctx.strokeStyle='rgba(255,45,85,0.35)';ctx.lineWidth=1;ctx.setLineDash([4,3]);
     ctx.strokeRect(mL,toY(ob.top),chartW,toY(ob.bot)-toY(ob.top));
-    // Label
-    ctx.fillStyle='rgba(255,45,85,.95)';ctx.font='bold 11px monospace';ctx.textAlign='left';
-    ctx.fillText(`OB SELL ${ob.bot.toFixed(0)}–${ob.top.toFixed(0)}`,mL+4,toY(ob.top)+12);
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,45,85,.9)';ctx.font='bold 10px monospace';ctx.textAlign='left';
+    ctx.fillText('OB SELL '+ob.bot.toFixed(0)+'–'+ob.top.toFixed(0),mL+4,toY(ob.top)-3);
   });
 
   // ══ رسم OB BUY zones (أخضر) ══
-  // رسم آخر OB Buy واحد فقط
+  // OB Buy — شفاف جداً
   obBuyZones.slice(-1).forEach((ob,i)=>{
-    const alpha=0.20;
-    ctx.fillStyle=`rgba(0,255,136,${alpha})`;
+    ctx.fillStyle='rgba(0,255,136,0.07)';
     ctx.fillRect(mL,toY(ob.top),chartW,toY(ob.bot)-toY(ob.top));
-    ctx.strokeStyle=`rgba(0,255,136,${alpha+.15})`;ctx.lineWidth=1;
+    ctx.strokeStyle='rgba(0,255,136,0.35)';ctx.lineWidth=1;ctx.setLineDash([4,3]);
     ctx.strokeRect(mL,toY(ob.top),chartW,toY(ob.bot)-toY(ob.top));
-    ctx.fillStyle='rgba(0,255,136,.95)';ctx.font='bold 11px monospace';ctx.textAlign='left';
-    ctx.fillText(`OB BUY ${ob.bot.toFixed(0)}–${ob.top.toFixed(0)}`,mL+4,toY(ob.bot)-3);
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(0,255,136,.9)';ctx.font='bold 10px monospace';ctx.textAlign='left';
+    ctx.fillText('OB BUY '+ob.bot.toFixed(0)+'–'+ob.top.toFixed(0),mL+4,toY(ob.bot)+12);
   });
 
-  // ══ رسم FVG zones (برتقالي) ══
-  fvgZones.slice(-3).forEach((fvg,i)=>{
-    const alpha=i===fvgZones.slice(-3).length-1?0.15:0.08;
-    ctx.fillStyle=`rgba(255,150,0,${alpha})`;
+  // FVG — شفاف جداً
+  fvgZones.slice(-2).forEach((fvg,i)=>{
+    ctx.fillStyle='rgba(255,160,0,0.06)';
     ctx.fillRect(mL,toY(fvg.top),chartW,toY(fvg.bot)-toY(fvg.top));
-    ctx.strokeStyle=`rgba(255,150,0,${alpha+.15})`;ctx.lineWidth=.7;ctx.setLineDash([3,3]);
+    ctx.strokeStyle='rgba(255,160,0,0.30)';ctx.lineWidth=.7;ctx.setLineDash([3,3]);
     ctx.strokeRect(mL,toY(fvg.top),chartW,toY(fvg.bot)-toY(fvg.top));
     ctx.setLineDash([]);
-    ctx.fillStyle='rgba(255,150,0,.95)';ctx.font='bold 10px monospace';ctx.textAlign='left';
-    ctx.fillText(`⚡FVG`,mL+4,toY(fvg.top)+10);
+    ctx.fillStyle='rgba(255,160,0,.8)';ctx.font='9px monospace';ctx.textAlign='left';
+    ctx.fillText('FVG',mL+4,toY(fvg.top)-2);
   });
 
   // ══ EMA 50 ══
@@ -1385,7 +1426,25 @@ function computeIndicators(){
   document.getElementById('sch-pa').textContent=bearC?'BEAR 🔴':'BULL 🟢';document.getElementById('sch-pa').style.color=bearC?'var(--red)':'var(--green)';
   const score=[bos,macd>0,d1bull,h1bull,!atH,!bearC,price>vwap,aligned,inOBBuy&&!inOBSell].filter(Boolean).length;
   const conf=Math.min(90,Math.round(40+score*7));
-  const dir=score>=6?'BUY':score<=2?'SELL':'WAIT';
+
+  // منطق SELL محسّن — البيع التصحيحي مسموح
+  const _pdCheck = computePremiumDiscount(cdata[curTF], price);
+  const inPremium = _pdCheck && _pdCheck.pct >= 70;
+  const inDiscount = _pdCheck && _pdCheck.pct <= 30;
+
+  // BUY: score عالي + ليس في Premium
+  // SELL: score منخفض أو في Premium + OB Sell + MSS هابط
+  // SELL التصحيحي: Premium + OB Sell + D1 ليس صاعداً بقوة
+  const sellCondition = (
+    score <= 3 || 
+    (inPremium && inOBSell) ||
+    (inPremium && !bos && bearC)
+  );
+  const buyCondition = (
+    score >= 6 && !inPremium
+  );
+
+  const dir = buyCondition ? 'BUY' : sellCondition ? 'SELL' : 'WAIT';
   // حساب RR للتحقق قبل الإشارة
   const _atr=calcATR(data);
   const _sl=dir==='BUY'?price-_atr*.5:price+_atr*.5;
@@ -1706,19 +1765,66 @@ function computeFibonacci(data) {
 // ── 3. Premium & Discount Zones ──────────────────────────
 function computePremiumDiscount(data, currentPrice) {
   if (!data || data.length < 10) return null;
-  const recent = data.slice(-50);
-  const high   = Math.max(...recent.map(c => c.h));
-  const low    = Math.min(...recent.map(c => c.l));
-  const range  = high - low;
-  const mid    = low + range * 0.5;
-  const eq     = low + range * 0.5;   // Equilibrium (50%)
-  const pct    = range > 0 ? ((currentPrice - low) / range) * 100 : 50;
+
+  // ── النطاق الصحيح للـ P&D ──
+  // نستخدم أكبر نطاق متاح: H4 إذا موجود، وإلا كل البيانات
+  // المهم: نطاق كافٍ يمثل السوق الحقيقي (ليس 12 ساعة فقط)
+  const h4Data  = cdata['H4'];
+  const h1Data  = cdata['H1'];
+
+  let rangeData = data; // افتراضي
+
+  if (h4Data && h4Data.length >= 10) {
+    // H4: آخر 50 شمعة = ~200 ساعة = ~8 أيام ← أفضل للـ P&D
+    rangeData = h4Data.slice(-50);
+  } else if (h1Data && h1Data.length >= 20) {
+    // H1: آخر 100 شمعة = ~4 أيام
+    rangeData = h1Data.slice(-100);
+  } else {
+    // آخر 200 شمعة من أي timeframe
+    rangeData = data.slice(-200);
+  }
+
+  const high  = Math.max(...rangeData.map(c => c.h));
+  const low   = Math.min(...rangeData.map(c => c.l));
+  const range = high - low;
+
+  if (range < 1) return null; // بيانات غير كافية
+
+  const eq  = low + range * 0.5; // Equilibrium 50%
+  const pct = ((currentPrice - low) / range) * 100;
+  const pctClamped = Math.max(0, Math.min(100, pct));
+
+  // مناطق أكثر دقة
+  const zone =
+    pctClamped >= 75 ? 'PREMIUM 🔴' :
+    pctClamped >= 60 ? 'UPPER PREMIUM ⚠️' :
+    pctClamped <= 25 ? 'DISCOUNT 🟢' :
+    pctClamped <= 40 ? 'LOWER DISCOUNT 🔵' :
+    'EQUILIBRIUM ⚖️';
+
+  const zoneColor =
+    pctClamped >= 75 ? 'var(--red)' :
+    pctClamped >= 60 ? 'var(--orange)' :
+    pctClamped <= 25 ? 'var(--green)' :
+    pctClamped <= 40 ? '#00B4FF' :
+    'var(--yellow)';
+
+  const tfUsed = (h4Data && h4Data.length >= 10) ? 'H4×50' :
+                 (h1Data && h1Data.length >= 20) ? 'H1×100' : 'Auto';
+
   return {
-    high, low, mid, eq, range, pct: parseFloat(pct.toFixed(1)),
-    isPremium:  currentPrice > eq,
-    isDiscount: currentPrice < eq,
-    zone: pct > 70 ? 'PREMIUM 🔴' : pct < 30 ? 'DISCOUNT 🟢' : 'EQUILIBRIUM 🟡',
-    zoneColor: pct > 70 ? 'var(--red)' : pct < 30 ? 'var(--green)' : 'var(--yellow)'
+    high, low, eq, range,
+    pct:        parseFloat(pctClamped.toFixed(1)),
+    isPremium:  pctClamped >= 60,
+    isDiscount: pctClamped <= 40,
+    zone, zoneColor, tfUsed,
+    // توصية واضحة
+    recommend: pctClamped >= 75 ? 'تجنب الشراء — بيع مفضل 🔴' :
+               pctClamped >= 60 ? 'حذر من الشراء ⚠️' :
+               pctClamped <= 25 ? 'شراء مفضل — ابتعد عن البيع 🟢' :
+               pctClamped <= 40 ? 'منطقة شراء محتملة 🔵' :
+               'منطقة محايدة — انتظر إشارة ⚖️'
   };
 }
 
@@ -1983,12 +2089,13 @@ function updateAdvancedUI(analysis) {
         <div style="height:8px;background:linear-gradient(90deg,var(--green),var(--yellow),var(--red));border-radius:4px;position:relative">
           <div style="position:absolute;top:-3px;left:${Math.min(96,Math.max(2,pd.pct))}%;width:3px;height:14px;background:#fff;border-radius:2px;transform:translateX(-50%)"></div>
         </div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;text-align:center;margin-top:4px;color:${pd.zoneColor};font-weight:700">${pd.zone} — ${pd.pct}%</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center;margin-top:4px;color:${pd.zoneColor};font-weight:700">${pd.zone} — ${pd.pct}%</div>
       </div>
       <div class="row"><span class="lbl">أعلى النطاق</span><span class="val" style="color:var(--red)">$${pd.high.toFixed(2)}</span></div>
-      <div class="row"><span class="lbl">Equilibrium</span><span class="val" style="color:var(--blue)">$${pd.eq.toFixed(2)}</span></div>
+      <div class="row"><span class="lbl">Equilibrium 50%</span><span class="val" style="color:var(--blue)">$${pd.eq.toFixed(2)}</span></div>
       <div class="row"><span class="lbl">أدنى النطاق</span><span class="val" style="color:var(--green)">$${pd.low.toFixed(2)}</span></div>
-      <div class="row"><span class="lbl">التوصية</span><span class="val" style="color:${pd.zoneColor}">${pd.isDiscount?'شراء مفضل ↑':pd.isPremium?'بيع مفضل ↓':'محايد ↔'}</span></div>`;
+      <div class="row"><span class="lbl">النطاق المرجعي</span><span class="val" style="color:var(--gdim)">${pd.tfUsed}</span></div>
+      <div class="row" style="border-top:1px solid var(--bdr);padding-top:4px;margin-top:3px"><span class="lbl">التوصية</span><span class="val" style="color:${pd.zoneColor};font-size:10px">${pd.recommend}</span></div>`;
   }
 
   // MSS Panel
