@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     price, bid, ask, spread, session, dxy, gsr, trend, symbol,
     rsi, macd, ema50, ema200, atr,
     highH1, lowH1, highH4, lowH4, highD1, lowD1,
-    lesson_mode, prompt_override
+    lesson_mode, prompt_override, lesson_prompt, max_tokens: reqMaxTokens
   } = req.body;
 
   const sym    = symbol || 'XAUUSD';
@@ -17,7 +17,8 @@ export default async function handler(req, res) {
   const name   = isGold ? 'الذهب XAU/USD' : 'الفضة XAG/USD';
 
   // ── وضع الدرس للـ AI Learning ────────────────────────────
-  if (lesson_mode && prompt_override) {
+  const lessonText = lesson_prompt || prompt_override;
+  if (lesson_mode && lessonText) {
     try {
       const r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -29,7 +30,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 200,
-          messages: [{ role: 'user', content: prompt_override }]
+          messages: [{ role: 'user', content: lessonText }]
         })
       });
       const d = await r.json();
