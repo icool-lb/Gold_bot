@@ -2684,7 +2684,7 @@ document.addEventListener('click', function initAudioClick() {
 if('speechSynthesis' in window){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();}
 // ══ Service Worker — تنبيهات في الخلفية ══
 if('serviceWorker' in navigator){
-  var swCode='self.addEventListener('message',function(e){if(e.data&&e.data.type==='NOTIFY'){self.registration.showNotification(e.data.title||'Gold Bot',{body:e.data.body||'',icon:'/favicon.ico',tag:e.data.tag||'gold',requireInteraction:!!e.data.important});}});';
+  var swCode="self.addEventListener('message',function(e){if(e.data&&e.data.type==='NOTIFY'){self.registration.showNotification(e.data.title||'Gold Bot',{body:e.data.body||'',icon:'/favicon.ico',tag:e.data.tag||'gold',requireInteraction:!!e.data.important});}});";
   var blob=new Blob([swCode],{type:'application/javascript'});
   var swUrl=URL.createObjectURL(blob);
   navigator.serviceWorker.register(swUrl).then(function(reg){
