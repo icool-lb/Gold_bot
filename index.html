@@ -1419,38 +1419,59 @@ function renderTrades(){
   const open=trades.filter(t=>t.status==='OPEN'||t.status==='TP1').reverse();
   const hist=trades.filter(t=>['TP2','SL'].includes(t.status)).reverse().slice(0,8);
   const fmt=v=>'$'+parseFloat(v).toFixed(2);
-  document.getElementById('openTrades').innerHTML=!open.length
-    ?'<div style="text-align:center;color:var(--gdim);font-size:10px;padding:8px">لا توجد صفقات مفتوحة</div>'
-    :open.map(t=>{
-      const isBuy=t.direction==='BUY',elapsed=Math.round((Date.now()-t.openTime)/60000);
-      const prog=t.tp1Hit?100:price&&t.entry?Math.min(100,Math.max(0,isBuy?(price-t.entry)/(t.tp1-t.entry)*100:(t.entry-price)/(t.entry-t.tp1)*100)):0;
-      return `<div class="tcard ${t.status==='TP1'?'partial':'open'}">
-        <div class="thdr"><div class="tid">#${t.id}</div><div class="tdir ${isBuy?'bull':'bear'}">${isBuy?'🟢':'🔴'} ${t.direction}</div><div class="tst ${t.status==='TP1'?'ts-p':'ts-o'}">${t.status==='TP1'?'TP1 ✓':'OPEN'}</div></div>
-        <div class="tlevs">
-          <div class="tl"><div class="tln">دخول</div><div class="tlv">${fmt(t.entry)}</div></div>
-          <div class="tl"><div class="tln">وقف</div><div class="tlv" style="color:var(--red)">${fmt(t.sl)}</div></div>
-          <div class="tl"><div class="tln">TP1</div><div class="tlv" style="color:${t.tp1Hit?'var(--green)':'#887755'}">${fmt(t.tp1)}</div></div>
-          <div class="tl"><div class="tln">TP2</div><div class="tlv" style="color:var(--green)">${fmt(t.tp2)}</div></div>
-        </div>
-        <div class="tpbar"><div class="${isBuy?'tpb':'tpb tpbs'}" style="width:${prog.toFixed(0)}%"></div></div>
-        '+(t.aiLesson?'<div class="tai">🧠 '+t.aiLesson+'</div>':'')+'
-        <div class="ttim">ATR:${t.atr} | R:R:${t.rr} | ${t.confidence}% | ${elapsed}د | #${t.checkCount}</div>
-      </div>`;
-    }).join('');
-  document.getElementById('tradeHistory').innerHTML=!hist.length
-    ?'<div style="text-align:center;color:var(--gdim);font-size:10px;padding:8px">لا توجد نتائج بعد</div>'
-    :hist.map(t=>{
-      const isBuy=t.direction==='BUY',isWin=t.result==='WIN'||t.result==='PARTIAL',dur=t.closeTime?Math.round((t.closeTime-t.openTime)/60000):0;
-      return `<div class="tcard ${isWin?'win':'loss'}">
-        <div class="thdr"><div class="tid">#${t.id}</div><div class="tdir ${isBuy?'bull':'bear'}">${isBuy?'🟢':'🔴'} ${t.direction}</div><div class="tst ${t.result==='WIN'?'ts-w':t.result==='PARTIAL'?'ts-p':'ts-l'}">${t.status}</div></div>
-        <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px">
-          <span style="color:#887755">دخول: ${fmt(t.entry)}</span>
-          <span style="color:${isWin?'var(--green)':'var(--red)'}">${isWin?'+':''}${(t.pnl||0).toFixed(2)} pts</span>
-          <span style="color:var(--gdim)">${dur}د</span>
-        </div>
-        '+(t.aiLesson?'<div class="tai">🧠 '+t.aiLesson+'</div>':'')+'
-      </div>`;
-    }).join('');
+  document.getElementById('openTrades').innerHTML = buildTradeCards(open, true);
+  document.getElementById('tradeHistory').innerHTML = buildTradeCards(hist, false);
+}
+
+function buildTradeCards(list, isOpen) {
+  if(!list || !list.length) {
+    return '<div style="text-align:center;color:var(--gdim);font-size:10px;padding:8px">'+(isOpen?'لا توجد صفقات مفتوحة':'لا توجد نتائج بعد')+'</div>';
+  }
+  var html = '';
+  for(var i=0; i<list.length; i++) {
+    var t = list[i];
+    var isBuy = t.direction === 'BUY';
+    var elapsed = Math.round((Date.now() - t.openTime) / 60000);
+    var prog = t.tp1Hit ? 100 : (price && t.entry ? Math.min(100, Math.max(0,
+      isBuy ? (price-t.entry)/(t.tp1-t.entry)*100 : (t.entry-price)/(t.entry-t.tp1)*100
+    )) : 0);
+    var isWin = t.result==='WIN' || t.result==='PARTIAL';
+    var cardClass = isOpen ? (t.status==='TP1'?'partial':'open') : (isWin?'win':'loss');
+    var statusClass = t.result==='WIN'?'ts-w':t.result==='PARTIAL'?'ts-p':t.result==='LOSS'?'ts-l':'ts-o';
+    var statusText = t.status || 'OPEN';
+    var pnlText = '';
+    if(!isOpen && t.pnl !== null && t.pnl !== undefined) {
+      pnlText = (t.pnl>=0?'+':'')+t.pnl.toFixed(2)+' pts';
+    }
+    var lessonHtml = '';
+    if(t.aiLesson && typeof t.aiLesson === 'string' && t.aiLesson.length > 0) {
+      lessonHtml = '<div class="tai">🧠 '+t.aiLesson+'</div>';
+    }
+    html += '<div class="tcard '+cardClass+'">';
+    html += '<div class="thdr">';
+    html += '<div class="tid">#'+t.id+'</div>';
+    html += '<div class="tdir '+(isBuy?'bull':'bear')+'">'+(isBuy?'🟢':'🔴')+' '+t.direction+'</div>';
+    html += '<div class="tst '+statusClass+'">'+statusText+'</div>';
+    html += '</div>';
+    if(isOpen) {
+      html += '<div class="tlevs">';
+      html += '<div class="tl"><div class="tln">دخول</div><div class="tlv">$'+t.entry.toFixed(2)+'</div></div>';
+      html += '<div class="tl"><div class="tln">وقف</div><div class="tlv" style="color:var(--red)">$'+t.sl.toFixed(2)+'</div></div>';
+      html += '<div class="tl"><div class="tln">TP1</div><div class="tlv" style="color:'+(t.tp1Hit?'var(--green)':'#887755')+'">$'+t.tp1.toFixed(2)+'</div></div>';
+      html += '<div class="tl"><div class="tln">TP2</div><div class="tlv" style="color:var(--green)">$'+t.tp2.toFixed(2)+'</div></div>';
+      html += '</div>';
+      html += '<div class="tpbar"><div class="'+(isBuy?'tpb':'tpb tpbs')+'" style="width:'+prog.toFixed(0)+'%"></div></div>';
+      html += '<div style="font-size:8px;color:var(--gdim);font-family:JetBrains Mono,monospace">ATR:'+t.atr+' R:R:'+t.rr+' '+elapsed+'د #'+t.checkCount+'</div>';
+    } else {
+      html += '<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px">';
+      html += '<span style="color:#887755">$'+t.entry.toFixed(2)+'</span>';
+      html += '<span style="color:'+(isWin?'var(--green)':'var(--red)')+'">'+pnlText+'</span>';
+      html += '</div>';
+    }
+    html += lessonHtml;
+    html += '</div>';
+  }
+  return html;
 }
 
 function updateStats(){
@@ -1536,235 +1557,208 @@ function updateLastCandle(p){
 const cv=document.getElementById('mc'),ctx=cv.getContext('2d');
 
 function drawChart(tf){
-  const wrap = document.getElementById('cwrap');
-  cv.width   = wrap.clientWidth;
-  cv.height  = wrap.clientHeight;
-  const W = cv.width, H = cv.height;
-  const allData = cdata[tf];
-  if(!allData || allData.length < 2) return;
+  var wrap = document.getElementById('cwrap');
+  if(!wrap) return;
+  cv.width  = wrap.clientWidth;
+  cv.height = wrap.clientHeight;
+  var W = cv.width, H = cv.height;
+  var allData = cdata[tf];
+  if(!allData || allData.length < 2){ return; }
 
-  // آخر 25 شمعة فقط
-  const data = allData.slice(-25);
+  // آخر 25 شمعة
+  var data = allData.slice(-25);
   if(data.length < 2) return;
 
-  // ── خلفية بيضاء احترافية ──
+  // ── خلفية بيضاء ──
   ctx.fillStyle = '#FFFFFF';
   ctx.fillRect(0, 0, W, H);
 
-  // ── حدود الشارت ──
-  const mL = 8, mR = 72, mT = 8, mB = 20;
-  const cW2 = W - mL - mR;
-  const cH2 = H - mT - mB;
+  // ── حدود ──
+  var mL=8, mR=68, mT=10, mB=18;
+  var cW2 = W - mL - mR;
+  var cH2 = H - mT - mB;
 
   // ── Y Scale بالـ Percentile ──
-  const allP = data.map(function(c2){return [c2.h,c2.l];}).reduce(function(a,b){return a.concat(b);},[]).sort(function(a,b){return a-b;});
-  const p5   = allP[Math.max(0, Math.floor(allP.length*0.05))];
-  const p95  = allP[Math.min(allP.length-1, Math.floor(allP.length*0.95))];
-  const rng  = (p95 - p5) || 10;
-  const pad  = rng * 0.25;
-  const pMin = p5 - pad;
-  const pMax = p95 + pad;
-  const toY  = p => mT + cH2 - ((p - pMin) / (pMax - pMin)) * cH2;
+  var allP = [];
+  for(var i=0;i<data.length;i++){ allP.push(data[i].h); allP.push(data[i].l); }
+  allP.sort(function(a,b){return a-b;});
+  var p5  = allP[Math.max(0, Math.floor(allP.length*0.05))];
+  var p95 = allP[Math.min(allP.length-1, Math.floor(allP.length*0.95))];
+  var rng = (p95-p5) || 10;
+  var pad = rng * 0.25;
+  var pMin = p5 - pad;
+  var pMax = p95 + pad;
+  function toY(p){ return mT + cH2 - ((p-pMin)/(pMax-pMin))*cH2; }
 
   // عرض الشمعة
-  const cW = Math.max(5, cW2 / data.length - 2);
+  var cW = Math.max(6, cW2/data.length - 2);
 
-  // ── Grid خطوط أفقية خفيفة ──
+  // ── Grid ──
   ctx.strokeStyle = '#F0F0F0';
-  ctx.lineWidth   = 0.5;
-  const steps = 8;
-  for(let i = 0; i <= steps; i++){
-    const price_line = pMin + (pMax - pMin) * i / steps;
-    const y = toY(price_line);
-    ctx.beginPath(); ctx.moveTo(mL, y); ctx.lineTo(W - mR, y); ctx.stroke();
-    // سعر على اليمين
-    ctx.fillStyle   = '#999999';
-    ctx.font        = '9px monospace';
-    ctx.textAlign   = 'left';
-    ctx.fillText(price_line.toFixed(1), W - mR + 3, y + 3);
+  ctx.lineWidth = 0.5;
+  for(var g=0;g<=6;g++){
+    var gp = pMin + (pMax-pMin)*g/6;
+    var gy = toY(gp);
+    ctx.beginPath(); ctx.moveTo(mL,gy); ctx.lineTo(W-mR,gy); ctx.stroke();
+    ctx.fillStyle='#AAAAAA'; ctx.font='8px monospace'; ctx.textAlign='left';
+    ctx.fillText(gp.toFixed(1), W-mR+2, gy+3);
   }
 
-  // ── Grid عمودي خفيف ──
-  ctx.strokeStyle = '#F5F5F5';
-  for(let i = 0; i < data.length; i += 4){
-    const x = mL + (i / data.length) * cW2;
-    ctx.beginPath(); ctx.moveTo(x, mT); ctx.lineTo(x, H - mB); ctx.stroke();
+  // ── OB SELL — خط أحمر أعلى فقط (لا fill) ──
+  obSellZones.slice(-1).forEach(function(ob){
+    if(ob.top <= pMin || ob.bot >= pMax) return; // خارج النطاق المرئي
+    var y1 = toY(ob.top);
+    var y2 = toY(ob.bot);
+    var h2 = Math.abs(y2-y1);
+    ctx.fillStyle = 'rgba(220,50,50,0.05)';
+    ctx.fillRect(mL, y1, cW2, h2);
+    ctx.strokeStyle = 'rgba(220,50,50,0.6)';
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([4,3]);
+    ctx.strokeRect(mL+0.5, y1+0.5, cW2-1, h2-1);
+    ctx.setLineDash([]);
+    if(y1 > mT+2) {
+      ctx.fillStyle='rgba(220,50,50,0.9)';
+      ctx.font='bold 9px monospace';
+      ctx.textAlign='left';
+      ctx.fillText('OB↓ '+ob.bot.toFixed(0)+'-'+ob.top.toFixed(0), mL+3, y1-2);
+    }
+  });
+
+  // ── OB BUY — خط أخضر تحت فقط ──
+  obBuyZones.slice(-1).forEach(function(ob){
+    if(ob.top <= pMin || ob.bot >= pMax) return;
+    var y1 = toY(ob.top);
+    var y2 = toY(ob.bot);
+    var h2 = Math.abs(y2-y1);
+    ctx.fillStyle = 'rgba(30,160,80,0.05)';
+    ctx.fillRect(mL, y1, cW2, h2);
+    ctx.strokeStyle = 'rgba(30,160,80,0.6)';
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([4,3]);
+    ctx.strokeRect(mL+0.5, y1+0.5, cW2-1, h2-1);
+    ctx.setLineDash([]);
+    var labelY = Math.min(H-mB-2, y2+11);
+    ctx.fillStyle='rgba(30,160,80,0.9)';
+    ctx.font='bold 9px monospace';
+    ctx.textAlign='left';
+    ctx.fillText('OB↑ '+ob.bot.toFixed(0)+'-'+ob.top.toFixed(0), mL+3, labelY);
+  });
+
+  // ── FVG — خط برتقالي متقطع فقط (بدون fill) ──
+  fvgZones.slice(-1).forEach(function(fvg){
+    if(fvg.top <= pMin || fvg.bot >= pMax) return;
+    var ymid = toY((fvg.top+fvg.bot)/2);
+    ctx.strokeStyle = 'rgba(255,140,0,0.5)';
+    ctx.lineWidth = 0.8;
+    ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(mL,ymid); ctx.lineTo(W-mR,ymid); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,140,0,0.8)';
+    ctx.font='8px monospace';
+    ctx.textAlign='left';
+    ctx.fillText('FVG',mL+3,ymid-1);
+  });
+
+  // ── EMA 50 ──
+  var closes = data.map(function(c2){return c2.cl;});
+  var e50=closes[0], k50=2/51;
+  ctx.beginPath(); ctx.strokeStyle='#2196F3'; ctx.lineWidth=1.2;
+  for(var i=0;i<data.length;i++){
+    e50=closes[i]*k50+e50*(1-k50);
+    var x=mL+(i/data.length)*cW2+cW/2;
+    i===0?ctx.moveTo(x,toY(e50)):ctx.lineTo(x,toY(e50));
   }
-
-  // ── OB SELL — إطار أحمر بدون fill كثيف ──
-  obSellZones.slice(-1).forEach(ob => {
-    const y1 = toY(ob.top), y2 = toY(ob.bot);
-    const h2 = Math.abs(y2 - y1);
-    // fill شفاف جداً
-    ctx.fillStyle = 'rgba(220, 50, 50, 0.06)';
-    ctx.fillRect(mL, y1, cW2, h2);
-    // إطار واضح
-    ctx.strokeStyle = 'rgba(220, 50, 50, 0.7)';
-    ctx.lineWidth   = 1.5;
-    ctx.setLineDash([5, 3]);
-    ctx.strokeRect(mL, y1, cW2, h2);
-    ctx.setLineDash([]);
-    // label أعلى المنطقة — خارج الشارت على اليسار
-    ctx.fillStyle = '#DC3232';
-    ctx.font      = 'bold 9px monospace';
-    ctx.textAlign = 'left';
-    const midY = y1 + h2/2 + 4;
-    ctx.fillText('OB↓ ' + ob.bot.toFixed(1) + '–' + ob.top.toFixed(1), mL + 3, y1 - 3);
-  });
-
-  // ── OB BUY — إطار أخضر ──
-  obBuyZones.slice(-1).forEach(ob => {
-    const y1 = toY(ob.top), y2 = toY(ob.bot);
-    const h2 = Math.abs(y2 - y1);
-    ctx.fillStyle = 'rgba(30, 160, 80, 0.06)';
-    ctx.fillRect(mL, y1, cW2, h2);
-    ctx.strokeStyle = 'rgba(30, 160, 80, 0.7)';
-    ctx.lineWidth   = 1.5;
-    ctx.setLineDash([5, 3]);
-    ctx.strokeRect(mL, y1, cW2, h2);
-    ctx.setLineDash([]);
-    ctx.fillStyle = '#1EA050';
-    ctx.font      = 'bold 9px monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText('OB↑ ' + ob.bot.toFixed(1) + '–' + ob.top.toFixed(1), mL + 3, y2 + 12);
-  });
-
-  // ── FVG — شفاف مع خط متقطع برتقالي ──
-  fvgZones.slice(-2).forEach(fvg => {
-    const y1 = toY(fvg.top), y2 = toY(fvg.bot);
-    const h2 = Math.abs(y2 - y1);
-    ctx.fillStyle = 'rgba(255, 140, 0, 0.05)';
-    ctx.fillRect(mL, y1, cW2, h2);
-    ctx.strokeStyle = 'rgba(255, 140, 0, 0.5)';
-    ctx.lineWidth   = 1;
-    ctx.setLineDash([3, 4]);
-    ctx.strokeRect(mL, y1, cW2, h2);
-    ctx.setLineDash([]);
-    ctx.fillStyle = '#FF8C00';
-    ctx.font      = '8px monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText('FVG', mL + 3, y1 - 2);
-  });
-
-  // ── EMA 50 — أزرق رفيع ──
-  const closes = data.map(c2 => c2.cl);
-  let e50 = closes[0], k50 = 2/51;
-  ctx.beginPath();
-  ctx.strokeStyle = '#2196F3';
-  ctx.lineWidth   = 1.2;
-  data.forEach((c2, i) => {
-    e50 = c2.cl * k50 + e50 * (1 - k50);
-    const x = mL + (i / data.length) * cW2 + cW/2;
-    i === 0 ? ctx.moveTo(x, toY(e50)) : ctx.lineTo(x, toY(e50));
-  });
   ctx.stroke();
 
-  // ── EMA 200 — رمادي متقطع ──
-  let e200 = allData[0].cl, k200 = 2/201;
-  allData.forEach(c2 => { e200 = c2.cl * k200 + e200 * (1 - k200); });
-  const e200y = toY(e200);
-  ctx.beginPath();
-  ctx.strokeStyle = '#AAAAAA';
-  ctx.lineWidth   = 1;
-  ctx.setLineDash([6, 4]);
-  ctx.moveTo(mL, e200y);
-  ctx.lineTo(W - mR, e200y);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  // label EMA200
-  ctx.fillStyle = '#AAAAAA';
-  ctx.font      = '8px monospace';
-  ctx.textAlign = 'right';
-  ctx.fillText('EMA200', W - mR - 3, e200y - 2);
+  // ── EMA 200 ──
+  var e200=allData[0].cl, k200=2/201;
+  for(var i=0;i<allData.length;i++){ e200=allData[i].cl*k200+e200*(1-k200); }
+  var e200y=toY(e200);
+  if(e200y>mT && e200y<H-mB){
+    ctx.beginPath(); ctx.strokeStyle='#AAAAAA'; ctx.lineWidth=0.8;
+    ctx.setLineDash([5,4]);
+    ctx.moveTo(mL,e200y); ctx.lineTo(W-mR,e200y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='#AAAAAA'; ctx.font='7px monospace'; ctx.textAlign='right';
+    ctx.fillText('EMA200',W-mR-3,e200y-1);
+  }
 
   // ── الشمعات ──
-  data.forEach((c2, i) => {
-    const x    = mL + (i / data.length) * cW2;
-    const cx   = x + cW / 2;
-    const bull = c2.cl >= c2.o;
+  for(var i=0;i<data.length;i++){
+    var c2  = data[i];
+    var x   = mL+(i/data.length)*cW2;
+    var cx  = x+cW/2;
+    var bull= c2.cl>=c2.o;
 
-    const bodyTop = toY(Math.max(c2.o, c2.cl));
-    const bodyBot = toY(Math.min(c2.o, c2.cl));
-    const bodyH   = Math.max(1.5, bodyBot - bodyTop);
+    var bTop = toY(Math.max(c2.o,c2.cl));
+    var bBot = toY(Math.min(c2.o,c2.cl));
+    var bH   = Math.max(1.5, bBot-bTop);
 
-    if(bull){
-      // صاعدة: أخضر غامق مملوء
-      ctx.fillStyle   = '#26A69A';
-      ctx.strokeStyle = '#1B7A72';
-    } else {
-      // هابطة: أحمر غامق مملوء
-      ctx.fillStyle   = '#EF5350';
-      ctx.strokeStyle = '#C62828';
-    }
+    // فتيل
+    ctx.strokeStyle = bull?'#1B7A72':'#C62828';
+    ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(cx,toY(c2.h)); ctx.lineTo(cx,toY(c2.l)); ctx.stroke();
 
-    // الفتيل
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(cx, toY(c2.h));
-    ctx.lineTo(cx, toY(c2.l));
-    ctx.stroke();
-
-    // الجسم
-    ctx.fillRect(x + 0.5, bodyTop, Math.max(2, cW - 1), bodyH);
-    ctx.strokeRect(x + 0.5, bodyTop, Math.max(2, cW - 1), bodyH);
-  });
+    // جسم
+    ctx.fillStyle   = bull?'#26A69A':'#EF5350';
+    ctx.strokeStyle = bull?'#1B7A72':'#C62828';
+    ctx.lineWidth=0.5;
+    ctx.fillRect(x+0.5, bTop, Math.max(2,cW-1), bH);
+    ctx.strokeRect(x+0.5, bTop, Math.max(2,cW-1), bH);
+  }
 
   // ── خطوط الصفقات المفتوحة ──
-  trades.filter(t => t.status==='OPEN' || t.status==='TP1').forEach(t => {
-    function drawTradeLine(price_val, color, label){
-      const y = toY(price_val);
-      ctx.strokeStyle = color;
-      ctx.lineWidth   = 1.5;
-      ctx.setLineDash([4, 3]);
-      ctx.beginPath(); ctx.moveTo(mL, y); ctx.lineTo(W - mR, y); ctx.stroke();
+  for(var t=0;t<trades.length;t++){
+    var tr=trades[t];
+    if(tr.status!=='OPEN'&&tr.status!=='TP1') continue;
+    function drawTL(pv,col,lbl){
+      var y=toY(pv);
+      if(y<mT||y>H-mB) return;
+      ctx.strokeStyle=col; ctx.lineWidth=1.5;
+      ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(mL,y); ctx.lineTo(W-mR,y); ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle   = color;
-      ctx.font        = 'bold 9px monospace';
-      ctx.textAlign   = 'right';
-      ctx.fillText(label + ' ' + price_val.toFixed(1), W - mR - 2, y - 2);
+      ctx.fillStyle=col; ctx.font='bold 8px monospace'; ctx.textAlign='right';
+      ctx.fillText(lbl+' '+pv.toFixed(1),W-mR-2,y-1);
     }
-    drawTradeLine(t.entry, '#1565C0', '📍');
-    drawTradeLine(t.sl,    '#C62828', '🛑');
-    drawTradeLine(t.tp1,   '#1B7A72', t.tp1Hit ? '✅' : '🎯');
-  });
+    drawTL(tr.entry,'rgba(30,100,255,0.9)','📍');
+    drawTL(tr.sl,'rgba(220,50,50,0.9)','🛑');
+    drawTL(tr.tp1,'rgba(30,160,80,0.9)',tr.tp1Hit?'✅':'🎯');
+  }
 
   // ── السعر الحالي ──
-  if(price > 0){
-    const cy = toY(price);
-    // خط السعر
-    ctx.strokeStyle = '#FF6F00';
-    ctx.lineWidth   = 1;
-    ctx.setLineDash([3, 3]);
-    ctx.beginPath(); ctx.moveTo(mL, cy); ctx.lineTo(W - mR, cy); ctx.stroke();
-    ctx.setLineDash([]);
-    // مستطيل السعر
-    ctx.fillStyle = '#FF6F00';
-    ctx.fillRect(W - mR + 1, cy - 9, mR - 2, 18);
-    // النص
-    ctx.fillStyle   = '#FFFFFF';
-    ctx.font        = 'bold 9px monospace';
-    ctx.textAlign   = 'left';
-    ctx.fillText(price.toFixed(2), W - mR + 3, cy + 3);
+  if(price>0){
+    var cy=toY(price);
+    if(cy>mT && cy<H-mB){
+      ctx.strokeStyle='#FF6F00'; ctx.lineWidth=1;
+      ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(mL,cy); ctx.lineTo(W-mR,cy); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='#FF6F00';
+      ctx.fillRect(W-mR+1,cy-9,mR-2,18);
+      ctx.fillStyle='#FFFFFF'; ctx.font='bold 9px monospace'; ctx.textAlign='left';
+      ctx.fillText(price.toFixed(2),W-mR+3,cy+3);
+    }
   }
 
   // ── TF label ──
-  ctx.fillStyle = 'rgba(0,0,0,0.15)';
-  ctx.font      = 'bold 14px Orbitron, monospace';
-  ctx.textAlign = 'right';
-  ctx.fillText(tf, W - mR - 5, H - mB - 2);
+  ctx.fillStyle='rgba(0,0,0,0.12)';
+  ctx.font='bold 13px Orbitron,monospace'; ctx.textAlign='right';
+  ctx.fillText(tf,W-mR-5,H-mB-2);
 
-  // ── تحديث labels خارج الشارت ──
-  const lOS  = obSellZones.length ? obSellZones[obSellZones.length-1] : null;
-  const lOB  = obBuyZones.length  ? obBuyZones[obBuyZones.length-1]  : null;
-  const lFVG = fvgZones.length    ? fvgZones[fvgZones.length-1]      : null;
-  const lbl1 = document.getElementById('lbl-ob-sell');
-  const lbl2 = document.getElementById('lbl-ob-buy');
-  const lbl3 = document.getElementById('lbl-fvg');
-  const lbl4 = document.getElementById('lbl-tp');
-  if(lbl1) lbl1.textContent = lOS  ? '📦 OB SELL: ' + lOS.bot.toFixed(2) + '–' + lOS.top.toFixed(2) : '📦 OB SELL: ---';
-  if(lbl2) lbl2.textContent = lOB  ? '🧲 OB BUY: '  + lOB.bot.toFixed(2) + '–' + lOB.top.toFixed(2) : '🧲 OB BUY: ---';
-  if(lbl3) lbl3.textContent = lFVG ? '⚡ FVG: '      + lFVG.bot.toFixed(2) + '–' + lFVG.top.toFixed(2): '⚡ FVG: ---';
-  if(lbl4) lbl4.textContent = tpLevel > 0 ? '🎯 TP: $' + tpLevel.toFixed(2) : '🎯 TP: ---';
+  // ── تحديث labels ──
+  var lOS=obSellZones.length?obSellZones[obSellZones.length-1]:null;
+  var lOB=obBuyZones.length?obBuyZones[obBuyZones.length-1]:null;
+  var lFVG=fvgZones.length?fvgZones[fvgZones.length-1]:null;
+  var e1=document.getElementById('lbl-ob-sell');
+  var e2=document.getElementById('lbl-ob-buy');
+  var e3=document.getElementById('lbl-fvg');
+  var e4=document.getElementById('lbl-tp');
+  if(e1) e1.textContent=lOS?'📦 OB SELL: '+lOS.bot.toFixed(2)+'–'+lOS.top.toFixed(2):'📦 OB SELL: ---';
+  if(e2) e2.textContent=lOB?'🧲 OB BUY: '+lOB.bot.toFixed(2)+'–'+lOB.top.toFixed(2):'🧲 OB BUY: ---';
+  if(e3) e3.textContent=lFVG?'⚡ FVG: '+lFVG.bot.toFixed(2)+'–'+lFVG.top.toFixed(2):'⚡ FVG: ---';
+  if(e4) e4.textContent=tpLevel>0?'🎯 TP: $'+tpLevel.toFixed(2):'🎯 TP: ---';
 }
 
 function updateSpark(tf){
@@ -1827,7 +1821,9 @@ function computeIndicators(){
                        aligned, inOBSell, inOBBuy, data);
   var bos=closes[n-1]>Math.max.apply(null,closes.slice(-10,-1));
   var atH=price>Math.max.apply(null,data.map(function(c){return c.h;}).slice(-20))*.998;
-  var bearC=data[n-1].cl<data[n-1].o;
+  // Price Action: استخدم آخر شمعة مكتملة (قبل الأخيرة)
+  var lastComplete = data.length > 1 ? data[n-2] : data[n-1];
+  var bearC = lastComplete.cl < lastComplete.o;
   var inOBSell=obSellZones.some(ob=>price>=ob.bot*.999&&price<=ob.top*1.001);
   var inOBBuy=obBuyZones.some(ob=>price>=ob.bot*.999&&price<=ob.top*1.001);
   document.getElementById('sch-ict').textContent=bos?'BUY 🟢':'SELL 🔴';document.getElementById('sch-ict').style.color=bos?'var(--green)':'var(--red)';
@@ -1929,11 +1925,14 @@ function updateSigCard(dir,conf,atr,atH,score,d1bull,aligned,inOBSell,inOBBuy){
 }
 
 function updateLevels(p){
-  const data=cdata[curTF];const fmt=v=>'$'+v.toFixed(2);
-  const latestOBSell=obSellZones.length?obSellZones[obSellZones.length-1]:null;
-  const prevOBSell=obSellZones.length>1?obSellZones[obSellZones.length-2]:null;
-  const latestOBBuy=obBuyZones.length?obBuyZones[obBuyZones.length-1]:null;
-  const prevOBBuy=obBuyZones.length>1?obBuyZones[obBuyZones.length-2]:null;
+  var data=cdata[curTF];var fmt=function(v){return '$'+v.toFixed(2);};
+  // OB Sell: فوق السعر فقط
+  var obSellAbove = obSellZones.filter(function(ob){return ob.bot > p;});
+  var obBuyBelow  = obBuyZones.filter(function(ob){return ob.top < p;});
+  var latestOBSell = obSellAbove.length ? obSellAbove[obSellAbove.length-1] : (obSellZones.length?obSellZones[obSellZones.length-1]:null);
+  var prevOBSell   = obSellAbove.length>1 ? obSellAbove[obSellAbove.length-2] : null;
+  var latestOBBuy  = obBuyBelow.length ? obBuyBelow[obBuyBelow.length-1] : (obBuyZones.length?obBuyZones[obBuyZones.length-1]:null);
+  var prevOBBuy    = obBuyBelow.length>1 ? obBuyBelow[obBuyBelow.length-2] : null;
   const bullFVG=fvgZones.find(f=>f.type==='bull');
   const bearFVG=fvgZones.find(f=>f.type==='bear');
   document.getElementById('lR3').textContent=prevOBSell?fmt(prevOBSell.top):data&&data.length?fmt(Math.max(...data.map(c=>c.h).slice(-50))):'---';
@@ -2347,7 +2346,9 @@ function computePremiumDiscount(data, currentPrice) {
   const low   = Math.min(...rangeData.map(c => c.l));
   const range = high - low;
 
-  if (range < 1) return null; // بيانات غير كافية
+  if (range < 5) return null; // بيانات غير كافية
+  // الحد الأدنى للنطاق = 50 نقطة للذهب
+  if (range < 50 && p > 1000) return null;
 
   const eq  = low + range * 0.5; // Equilibrium 50%
   const pct = ((currentPrice - low) / range) * 100;
