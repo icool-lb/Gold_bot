@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🥇 Gold AI Bot v3 — XAU/USD</title>
+<title>🥇 Silver AI Bot v3 — XAG/USD</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cairo:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -156,7 +156,7 @@ canvas{display:block}
 <div class="alert-zone" id="alertZone"></div>
 
 <header class="hdr">
-  <div class="logo" style="font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:#00B4FF;letter-spacing:2px;text-shadow:0 0 15px rgba(0,180,255,.4)">XAU<span style="color:#FFA040">/</span>USD <span style="font-size:10px;color:rgba(0,180,255,.5)">GOLD</span></div>
+  <div class="logo" style="font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:#00B4FF;letter-spacing:2px;text-shadow:0 0 15px rgba(0,180,255,.4)">XAG<span style="color:#FFA040">/</span>USD <span style="font-size:10px;color:rgba(0,180,255,.5)">GOLD</span></div>
   <div style="text-align:center">
     <div class="lp" id="livePrice">---.--</div>
     <div style="font-size:11px" id="priceChg"><span style="color:var(--gdim)">جاري التحميل...</span></div>
@@ -171,7 +171,7 @@ canvas{display:block}
 
 <!-- ══ LEFT ══ -->
 <div class="lp2">
-  <div style="font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:var(--gdim);text-align:center;padding:4px 0;border-bottom:1px solid var(--bdr);margin-bottom:2px">SIGNAL TABLEAU — XAU/USD</div>
+  <div style="font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:var(--gdim);text-align:center;padding:4px 0;border-bottom:1px solid var(--bdr);margin-bottom:2px">SIGNAL TABLEAU — XAG/USD</div>
 
   <div class="shdr sg"><span>TRADING SESSIONS</span></div>
   <div class="sess soff" id="s-as"><div><div style="font-weight:700;font-size:12px">🌏 آسيا</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px">GMT 00:00–09:00 | بيروت 03:00–12:00</div></div><div id="s-as-st" style="font-size:10px">○ CLOSED</div></div>
@@ -198,7 +198,7 @@ canvas{display:block}
     <div class="ic"><div class="in">Bid</div><div class="iv" style="color:var(--red)" id="m-bid">---</div><div class="is" style="color:var(--red)">SELL</div></div>
     <div class="ic"><div class="in">Ask</div><div class="iv" style="color:var(--green)" id="m-ask">---</div><div class="is" style="color:var(--green)">BUY</div></div>
     <div class="ic"><div class="in">Spread</div><div class="iv" style="color:#F5E6C8" id="m-spread">---</div><div class="is" style="color:var(--gdim)">PTS</div></div>
-    <div class="ic"><div class="in">GSR</div><div class="iv" style="color:var(--gold)" id="m-gsr">---</div><div class="is" style="color:var(--gdim)">RATIO</div></div>
+    <div class="ic"><div class="in">XAG</div><div class="iv" style="color:var(--gold)" id="m-gsr">---</div><div class="is" style="color:var(--gdim)">RATIO</div></div>
     <div class="ic"><div class="in">DXY</div><div class="iv" style="color:var(--orange)">104.2</div><div class="is" style="color:var(--red)">BEAR↑</div></div>
     <div class="ic"><div class="in">ATR</div><div class="iv" style="color:var(--blue)" id="m-atr">---</div><div class="is" style="color:var(--blue)">14</div></div>
   </div>
@@ -457,7 +457,7 @@ canvas{display:block}
   <!-- 12. SYSTEM LOG -->
   <div>
     <div class="shdr sg"><span>SYSTEM LOG</span></div>
-    <div class="ailog" id="sysLog"><div><span>[BOOT]</span> Gold AI Bot v3</div></div>
+    <div class="ailog" id="sysLog"><div><span>[BOOT]</span> Silver AI Bot v3</div></div>
   </div>
 
 </div></div>
@@ -480,15 +480,15 @@ let obSellZones = [], obBuyZones = [], fvgZones = [], tpLevel = 0;
 
 // Trades
 let trades = [], tradeN = 0;
-function loadTrades(){try{trades=JSON.parse(localStorage.getItem('gold_trades')||'[]');tradeN=parseInt(localStorage.getItem('gold_tradeN')||'0');}catch(e){trades=[];}}
-function saveTrades(){localStorage.setItem('gold_trades',JSON.stringify(trades));localStorage.setItem('gold_tradeN',tradeN.toString());}
+function loadTrades(){try{trades=JSON.parse(localStorage.getItem('silver_trades')||'[]');tradeN=parseInt(localStorage.getItem('silver_tradeN')||'0');}catch(e){trades=[];}}
+function saveTrades(){localStorage.setItem('silver_trades',JSON.stringify(trades));localStorage.setItem('silver_tradeN',tradeN.toString());}
 
 // ═══════════════════════════════════════════════════════
 // SELF-LEARNING ENGINE — 3 Levels
 // ═══════════════════════════════════════════════════════
 
 // ── الأوزان القابلة للتعديل (المستوى 2) ──
-var SL_WEIGHTS = JSON.parse(localStorage.getItem('gold_sl_weights') || JSON.stringify({
+var SL_WEIGHTS = JSON.parse(localStorage.getItem('silver_sl_weights') || JSON.stringify({
   asian_buy:   1.0,  // وزن BUY في آسيا (يُقلَّل إذا خسر كثيراً)
   premium_sell:1.0,  // وزن SELL في Premium
   discount_buy:1.0,  // وزن BUY في Discount
@@ -498,7 +498,7 @@ var SL_WEIGHTS = JSON.parse(localStorage.getItem('gold_sl_weights') || JSON.stri
   cooldown_len:120   // مدة الـ cooldown بالدقائق (تتغير تلقائياً)
 }));
 
-function saveSLWeights(){ localStorage.setItem('gold_sl_weights', JSON.stringify(SL_WEIGHTS)); }
+function saveSLWeights(){ localStorage.setItem('silver_sl_weights', JSON.stringify(SL_WEIGHTS)); }
 
 // ── المستوى 1: تسجيل سياق الصفقة ──
 function recordTradeContext(trade, data, currentPrice) {
@@ -613,13 +613,13 @@ async function weeklyClaudeReview() {
     var r = await fetch(BASE+'/api/analyze', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({symbol:'XAUUSD',price:'0',lesson_mode:true,lesson_prompt:prompt,max_tokens:200})
+      body:JSON.stringify({symbol:'XAGUSD',price:'0',lesson_mode:true,lesson_prompt:prompt,max_tokens:200})
     });
     var d = await r.json();
     var review = (d.analysis||'').substring(0,500);
     if(review) {
       log('[REVIEW] ✅ '+review.substring(0,80));
-      localStorage.setItem('gold_weekly_review', JSON.stringify({text:review,time:Date.now()}));
+      localStorage.setItem('silver_weekly_review', JSON.stringify({text:review,time:Date.now()}));
       tgNotify('📊 *مراجعة أسبوعية*\n\n'+review+'\n\n_WR: '+wr+'% | '+closed.length+' صفقة_');
       renderSLReport();
     }
@@ -636,7 +636,7 @@ function renderSLReport() {
   var losses   = closed.filter(function(t){return t.result==='LOSS';}).length;
   var wr       = closed.length ? Math.round(wins/closed.length*100) : 0;
   var wrColor  = wr>=60?'var(--green)':wr>=40?'var(--yellow)':'var(--red)';
-  var review   = JSON.parse(localStorage.getItem('gold_weekly_review')||'null');
+  var review   = JSON.parse(localStorage.getItem('silver_weekly_review')||'null');
 
   var html = '<div style="padding:4px 0;border-bottom:1px solid rgba(0,180,255,.1);margin-bottom:6px">'
     +'<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px">'
@@ -698,7 +698,7 @@ function resetTrades(){
   if(!confirm('هل تريد حذف كل الصفقات؟ لا يمكن التراجع')) return;
   trades=[];tradeN=0;saveTrades();renderTrades();updateStats();renderSLReport();addWeeklyReviewButton();
 // مراجعة أسبوعية تلقائية (كل أسبوع)
-var lastReview = JSON.parse(localStorage.getItem('gold_weekly_review')||'null');
+var lastReview = JSON.parse(localStorage.getItem('silver_weekly_review')||'null');
 var reviewAge  = lastReview ? (Date.now()-lastReview.time)/86400000 : 999;
 if(reviewAge > 7){ setTimeout(weeklyClaudeReview, 30000); }
   log('[TRADES] 🗑 Reset — all trades cleared');
@@ -706,7 +706,7 @@ if(reviewAge > 7){ setTimeout(weeklyClaudeReview, 30000); }
 function exportTrades(){const b=new Blob([JSON.stringify({trades,tradeN},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`gold_trades_${new Date().toISOString().slice(0,10)}.json`;a.click();}
 function importTrades(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);trades=d.trades||[];tradeN=d.tradeN||0;saveTrades();renderTrades();updateStats();renderSLReport();addWeeklyReviewButton();
 // مراجعة أسبوعية تلقائية (كل أسبوع)
-var lastReview = JSON.parse(localStorage.getItem('gold_weekly_review')||'null');
+var lastReview = JSON.parse(localStorage.getItem('silver_weekly_review')||'null');
 var reviewAge  = lastReview ? (Date.now()-lastReview.time)/86400000 : 999;
 if(reviewAge > 7){ setTimeout(weeklyClaudeReview, 30000); }log(`[IMPORT] ${trades.length} trades`);}catch(err){alert('ملف غير صالح');}};r.readAsText(f);}
 
@@ -922,14 +922,32 @@ async function fetchPrice() {
     if(d.bid) document.getElementById('m-bid').textContent=d.bid.toFixed(2);
     if(d.ask) document.getElementById('m-ask').textContent=d.ask.toFixed(2);
     if(d.spread) document.getElementById('m-spread').textContent=d.spread.toFixed(2);
-    document.getElementById('m-gsr').textContent=(price/74).toFixed(1);
+    document.getElementById('m-gsr').textContent=price.toFixed(3);
     document.getElementById('lCur').textContent='$'+price.toFixed(2);
     updateLastCandle(price);
+    // تصحيح الـ offset عند كل تحديث سعر
+    Object.keys(cdata).forEach(function(tf2){
+      var arr = cdata[tf2];
+      if(!arr || arr.length < 2) return;
+      var lastC = arr[arr.length-1];
+      // إذا الشمعة الأخيرة تختلف بأكثر من 1 نقطة عن السعر الحالي (بعد updateLastCandle)
+      // هذا يعني الـ offset لم يُطبَّق بعد
+      var diff = price - lastC.cl;
+      if(Math.abs(diff) > 5 && Math.abs(diff) < 100) {
+        for(var i=0;i<arr.length;i++){
+          arr[i].o  = parseFloat((arr[i].o  + diff).toFixed(3));
+          arr[i].h  = parseFloat((arr[i].h  + diff).toFixed(3));
+          arr[i].l  = parseFloat((arr[i].l  + diff).toFixed(3));
+          arr[i].cl = parseFloat((arr[i].cl + diff).toFixed(3));
+        }
+        log('[PRICE] Offset corrected '+tf2+': '+diff.toFixed(2));
+      }
+    });
     updateLevels(price);
     computeIndicators();
     checkAlerts(price);
     monitorTrades(price);
-    log(`[MT5] $${price.toFixed(2)} Bid:${d.bid} Ask:${d.ask}`);
+    log('[MT5] $'+price.toFixed(2)+' Bid:'+d.bid+' Ask:'+d.ask);
   } catch(e){log(`[PRICE] Error: ${e.message}`);}
 }
 
@@ -937,7 +955,7 @@ async function fetchPrice() {
 // ATR
 // ═══════════════════════════════════════════════
 function calcATR(data,n=14){
-  if(!data||data.length<n+1) return 25;
+  if(!data||data.length<n+1) return 0.5;
   const trs=data.slice(-n).map((c,i,a)=>i?Math.max(c.h-c.l,Math.abs(c.h-a[i-1].cl),Math.abs(c.l-a[i-1].cl)):c.h-c.l);
   return trs.reduce((a,b)=>a+b,0)/n;
 }
@@ -1000,6 +1018,20 @@ function detectOBandFVG(data) {
   obSellZones = obSellZones.slice(-3);
   obBuyZones  = obBuyZones.slice(-3);
   fvgZones    = fvgZones.slice(-4);
+
+  // تصفية بناءً على السعر الحالي إذا كان متاحاً
+  if(price > 0) {
+    // OB Sell: يجب أن يكون bot > currentPrice - 50 (قريب أو فوق)
+    obSellZones = obSellZones.filter(function(ob){ return ob.bot > price - 30; });
+    // OB Buy: يجب أن يكون top < currentPrice + 50 (قريب أو تحت)
+    obBuyZones = obBuyZones.filter(function(ob){ return ob.top < price + 30; });
+    // FVG: السعر لم يملأه (لا يزال gap)
+    fvgZones = fvgZones.filter(function(f){
+      if(f.type==='bull') return price < f.top; // صاعد: السعر تحت الفجوة
+      if(f.type==='bear') return price > f.bot; // هابط: السعر فوق الفجوة
+      return true;
+    });
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -1180,7 +1212,7 @@ async function autoSignal(dir, p) {
   // ══ ATR FILTER — لا تداول في سوق خائف ══
   // ATR منخفض جداً = تذبذب بدون اتجاه
   const currentATR = calcATR(data);
-  const minATR = 8; // الحد الأدنى لتداول الذهب
+  const minATR = 8; // الحد الأدنى لتداول الفضة
   if(currentATR < minATR) {
     log('[SIGNAL] ❌ ATR منخفض جداً (' + currentATR.toFixed(1) + ') — سوق ضعيف الزخم');
     return;
@@ -1219,10 +1251,10 @@ async function sendChartToTelegram(auto=false) {
   const tf=curTF;
 
   try {
-    // ── شارت XAU/USD الرئيسي ──
+    // ── شارت XAG/USD الرئيسي ──
     const cvMain=document.getElementById('mc');
     const xauB64=cvMain.toDataURL('image/png').split(',')[1];
-    const xauCaption=`📸 *XAU/USD — ${tf}*
+    const xauCaption=`📸 *XAG/USD — ${tf}*
 💰 السعر: \`$${price.toFixed(2)}\`
 📊 الإشارة: *${dir}*
 📦 OB Sell: ${obSellZones.length>0?obSellZones[obSellZones.length-1].bot.toFixed(2)+'–'+obSellZones[obSellZones.length-1].top.toFixed(2):'---'}
@@ -1230,7 +1262,7 @@ async function sendChartToTelegram(auto=false) {
 ⚡ FVG: ${fvgZones.length>0?fvgZones[fvgZones.length-1].bot.toFixed(2)+'–'+fvgZones[fvgZones.length-1].top.toFixed(2):'---'}
 🎯 TP1: ${document.getElementById('sTP1').textContent} | SL: ${document.getElementById('sSL').textContent}
 ⏱ \`${new Date().toUTCString()}\`
-_🥇 Gold AI Bot v3_`;
+_🥇 Silver AI Bot v3_`;
 
     await fetch(`${BASE}/api/chart`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:xauB64,caption:xauCaption})});
     log('[CHART] ✅ XAU شارت أُرسل');
@@ -1239,8 +1271,8 @@ _🥇 Gold AI Bot v3_`;
     const xagChart = await buildMiniChart('XAGUSD', tf);
     if (xagChart) {
       await fetch(`${BASE}/api/chart`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:xagChart,caption:`📸 *XAG/USD الفضة — ${tf}*
-🔗 مقارنة مع الذهب
-_🥇 Gold AI Bot v3_`})});
+🔗 مقارنة مع الفضة
+_🥇 Silver AI Bot v3_`})});
       log('[CHART] ✅ XAG شارت أُرسل');
     }
 
@@ -1249,7 +1281,7 @@ _🥇 Gold AI Bot v3_`})});
     if (dxyChart) {
       await fetch(`${BASE}/api/chart`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:dxyChart,caption:`📸 *DXY الدولار — ${tf}*
 📈 DXY صاعد = ذهب هابط
-_🥇 Gold AI Bot v3_`})});
+_🥇 Silver AI Bot v3_`})});
       log('[CHART] ✅ DXY شارت أُرسل');
     }
 
@@ -1394,7 +1426,7 @@ async function getLesson(t,outcome,p){
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        symbol:'XAUUSD',
+        symbol:'XAGUSD',
         price:p.toFixed(2),
         lesson_mode:true,
         lesson_prompt:msg,
@@ -1508,10 +1540,35 @@ async function fetchCandles(tf){
       .sort((a,b) => (a.t||0)-(b.t||0))
       .slice(-60); // آخر 60 شمعة فقط
     if(!cleanCandles.length){ log('[CANDLES] ✗ no valid candles after filter'); return; }
+
+    // تصحيح أسعار Yahoo Futures → Spot MetaAPI
+    if(d.source && d.source.indexOf('yahoo') >= 0 && cleanCandles.length > 0) {
+      var lastYClose = cleanCandles[cleanCandles.length-1].cl;
+      var spotPrice = price > 0 ? price : lastYClose;
+      var offset = spotPrice - lastYClose;
+      // طبّق الـ offset دائماً إذا كان هناك فرق
+      if(Math.abs(offset) > 0.05) {
+        cleanCandles = cleanCandles.map(function(c2){
+          return {
+            t:  c2.t,
+            o:  parseFloat((c2.o  + offset).toFixed(3)),
+            h:  parseFloat((c2.h  + offset).toFixed(3)),
+            l:  parseFloat((c2.l  + offset).toFixed(3)),
+            cl: parseFloat((c2.cl + offset).toFixed(3)),
+            v:  c2.v
+          };
+        });
+        log('[CANDLES] Yahoo→Spot offset: '+offset.toFixed(2)+' pts ('+d.source+')');
+      }
+    }
+
     cdata[tf] = cleanCandles;
     ldone[tf]=true;
     document.getElementById('cload').style.display='none';
-    log(`[CANDLES] ✓ ${tf}: ${cdata[tf].length}/${raw.length} (${d.source})`);
+    log('[CANDLES] ✓ '+tf+': '+cdata[tf].length+'/'+raw.length+' ('+d.source+')');
+    if(d.source && d.source.indexOf('yahoo') >= 0) {
+      log('[CANDLES] ⚠️ Yahoo Futures — أسعار قد تختلف عن MT5 Spot');
+    }
     detectOBandFVG(cdata[tf]);
     if(tf===curTF)drawChart(tf);
     updateSpark(tf);
@@ -1617,6 +1674,8 @@ function drawChart(tf){
   // ── OB SELL — خط أحمر أعلى فقط (لا fill) ──
   obSellZones.slice(-1).forEach(function(ob){
     if(ob.top <= pMin || ob.bot >= pMax) return; // خارج النطاق المرئي
+    // OB Sell يجب أن يكون فوق أو قريب من السعر (ليس تحته بكثير)
+    if(ob.top < price - 50) return;
     var y1 = toY(ob.top);
     var y2 = toY(ob.bot);
     var h2 = Math.abs(y2-y1);
@@ -1638,6 +1697,8 @@ function drawChart(tf){
   // ── OB BUY — خط أخضر تحت فقط ──
   obBuyZones.slice(-1).forEach(function(ob){
     if(ob.top <= pMin || ob.bot >= pMax) return;
+    // OB Buy يجب أن يكون تحت أو قريب من السعر
+    if(ob.bot > price + 50) return;
     var y1 = toY(ob.top);
     var y2 = toY(ob.bot);
     var h2 = Math.abs(y2-y1);
@@ -2011,7 +2072,7 @@ async function runAI(){
   const ep=aiModel==='claude'?`${BASE}/api/analyze`:`${BASE}/api/openai`;
   try{
     const r=await fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-      symbol:'XAUUSD',price:price.toFixed(2),
+      symbol:'XAGUSD',price:price.toFixed(2),
       bid:document.getElementById('m-bid').textContent,ask:document.getElementById('m-ask').textContent,
       spread:document.getElementById('m-spread').textContent,rsi:document.getElementById('i-rsi').textContent,
       macd:document.getElementById('i-macd').textContent,ema50:document.getElementById('i-e50').textContent,
@@ -2143,13 +2204,13 @@ function updateSchoolsTableau(bos,macd,d1bull,h1bull,atH,bearC,p,vwap,aligned,in
 // ════════════════════════════════════════════════
 // SELF-LEARNING LOG UI
 // ════════════════════════════════════════════════
-var learningHistory = JSON.parse(localStorage.getItem('gold_lessons')||'[]');
+var learningHistory = JSON.parse(localStorage.getItem('silver_lessons')||'[]');
 
 function updateLearningLog(tradeId, lesson, outcome, direction) {
   var entry = {id:tradeId, lesson:lesson, outcome:outcome, direction:direction, time:Date.now()};
   learningHistory.unshift(entry);
   if(learningHistory.length > 20) learningHistory = learningHistory.slice(0,20);
-  localStorage.setItem('gold_lessons', JSON.stringify(learningHistory));
+  localStorage.setItem('silver_lessons', JSON.stringify(learningHistory));
   renderLearningLog();
 }
 
@@ -2185,8 +2246,8 @@ async function tgSend(type){
   const logEl=document.getElementById('tgLog');
   logEl.style.display='block';logEl.className='bdg bwrn';logEl.textContent='⏳ إرسال...';
   const body=type==='test'
-    ?{message:`🥇 *Test — Gold AI Bot v3*\n\n💰 $${price.toFixed(2)}\nBid:${document.getElementById('m-bid').textContent} Spread:${document.getElementById('m-spread').textContent}\nATR:${document.getElementById('m-atr').textContent}\nD1:${document.getElementById('t-d1').textContent}\nOB Sell:${document.getElementById('lbl-ob-sell').textContent}\nOB Buy:${document.getElementById('lbl-ob-buy').textContent}\n${new Date().toUTCString()}`}
-    :{message:`📊 *إشارة XAU/USD*\n${document.getElementById('sigDir').textContent} @ $${price.toFixed(2)}\nSL:${document.getElementById('sSL').textContent} TP1:${document.getElementById('sTP1').textContent}\nR:R:${document.getElementById('sRR').textContent}\nD1:${document.getElementById('t-d1').textContent} | ${document.getElementById('t-align').textContent}\n${document.getElementById('lbl-ob-sell').textContent}\n${document.getElementById('lbl-ob-buy').textContent}`};
+    ?{message:`🥇 *Test — Silver AI Bot v3*\n\n💰 $${price.toFixed(2)}\nBid:${document.getElementById('m-bid').textContent} Spread:${document.getElementById('m-spread').textContent}\nATR:${document.getElementById('m-atr').textContent}\nD1:${document.getElementById('t-d1').textContent}\nOB Sell:${document.getElementById('lbl-ob-sell').textContent}\nOB Buy:${document.getElementById('lbl-ob-buy').textContent}\n${new Date().toUTCString()}`}
+    :{message:`📊 *إشارة XAG/USD*\n${document.getElementById('sigDir').textContent} @ $${price.toFixed(2)}\nSL:${document.getElementById('sSL').textContent} TP1:${document.getElementById('sTP1').textContent}\nR:R:${document.getElementById('sRR').textContent}\nD1:${document.getElementById('t-d1').textContent} | ${document.getElementById('t-align').textContent}\n${document.getElementById('lbl-ob-sell').textContent}\n${document.getElementById('lbl-ob-buy').textContent}`};
   try{
     const r=await fetch(`${BASE}/api/telegram`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const d=await r.json();
@@ -2197,7 +2258,7 @@ async function tgSend(type){
 
 async function tgSendTrade(t,rr){
   const isBuy=t.direction==='BUY';
-  const msg=`${isBuy?'🟢':'🔴'} *إشارة #${t.id} — XAU/USD*\n━━━━━━━━━━━━━━━━━━━━━\n📊 ${t.direction} | الثقة: ${t.confidence}%\n📍 دخول: \`$${t.entry}\`\n🛑 وقف: \`$${t.sl}\` (ATR×0.5)\n🎯 TP1: \`$${t.tp1}\` (OB/FVG)\n🎯 TP2: \`$${t.tp2}\`\n⚖️ R:R: 1:${rr.toFixed(2)}\n━━━━━━━━━━━━━━━━━━━━━\n💡 ${t.reason}\n🌐 ${t.session}\n⏱ \`${new Date().toUTCString()}\`\n_🥇 Gold AI Bot v3_`;
+  const msg=`${isBuy?'🟢':'🔴'} *إشارة #${t.id} — XAG/USD*\n━━━━━━━━━━━━━━━━━━━━━\n📊 ${t.direction} | الثقة: ${t.confidence}%\n📍 دخول: \`$${t.entry}\`\n🛑 وقف: \`$${t.sl}\` (ATR×0.5)\n🎯 TP1: \`$${t.tp1}\` (OB/FVG)\n🎯 TP2: \`$${t.tp2}\`\n⚖️ R:R: 1:${rr.toFixed(2)}\n━━━━━━━━━━━━━━━━━━━━━\n💡 ${t.reason}\n🌐 ${t.session}\n⏱ \`${new Date().toUTCString()}\`\n_🥇 Silver AI Bot v3_`;
   try{await fetch(`${BASE}/api/telegram`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})});}catch(e){}
 }
 
@@ -2242,7 +2303,7 @@ async function runNewsAnalysis() {
     bdg.style.display = 'block';
     log(`[NEWS] ✓ ${d.model} (${text.length} chars)`);
     // إرسال للتلغرام
-    await tgNotify(`📰 *تحليل الأخبار اللحظية — XAU/USD*\n\n${text.substring(0,1500)}\n\n⏱ \`${new Date().toUTCString()}\`\n_🥇 Gold AI Bot v3_`);
+    await tgNotify(`📰 *تحليل الأخبار اللحظية — XAG/USD*\n\n${text.substring(0,1500)}\n\n⏱ \`${new Date().toUTCString()}\`\n_🥇 Silver AI Bot v3_`);
   } catch(e) {
     out.textContent   = '⚠️ خطأ: ' + e.message;
     out.style.color   = 'var(--red)';
@@ -2538,7 +2599,7 @@ function computeCorrelation() {
     signal: dxyConfirms && xagLeadsXau ? 'قوي ✅' : dxyConfirms || xagLeadsXau ? 'متوسط 🟡' : 'ضعيف ⚠️',
     color:  dxyConfirms && xagLeadsXau ? 'var(--green)' : dxyConfirms || xagLeadsXau ? 'var(--yellow)' : 'var(--red)',
     dxyImpact: dxyDir === 'up' ? '↑ DXY → ↓ ذهب 🔴' : '↓ DXY → ↑ ذهب 🟢',
-    xagSignal: xagDir === 'up' ? '↑ XAG يقود الذهب 🟢' : '↓ XAG يقود الذهب 🔴'
+    xagSignal: xagDir === 'up' ? '↑ XAG يقود الفضة 🟢' : '↓ XAG يقود الفضة 🔴'
   };
 }
 
@@ -2725,7 +2786,7 @@ updateSessions();
 setInterval(updateSessions,1000);
 setInterval(renderCalendar,60000); // تحديث كل دقيقة
 
-log('[BOOT] Gold AI Bot v3 — OB + FVG + Calendar + Sound + Chart Send');
+log('[BOOT] Silver AI Bot v3 — OB + FVG + Calendar + Sound + Chart Send');
 log('[CHART] Default: M15 | OB Sell/Buy + FVG + TP zones');
 log('[AUDIO] اضغط زر الصوت لتفعيله على iPhone');
 
@@ -2741,7 +2802,7 @@ setInterval(()=>{fetchCandles(curTF);renderCalendar();try{const kz=getKillZone()
 setInterval(()=>fetchCorrelation(curTF),300000); // correlation كل 5 دقائق
 renderTrades();updateStats();renderSLReport();addWeeklyReviewButton();
 // مراجعة أسبوعية تلقائية (كل أسبوع)
-var lastReview = JSON.parse(localStorage.getItem('gold_weekly_review')||'null');
+var lastReview = JSON.parse(localStorage.getItem('silver_weekly_review')||'null');
 var reviewAge  = lastReview ? (Date.now()-lastReview.time)/86400000 : 999;
 if(reviewAge > 7){ setTimeout(weeklyClaudeReview, 30000); }
 </script>
