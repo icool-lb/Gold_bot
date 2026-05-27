@@ -1495,12 +1495,19 @@ async function fetchCandles(tf){
     const r=await fetch(`${BASE}/api/price?type=candles&tf=${tf}&limit=60`);
     const d=await r.json();
     if(!d.candles&&d.candles.length){log(`[CANDLES] ✗ ${d.error||'empty'}`);return;}
-    // فرز وتنظيف بسيط فقط
+    // فرز وتنظيف
     const raw = d.candles;
+    const now_ts = Date.now();
+    // احتفظ بآخر 8 ساعات فقط (يمنع الشمعات القديمة)
+    const maxAge = {M5:4*3600000, M15:8*3600000, M30:16*3600000, H1:48*3600000, H4:200*3600000};
+    const cutoff = now_ts - (maxAge[tf] || 8*3600000);
     const cleanCandles = raw
       .filter(c => c.o > 0 && c.cl > 0 && c.h > 0 && c.l > 0
-               && c.h >= c.l && !isNaN(c.o) && !isNaN(c.cl))
-      .sort((a,b) => (a.t||0)-(b.t||0));
+               && c.h >= c.l && !isNaN(c.o) && !isNaN(c.cl)
+               && (!c.t || c.t >= cutoff))
+      .sort((a,b) => (a.t||0)-(b.t||0))
+      .slice(-60); // آخر 60 شمعة فقط
+    if(!cleanCandles.length){ log('[CANDLES] ✗ no valid candles after filter'); return; }
     cdata[tf] = cleanCandles;
     ldone[tf]=true;
     document.getElementById('cload').style.display='none';
@@ -1524,9 +1531,12 @@ function updateLastCandle(p){
     const last    = data[data.length-1];
     const period  = tfMs[tf] || 15*60000;
     // وقت انتهاء الشمعة الحالية
-    const candleEnd = (last.t || 0) + period;
+    // إذا كان timestamp الشمعة الأخيرة قديماً جداً (أكثر من 3 فترات)
+    // فهذا يعني البيانات من Yahoo قديمة — أضف شمعة جديدة
+    const candleEnd = last.t > 0 ? last.t + period : now;
+    const isVeryOld = last.t > 0 && (now - last.t) > period * 3;
 
-    if(now >= candleEnd) {
+    if(now >= candleEnd || isVeryOld) {
       // ── شمعة جديدة: أنشئ شمعة جديدة بدلاً من تعديل القديمة ──
       const newCandle = {
         t:  Math.floor(now / period) * period,
