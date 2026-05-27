@@ -503,10 +503,11 @@ function saveSLWeights(){ localStorage.setItem('gold_sl_weights', JSON.stringify
 // ── المستوى 1: تسجيل سياق الصفقة ──
 function recordTradeContext(trade, data, currentPrice) {
   if(!data || data.length < 14) return;
-  var pd2   = computePremiumDiscount(data, currentPrice);
-  var kz2   = getKillZone();
-  var vw2   = computeVWAP(data);
-  var atr2  = calcATR(data);
+  var pd2, kz2, vw2, atr2;
+  try{ pd2  = computePremiumDiscount(data, currentPrice); }catch(e){ pd2=null; }
+  try{ kz2  = getKillZone(); }catch(e){ kz2={active:null,bestTrade:false}; }
+  try{ vw2  = computeVWAP(data); }catch(e){ vw2={vwap:0}; }
+  try{ atr2 = calcATR(data); }catch(e){ atr2=15; }
   var now   = new Date();
   var h     = now.getUTCHours();
   var sess  = (h>=7&&h<10)?'london':(h>=12&&h<15)?'ny':(h>=0&&h<7)?'asia':'other';
@@ -598,22 +599,14 @@ async function weeklyClaudeReview() {
   var losses= closed.filter(function(t){return t.result==='LOSS';}).length;
   var wr    = Math.round(wins/(wins+losses)*100);
 
-  var prompt = 'أنت محلل تداول خبير. راجع هذه الصفقات وأعطِ توصيات تحسين:
-
-'
-    + 'إحصائيات: '+closed.length+' صفقة | WIN='+wins+' | LOSS='+losses+' | WR='+wr+'%
-
-'
-    + 'الأوزان الحالية: '+JSON.stringify(SL_WEIGHTS)+'
-
-'
-    + 'آخر 10 صفقات:
-'
-    + closed.slice(-10).map(function(t){
-        return '#'+t.id+' '+t.direction+' '+t.result
-          +(t.context?' ['+t.context.session+' pd='+t.context.pdPct+'% atr='+t.context.atr+']':'');
-      }).join('\n')
-    + '\nاقترح 3 تعديلات محددة على الأوزان أو الشروط. كن موجزاً (أقل من 100 كلمة).';
+  var tradesText = closed.slice(-10).map(function(t){
+    return '#'+t.id+' '+t.direction+' '+t.result+(t.context?' ['+t.context.session+' pd='+t.context.pdPct+'% atr='+t.context.atr+']':'');
+  }).join(', ');
+  var prompt = 'أنت محلل تداول خبير. راجع هذه الصفقات: '
+    + closed.length+' صفقة WIN='+wins+' LOSS='+losses+' WR='+wr+'% '
+    + 'أوزان: '+JSON.stringify(SL_WEIGHTS)+' '
+    + 'آخر10: '+tradesText
+    + ' اقترح 3 تعديلات. كن موجزاً (أقل من 100 كلمة).';
 
   try {
     log('[REVIEW] جاري مراجعة Claude الأسبوعية...');
