@@ -612,11 +612,8 @@ async function weeklyClaudeReview() {
     + closed.slice(-10).map(function(t){
         return '#'+t.id+' '+t.direction+' '+t.result
           +(t.context?' ['+t.context.session+' pd='+t.context.pdPct+'% atr='+t.context.atr+']':'');
-      }).join('
-')
-    + '
-
-اقترح 3 تعديلات محددة على الأوزان أو الشروط. كن موجزاً (أقل من 100 كلمة).';
+      }).join('\n')
+    + '\nاقترح 3 تعديلات محددة على الأوزان أو الشروط. كن موجزاً (أقل من 100 كلمة).';
 
   try {
     log('[REVIEW] جاري مراجعة Claude الأسبوعية...');
@@ -630,11 +627,7 @@ async function weeklyClaudeReview() {
     if(review) {
       log('[REVIEW] ✅ '+review.substring(0,80));
       localStorage.setItem('gold_weekly_review', JSON.stringify({text:review,time:Date.now()}));
-      tgNotify('📊 *مراجعة أسبوعية*
-
-'+review+'
-
-_WR: '+wr+'% | '+closed.length+' صفقة_');
+      tgNotify('📊 *مراجعة أسبوعية*\n\n'+review+'\n\n_WR: '+wr+'% | '+closed.length+' صفقة_');
       renderSLReport();
     }
   } catch(e) { log('[REVIEW] Error: '+e.message); }
@@ -1037,7 +1030,7 @@ function checkAlerts(p) {
       autoSignal('SELL',p);
       return;
     }
-  }
+  });
 
   // تحقق من OB Buy
   obBuyZones.forEach(function(ob){
@@ -1049,7 +1042,7 @@ function checkAlerts(p) {
       autoSignal('BUY',p);
       return;
     }
-  }
+  });
 
   // تحقق من FVG
   fvgZones.forEach(function(fvg){
@@ -1062,7 +1055,7 @@ function checkAlerts(p) {
       autoSignal(dir, p);
       return;
     }
-  }
+  });
 }
 
 // ═══════════════════════════════════════════════
@@ -1367,7 +1360,7 @@ function monitorTrades(p){
       log(`[TRADE] #${t.id} Entry @ ${p.toFixed(2)}`);
     }
     const check=t.entryHit||elapsed<5||Math.floor(elapsed)%5===0;
-    if(!check)continue;
+    if(!check)return;
     if(!t.tp1Hit&&(isBuy?p>=t.tp1:p<=t.tp1)){
       const pnl=isBuy?t.tp1-t.entry:t.entry-t.tp1;
       updTrade(t.id,{tp1Hit:true,status:'TP1',result:'PARTIAL',pnl});
@@ -1395,12 +1388,8 @@ function monitorTrades(p){
       tgNotify(`❌ *#${t.id} — وقف خسارة*\n📉 \`${pnl.toFixed(2)}\` pts\n💡 ${t.reason}`);
       getLesson(t,'SL',p);
     }
-  }
-  renderTrades();updateStats();renderSLReport();addWeeklyReviewButton();
-// مراجعة أسبوعية تلقائية (كل أسبوع)
-var lastReview = JSON.parse(localStorage.getItem('gold_weekly_review')||'null');
-var reviewAge  = lastReview ? (Date.now()-lastReview.time)/86400000 : 999;
-if(reviewAge > 7){ setTimeout(weeklyClaudeReview, 30000); }
+  });
+  renderTrades();updateStats();
 }
 
 async function getLesson(t,outcome,p){
@@ -2463,7 +2452,8 @@ function getKillZone() {
   ];
 
   let active = null, next = null;
-  zones.forEach(function(z){
+  for(var _zi=0;_zi<zones.length;_zi++){
+    var z=zones[_zi];
     if (mins >= z.start && mins < z.end) { active = z; break; }
   }
   if (!active) {
