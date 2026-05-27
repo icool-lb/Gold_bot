@@ -40,15 +40,15 @@ body{background:var(--bg);color:#F5E6C8;font-family:'Cairo',sans-serif;min-heigh
 .tftabs{display:flex;background:var(--bg3);border-bottom:1px solid var(--bdr)}
 .tft{padding:10px 16px;font-family:'Orbitron',monospace;font-size:10px;cursor:pointer;color:var(--gdim);border-bottom:2px solid transparent;transition:all .2s;letter-spacing:1px}
 .tft.active{color:var(--gold2);border-bottom-color:var(--gold);background:rgba(255,215,0,.05)}
-.cwrap{flex:1;position:relative;background:var(--bg3);overflow:hidden;min-height:280px}
+.cwrap{flex:1;position:relative;background:#FFFFFF;overflow:hidden;min-height:280px}
 canvas{display:block}
 .clbls{position:absolute;top:6px;left:6px;display:flex;flex-direction:column;gap:4px;pointer-events:none}
 .clbl{font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 7px;border-radius:3px;backdrop-filter:blur(4px)}
-.cl-s{background:rgba(255,45,85,.2);border:1px solid rgba(255,45,85,.5);color:#FF8899}
-.cl-d{background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.4);color:#88FFCC}
-.cl-f{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.35);color:#FFE088}
-.cl-ob{background:rgba(255,100,0,.15);border:1px solid rgba(255,100,0,.5);color:#FFAA66}
-.cload{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Orbitron',monospace;font-size:11px;color:var(--gdim);text-align:center}
+.cl-s{background:rgba(220,50,50,.9);border:1px solid #DC3232;color:#FFFFFF}
+.cl-d{background:rgba(30,160,80,.9);border:1px solid #1EA050;color:#FFFFFF}
+.cl-f{background:rgba(255,140,0,.9);border:1px solid #FF8C00;color:#FFFFFF}
+.cl-ob{background:rgba(255,100,0,.9);border:1px solid #FF6400;color:#FFFFFF}
+.cload{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Orbitron',monospace;font-size:11px;color:#999;text-align:center}
 .minir{display:grid;grid-template-columns:repeat(4,1fr);height:80px;border-top:1px solid var(--bdr)}
 .minic{border-right:1px solid var(--bdr);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:4px;transition:background .2s}
 .minic:hover,.minic.active{background:rgba(255,215,0,.05)}
@@ -140,6 +140,11 @@ canvas{display:block}
 /* CHART SEND BTN */
 .chart-send-btn{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.8);border:1px solid rgba(0,150,255,.5);border-radius:6px;color:var(--blue);padding:6px 12px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;transition:all .2s;z-index:10}
 .chart-send-btn:hover{background:rgba(0,100,200,.3);box-shadow:0 0 10px rgba(0,150,255,.3)}
+.school-row{display:grid;grid-template-columns:80px 70px 1fr;align-items:center;padding:5px 8px;border-bottom:1px solid rgba(0,180,255,.08);font-size:10px;gap:4px}
+.school-row:last-child{border-bottom:none}
+.sch-name{color:rgba(150,180,220,.7);font-size:9px;font-family:'Orbitron',monospace;letter-spacing:.5px}
+.sch-signal{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;text-align:center}
+.sch-detail{font-size:9px;color:rgba(120,160,200,.6);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,180,255,.2);border-radius:2px}
 .section-panel{background:rgba(9,20,32,0.8);border:1px solid rgba(0,180,255,0.12);border-radius:6px;padding:8px}
 .row{display:flex;justify-content:space-between;align-items:center;margin:3px 0;font-size:11px}
@@ -273,7 +278,7 @@ canvas{display:block}
 <!-- ══ RIGHT ══ -->
 <div class="rp">
 
-  <!-- SIGNAL -->
+  <!-- 1. SIGNAL CARD -->
   <div class="sc swait" id="sigCard">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
       <div>
@@ -297,20 +302,66 @@ canvas{display:block}
     <div class="srow"><span class="slbl">أفضل جلسة</span><span class="sval" style="color:var(--blue)" id="sSess">---</span></div>
   </div>
 
-  <!-- SCHOOLS -->
+  <!-- 2. MASTER TABLEAU — كل التحليلات في مكان واحد -->
   <div>
-    <div class="shdr sg"><span>MULTI-SCHOOL + TOP-DOWN</span></div>
-    <div class="sgrid">
-      <div class="sit"><div class="sn">ICT / SMC</div><div class="ss" id="sch-ict" style="color:var(--gdim)">---</div></div>
-      <div class="sit"><div class="sn">Wyckoff</div><div class="ss" id="sch-wyk" style="color:var(--gdim)">---</div></div>
-      <div class="sit"><div class="sn">Elliott</div><div class="ss" id="sch-ell" style="color:var(--gdim)">---</div></div>
-      <div class="sit"><div class="sn">Supply/Demand</div><div class="ss" id="sch-sd" style="color:var(--gdim)">---</div></div>
-      <div class="sit"><div class="sn">Price Action</div><div class="ss" id="sch-pa" style="color:var(--gdim)">---</div></div>
-      <div class="sit"><div class="sn">Top-Down D1→H1</div><div class="ss" id="sch-td" style="color:var(--gdim)">---</div></div>
+    <div class="shdr sg"><span>🏆 MASTER TABLEAU — التحليل الكامل</span></div>
+    <div style="background:rgba(9,20,32,.9);border:1px solid rgba(0,180,255,.2);border-radius:8px;overflow:hidden">
+
+      <!-- MASTER SCORE ROW -->
+      <div style="background:rgba(0,180,255,.06);padding:10px 12px;border-bottom:1px solid rgba(0,180,255,.15)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-family:'Orbitron',monospace;font-size:9px;color:rgba(0,180,255,.6);letter-spacing:2px">MASTER SCORE</div>
+          <div id="ms-quality" style="font-size:9px;color:var(--gdim)">---</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="ms-score" style="font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:900;color:var(--gold);line-height:1">--</div>
+          <div style="flex:1">
+            <div style="height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;margin-bottom:4px">
+              <div id="ms-bar" style="height:100%;width:50%;background:linear-gradient(90deg,var(--red),var(--yellow),var(--green));border-radius:3px;transition:width .5s"></div>
+            </div>
+            <div id="ms-dir" style="font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:var(--yellow)">WAIT</div>
+          </div>
+        </div>
+        <div id="ms-reasons" style="font-size:9px;line-height:1.6;color:rgba(150,180,220,.6);margin-top:4px"></div>
+      </div>
+
+      <!-- SCHOOLS TABLEAU -->
+      <div id="schoolsTableau">
+        <!-- ICT/SMC -->
+        <div class="school-row"><div class="sch-name">ICT/SMC</div><div class="sch-signal" id="sch-ict">---</div><div class="sch-detail" id="det-ict">Order Blocks</div></div>
+        <!-- Wyckoff -->
+        <div class="school-row"><div class="sch-name">Wyckoff</div><div class="sch-signal" id="sch-wyk">---</div><div class="sch-detail" id="det-wyk">Accumulation</div></div>
+        <!-- Elliott -->
+        <div class="school-row"><div class="sch-name">Elliott</div><div class="sch-signal" id="sch-ell">---</div><div class="sch-detail" id="det-ell">Wave count</div></div>
+        <!-- S&D -->
+        <div class="school-row"><div class="sch-name">S&D Zones</div><div class="sch-signal" id="sch-sd">---</div><div class="sch-detail" id="det-sd">Supply/Demand</div></div>
+        <!-- Price Action -->
+        <div class="school-row"><div class="sch-name">Price Action</div><div class="sch-signal" id="sch-pa">---</div><div class="sch-detail" id="det-pa">Candle pattern</div></div>
+        <!-- Top-Down -->
+        <div class="school-row"><div class="sch-name">Top-Down</div><div class="sch-signal" id="sch-td">---</div><div class="sch-detail" id="det-td">D1→H4→H1</div></div>
+        <!-- MSS -->
+        <div class="school-row"><div class="sch-name">MSS/BOS</div><div class="sch-signal" id="sch-mss">---</div><div class="sch-detail" id="det-mss">Structure</div></div>
+        <!-- P&D -->
+        <div class="school-row"><div class="sch-name">Prem/Disc</div><div class="sch-signal" id="sch-pd">---</div><div class="sch-detail" id="det-pd">H4 range</div></div>
+        <!-- Fibonacci -->
+        <div class="school-row"><div class="sch-name">Fibonacci</div><div class="sch-signal" id="sch-fib">---</div><div class="sch-detail" id="det-fib">61.8% level</div></div>
+        <!-- Kill Zone -->
+        <div class="school-row"><div class="sch-name">Kill Zone</div><div class="sch-signal" id="sch-kz">---</div><div class="sch-detail" id="det-kz">Time-based</div></div>
+        <!-- VWAP -->
+        <div class="school-row"><div class="sch-name">VWAP/POC</div><div class="sch-signal" id="sch-vw">---</div><div class="sch-detail" id="det-vw">Volume</div></div>
+        <!-- Correlation -->
+        <div class="school-row"><div class="sch-name">XAG+DXY</div><div class="sch-signal" id="sch-corr">---</div><div class="sch-detail" id="det-corr">Correlation</div></div>
+        <!-- CONSENSUS -->
+        <div class="school-row" style="background:rgba(0,180,255,.06);border-top:1px solid rgba(0,180,255,.2)">
+          <div class="sch-name" style="color:#00B4FF;font-weight:900">CONSENSUS</div>
+          <div class="sch-signal" id="sch-cons" style="font-size:13px;font-weight:900">---</div>
+          <div class="sch-detail" id="det-cons" style="color:#00B4FF">0/12 موافق</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- INDICATORS -->
+  <!-- 3. INDICATORS -->
   <div>
     <div class="shdr sb"><span>INDICATORS</span></div>
     <div class="igrid">
@@ -323,97 +374,49 @@ canvas{display:block}
     </div>
   </div>
 
-  <!-- KEY LEVELS -->
+  <!-- 4. KEY LEVELS -->
   <div>
     <div class="shdr sg"><span>KEY LEVELS — OB / FVG</span></div>
-    <div class="lv lr"><span style="color:var(--red);font-size:8px">OB SELL D1</span><span id="lR3">---</span><span class="ll">Order Block بيع</span></div>
-    <div class="lv lr"><span style="color:var(--red);font-size:8px">OB SELL H4</span><span id="lR2">---</span><span class="ll">Order Block بيع</span></div>
-    <div class="lv lr"><span style="color:var(--orange);font-size:8px">FVG UP</span><span id="lR1">---</span><span class="ll">Fair Value Gap</span></div>
-    <div class="lv lc"><span style="color:var(--gold);font-size:8px">↔</span><span id="lCur" style="color:#F5E6C8;font-weight:900">---</span><span class="ll">السعر الحالي</span></div>
-    <div class="lv ls"><span style="color:var(--green);font-size:8px">FVG DN</span><span id="lS1">---</span><span class="ll">Fair Value Gap</span></div>
-    <div class="lv ls"><span style="color:var(--green);font-size:8px">OB BUY H4</span><span id="lS2">---</span><span class="ll">Order Block شراء</span></div>
-    <div class="lv ls"><span style="color:var(--green);font-size:8px">OB BUY D1</span><span id="lS3">---</span><span class="ll">Order Block شراء</span></div>
+    <div class="lv lr"><span style="color:var(--red);font-size:8px">OB SELL D1</span><span id="lR3">---</span><span class="ll">مقاومة</span></div>
+    <div class="lv lr"><span style="color:var(--red);font-size:8px">OB SELL H4</span><span id="lR2">---</span><span class="ll">مقاومة</span></div>
+    <div class="lv lr"><span style="color:var(--orange);font-size:8px">FVG BEAR</span><span id="lR1">---</span><span class="ll">فجوة هابطة</span></div>
+    <div class="lv lc"><span style="color:var(--gold);font-size:8px">↔</span><span id="lCur" style="color:#F5E6C8;font-weight:900">---</span><span class="ll">الحالي</span></div>
+    <div class="lv ls"><span style="color:var(--green);font-size:8px">FVG BULL</span><span id="lS1">---</span><span class="ll">فجوة صاعدة</span></div>
+    <div class="lv ls"><span style="color:var(--green);font-size:8px">OB BUY H4</span><span id="lS2">---</span><span class="ll">دعم</span></div>
+    <div class="lv ls"><span style="color:var(--green);font-size:8px">OB BUY D1</span><span id="lS3">---</span><span class="ll">دعم</span></div>
   </div>
 
-  <!-- ECONOMIC CALENDAR — LIVE -->
+  <!-- 5. ECONOMIC CALENDAR -->
   <div>
     <div class="shdr sr"><span>ECONOMIC CALENDAR — LIVE</span></div>
-    <!-- أحداث اليوم من ForexFactory -->
     <div id="calEvents" class="cal-container">
       <div style="text-align:center;padding:10px;color:var(--gdim);font-size:10px">⏳ جاري تحميل الروزنامة...</div>
     </div>
-    <div style="font-size:9px;color:var(--gdim);text-align:center;margin-top:3px">
-      🔔 تنبيه قبل الخبر بـ 30 دقيقة تلقائياً
+    <div style="font-size:9px;color:var(--gdim);text-align:center;margin-top:3px">🔔 تنبيه تلقائي 30 دقيقة قبل الخبر</div>
+  </div>
+
+  <!-- 6. SELF-LEARNING LOG -->
+  <div>
+    <div class="shdr sg"><span>🧠 Self-Learning — سجل التعلم</span></div>
+    <div id="learningLog" style="background:rgba(9,20,32,.8);border:1px solid rgba(0,180,255,.12);border-radius:6px;padding:8px;max-height:150px;overflow-y:auto">
+      <div style="color:var(--gdim);font-size:10px;text-align:center">في انتظار نتائج الصفقات...</div>
+    </div>
+    <div style="margin-top:4px" class="brow">
+      <div class="stat"><div class="st-n">مُستفاد</div><div class="st-v" style="color:var(--gold)" id="ll-count">0</div><div class="st-l">درس</div></div>
+      <div class="stat"><div class="st-n">آخر درس</div><div class="st-v" style="color:var(--blue);font-size:10px" id="ll-last">---</div></div>
     </div>
   </div>
 
-  <!-- AUDIO TEST + CONTROLS -->
-  <div>
-    <div class="shdr sg"><span>🔊 التنبيهات الصوتية</span></div>
-    <div class="brow3">
-      <button class="btn btn-g" onclick="testSound('buy')" style="font-size:10px">🟢 شراء</button>
-      <button class="btn btn-r" onclick="testSound('sell')" style="font-size:10px">🔴 بيع</button>
-      <button class="btn btn-b" onclick="testSound('news')" style="font-size:10px">📰 خبر</button>
-    </div>
-    <div class="brow" style="margin-top:4px">
-      <button class="btn" onclick="testSound('trade')" style="font-size:10px">🔔 صفقة</button>
-      <button class="btn" onclick="testSound('tp')" style="font-size:10px">🎯 هدف</button>
-    </div>
-    <div id="audioStatus" class="bdg bwrn" style="margin-top:4px">اضغط أي زر لتفعيل الصوت</div>
-  </div>
-
-  <!-- MASTER SCORE -->
-  <div>
-    <div class="shdr sg"><span>🏆 MASTER SCORE</span></div>
-    <div id="masterScore" style="background:rgba(9,20,32,0.8);border:1px solid rgba(0,180,255,0.25);border-radius:8px;padding:12px">
-      <div style="text-align:center;color:var(--gdim);font-size:10px">جاري تحميل التحليل...</div>
-    </div>
-  </div>
-
-  <div>
-    <div class="shdr sg"><span>📊 VWAP + Volume Profile</span></div>
-    <div id="vwapPanel" class="section-panel"><div style="color:var(--gdim);font-size:10px;text-align:center">جاري...</div></div>
-  </div>
-
-  <div>
-    <div class="shdr sg"><span>📐 Fibonacci Levels</span></div>
-    <div id="fibPanel" class="section-panel"><div style="color:var(--gdim);font-size:10px;text-align:center">جاري...</div></div>
-  </div>
-
-  <div>
-    <div class="shdr sg"><span>⚖️ Premium & Discount</span></div>
-    <div id="pdPanel" class="section-panel"><div style="color:var(--gdim);font-size:10px;text-align:center">جاري...</div></div>
-  </div>
-
-  <div>
-    <div class="shdr sg"><span>🔄 MSS — Market Structure</span></div>
-    <div id="mssPanel" class="section-panel"><div style="color:var(--gdim);font-size:10px;text-align:center">جاري...</div></div>
-  </div>
-
-  <div>
-    <div class="shdr sg"><span>🎯 Kill Zones — Time Based</span></div>
-    <div id="kzPanel" class="section-panel"><div style="color:var(--gdim);font-size:10px;text-align:center">جاري...</div></div>
-  </div>
-
-  <div>
-    <div class="shdr sg"><span>🔗 Correlation XAG + DXY</span></div>
-    <div id="corrPanel" class="section-panel"><div style="color:var(--gdim);font-size:10px;text-align:center">جاري...</div></div>
-  </div>
-
-  <!-- NEWS ANALYSIS -->
+  <!-- 7. NEWS -->
   <div>
     <div class="shdr sr"><span>📰 تحليل الأخبار اللحظية</span></div>
-    <button class="btn btn-b" onclick="runNewsAnalysis()" id="newsBtn" style="font-size:12px;margin-bottom:4px">
-      📰 تحليل الأخبار اللحظية الآن
-    </button>
-    <div style="font-size:9px;color:var(--gdim);text-align:center;margin-bottom:6px">
-      🔍 يبحث: ترامب • إيران • فيدرالي • حروب • صفقات سلام • GAP
-    </div>
-    <div class="air" id="newsOut" style="color:var(--gdim);font-size:11px;display:none;max-height:250px"></div>
+    <button class="btn btn-b" onclick="runNewsAnalysis()" id="newsBtn" style="font-size:12px;margin-bottom:4px">📰 تحليل الأخبار الآن</button>
+    <div style="font-size:9px;color:var(--gdim);text-align:center;margin-bottom:6px">ترامب • إيران • فيدرالي • حروب • GAP</div>
+    <div class="air" id="newsOut" style="color:var(--gdim);font-size:11px;display:none;max-height:200px"></div>
     <div id="newsBdg" class="bdg bwrn" style="display:none"></div>
   </div>
 
-  <!-- AI ANALYSIS -->
+  <!-- 8. AI ANALYSIS -->
   <div>
     <div class="shdr sg"><span>AI ANALYSIS — TOP DOWN</span></div>
     <div class="mt">
@@ -425,49 +428,22 @@ canvas{display:block}
     <div id="aiBdg" class="bdg bwrn" style="display:none"></div>
   </div>
 
-  <!-- OPEN TRADES -->
+  <!-- 9. OPEN TRADES -->
   <div>
     <div class="shdr sg2"><span>الصفقات المفتوحة</span></div>
     <div id="openTrades"><div style="text-align:center;color:var(--gdim);font-size:10px;padding:8px">لا توجد صفقات مفتوحة</div></div>
   </div>
 
-  <!-- TRADE HISTORY -->
+  <!-- 10. TRADE HISTORY -->
   <div>
     <div class="shdr sg"><span>نتائج الصفقات المقترحة</span></div>
     <div id="tradeHistory"><div style="text-align:center;color:var(--gdim);font-size:10px;padding:8px">لا توجد نتائج بعد</div></div>
   </div>
 
+  <!-- تنبيهات صوتية تلقائية — لا أزرار، تعمل في الخلفية -->
+  <div id="audioStatus" style="display:none"></div>
 
-  <!-- دليل التحليل -->
-  <div>
-    <div class="shdr sg"><span>📖 دليل قراءة المؤشرات</span></div>
-    <div style="background:rgba(9,20,32,.8);border:1px solid rgba(0,180,255,.15);border-radius:6px;padding:10px;font-size:10px;line-height:1.8;color:rgba(200,220,255,.8)">
-      <div style="font-weight:700;color:#00B4FF;margin-bottom:4px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">RSI 14</div>
-      <div>>70 = تشبع شراء ← انتظر هبوط | <30 = تشبع بيع ← فرصة شراء | 40–60 = محايد</div>
-      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">MACD</div>
-      <div>فوق الصفر = زخم صاعد ✅ | تحت الصفر = زخم هابط | تقاطع = إشارة تحول</div>
-      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">EMA 50 / 200</div>
-      <div>السعر فوق EMA = صاعد | EMA50 يقطع EMA200 للأعلى = Golden Cross 🟢 | العكس = Death Cross 🔴</div>
-      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">OB — Order Block</div>
-      <div>OB Sell = منطقة مؤسسية للبيع | OB Buy = منطقة مؤسسية للشراء | ادخل عند الارتداد منها</div>
-      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">FVG — Fair Value Gap</div>
-      <div>فجوة سعرية يملأها السوق لاحقاً | Bull FVG = دعم | Bear FVG = مقاومة</div>
-      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">Premium & Discount</div>
-      <div>>70% = Premium → بيع مفضل | <30% = Discount → شراء مفضل | 50% = EQ محايد</div>
-      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">MSS — BOS / CHoCH</div>
-      <div>BOS = كسر هيكل → استمرار | CHoCH = تغيير طابع → انعكاس محتمل 🔄</div>
-      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">Kill Zones ⭐</div>
-      <div>London 07–10 GMT = أفضل وقت للذهب | NY 12–15 GMT = تقلب عالٍ | تجنب Asia</div>
-      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">VWAP + POC</div>
-      <div>فوق VWAP = مشترون مسيطرون | POC = أكثر سعر تداولاً = دعم/مقاومة قوي</div>
-      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">Fibonacci 🎯</div>
-      <div>61.8% = Golden Ratio ← أقوى مستوى | 38.2% = ارتداد طبيعي | 50% = منتصف النطاق</div>
-      <div style="font-weight:700;color:#00B4FF;margin:6px 0 2px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px">Master Score</div>
-      <div>75–100 = A+ ادخل بثقة | 60–74 = A جيد | 45–59 = B انتظر تأكيد | <45 = C تجنب</div>
-    </div>
-  </div>
-
-  <!-- TELEGRAM -->
+  <!-- 11. TELEGRAM -->
   <div>
     <div class="shdr sb"><span>TELEGRAM BOT</span></div>
     <div id="tgSt" class="bdg bok">● Bot يعمل عبر Vercel — Token محمي</div>
@@ -478,13 +454,13 @@ canvas{display:block}
     <div id="tgLog" class="bdg" style="margin-top:4px;display:none"></div>
   </div>
 
-  <!-- LOG -->
+  <!-- 12. SYSTEM LOG -->
   <div>
     <div class="shdr sg"><span>SYSTEM LOG</span></div>
-    <div class="ailog" id="sysLog"><div><span>[BOOT]</span> Gold AI Bot v3 — OB + FVG + Calendar</div></div>
+    <div class="ailog" id="sysLog"><div><span>[BOOT]</span> Gold AI Bot v3</div></div>
   </div>
 
-</div>
+</div></div>
 </div>
 
 <script>
@@ -507,13 +483,246 @@ let trades = [], tradeN = 0;
 function loadTrades(){try{trades=JSON.parse(localStorage.getItem('gold_trades')||'[]');tradeN=parseInt(localStorage.getItem('gold_tradeN')||'0');}catch(e){trades=[];}}
 function saveTrades(){localStorage.setItem('gold_trades',JSON.stringify(trades));localStorage.setItem('gold_tradeN',tradeN.toString());}
 
+// ═══════════════════════════════════════════════════════
+// SELF-LEARNING ENGINE — 3 Levels
+// ═══════════════════════════════════════════════════════
+
+// ── الأوزان القابلة للتعديل (المستوى 2) ──
+var SL_WEIGHTS = JSON.parse(localStorage.getItem('gold_sl_weights') || JSON.stringify({
+  asian_buy:   1.0,  // وزن BUY في آسيا (يُقلَّل إذا خسر كثيراً)
+  premium_sell:1.0,  // وزن SELL في Premium
+  discount_buy:1.0,  // وزن BUY في Discount
+  kz_bonus:    1.0,  // مكافأة Kill Zone
+  atr_low_pen: 1.0,  // عقوبة ATR منخفض
+  momentum_pen:1.0,  // عقوبة Momentum عكسي
+  cooldown_len:120   // مدة الـ cooldown بالدقائق (تتغير تلقائياً)
+}));
+
+function saveSLWeights(){ localStorage.setItem('gold_sl_weights', JSON.stringify(SL_WEIGHTS)); }
+
+// ── المستوى 1: تسجيل سياق الصفقة ──
+function recordTradeContext(trade, data, currentPrice) {
+  if(!data || data.length < 14) return;
+  var pd2   = computePremiumDiscount(data, currentPrice);
+  var kz2   = getKillZone();
+  var vw2   = computeVWAP(data);
+  var atr2  = calcATR(data);
+  var now   = new Date();
+  var h     = now.getUTCHours();
+  var sess  = (h>=7&&h<10)?'london':(h>=12&&h<15)?'ny':(h>=0&&h<7)?'asia':'other';
+
+  trade.context = {
+    pdPct:   pd2 ? pd2.pct : 50,
+    pdZone:  pd2 ? pd2.zone : '---',
+    kzActive:kz2.active ? kz2.active.name : 'none',
+    kzBest:  kz2.bestTrade,
+    aboveVWAP: currentPrice > vw2.vwap,
+    atr:     atr2,
+    session: sess,
+    hour:    h,
+    rsi:     parseFloat(document.getElementById('i-rsi')  ? document.getElementById('i-rsi').textContent  : 50),
+    macd:    parseFloat(document.getElementById('i-macd') ? document.getElementById('i-macd').textContent : 0),
+    score:   parseInt(document.getElementById('sigQual')  ? document.getElementById('sigQual').textContent : '5')
+  };
+  saveTrades();
+}
+
+// ── المستوى 2: تحليل الأنماط وتعديل الأوزان ──
+function analyzePatternsAndAdjust() {
+  var closed = trades.filter(function(t){return t.result&&t.context;});
+  if(closed.length < 5) return; // نحتاج 5 صفقات على الأقل
+
+  // آسيا BUY
+  var asiaBuy  = closed.filter(function(t){return t.context.session==='asia' && t.direction==='BUY';});
+  var asiaBuyW = asiaBuy.filter(function(t){return t.result==='WIN';});
+  if(asiaBuy.length >= 3) {
+    var asiaBuyWR = asiaBuyW.length / asiaBuy.length;
+    SL_WEIGHTS.asian_buy = Math.max(0.3, Math.min(1.5, asiaBuyWR * 1.5));
+    log('[LEARN] آسيا BUY WR='+Math.round(asiaBuyWR*100)+'% → وزن='+SL_WEIGHTS.asian_buy.toFixed(2));
+  }
+
+  // Premium SELL
+  var premSell = closed.filter(function(t){return t.context.pdPct>=65 && t.direction==='SELL';});
+  var premSellW= premSell.filter(function(t){return t.result==='WIN';});
+  if(premSell.length >= 3) {
+    var premSellWR = premSellW.length / premSell.length;
+    SL_WEIGHTS.premium_sell = Math.max(0.5, Math.min(2.0, premSellWR * 2.0));
+    log('[LEARN] Premium SELL WR='+Math.round(premSellWR*100)+'% → وزن='+SL_WEIGHTS.premium_sell.toFixed(2));
+  }
+
+  // Discount BUY
+  var discBuy  = closed.filter(function(t){return t.context.pdPct<=35 && t.direction==='BUY';});
+  var discBuyW = discBuy.filter(function(t){return t.result==='WIN';});
+  if(discBuy.length >= 3) {
+    var discBuyWR = discBuyW.length / discBuy.length;
+    SL_WEIGHTS.discount_buy = Math.max(0.5, Math.min(2.0, discBuyWR * 2.0));
+    log('[LEARN] Discount BUY WR='+Math.round(discBuyWR*100)+'% → وزن='+SL_WEIGHTS.discount_buy.toFixed(2));
+  }
+
+  // Kill Zone
+  var kzTrades = closed.filter(function(t){return t.context.kzBest;});
+  var kzW      = kzTrades.filter(function(t){return t.result==='WIN';});
+  if(kzTrades.length >= 3) {
+    var kzWR = kzW.length / kzTrades.length;
+    SL_WEIGHTS.kz_bonus = Math.max(0.8, Math.min(2.0, kzWR * 2.0));
+    log('[LEARN] Kill Zone WR='+Math.round(kzWR*100)+'% → وزن='+SL_WEIGHTS.kz_bonus.toFixed(2));
+  }
+
+  // Cooldown adjustment
+  var recentLosses = closed.filter(function(t){return t.result==='LOSS';}).slice(-10);
+  var consecLosses = 0;
+  for(var i=recentLosses.length-1;i>=0;i--){
+    if(recentLosses[i].result==='LOSS') consecLosses++;
+    else break;
+  }
+  if(consecLosses >= 4) {
+    SL_WEIGHTS.cooldown_len = Math.min(240, SL_WEIGHTS.cooldown_len + 30);
+    log('[LEARN] خسائر متتالية '+consecLosses+' → cooldown='+SL_WEIGHTS.cooldown_len+'د');
+  } else if(consecLosses === 0 && closed.slice(-5).every(function(t){return t.result==='WIN';})) {
+    SL_WEIGHTS.cooldown_len = Math.max(60, SL_WEIGHTS.cooldown_len - 15);
+  }
+
+  saveSLWeights();
+  renderSLReport();
+}
+
+// ── المستوى 3: Claude الأسبوعي ──
+async function weeklyClaudeReview() {
+  var closed = trades.filter(function(t){return t.result;}).slice(-30);
+  if(closed.length < 5) {
+    log('[REVIEW] لا توجد بيانات كافية للمراجعة');
+    return;
+  }
+
+  var wins  = closed.filter(function(t){return t.result==='WIN';}).length;
+  var losses= closed.filter(function(t){return t.result==='LOSS';}).length;
+  var wr    = Math.round(wins/(wins+losses)*100);
+
+  var prompt = 'أنت محلل تداول خبير. راجع هذه الصفقات وأعطِ توصيات تحسين:
+
+'
+    + 'إحصائيات: '+closed.length+' صفقة | WIN='+wins+' | LOSS='+losses+' | WR='+wr+'%
+
+'
+    + 'الأوزان الحالية: '+JSON.stringify(SL_WEIGHTS)+'
+
+'
+    + 'آخر 10 صفقات:
+'
+    + closed.slice(-10).map(function(t){
+        return '#'+t.id+' '+t.direction+' '+t.result
+          +(t.context?' ['+t.context.session+' pd='+t.context.pdPct+'% atr='+t.context.atr+']':'');
+      }).join('
+')
+    + '
+
+اقترح 3 تعديلات محددة على الأوزان أو الشروط. كن موجزاً (أقل من 100 كلمة).';
+
+  try {
+    log('[REVIEW] جاري مراجعة Claude الأسبوعية...');
+    var r = await fetch(BASE+'/api/analyze', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({symbol:'XAUUSD',price:'0',lesson_mode:true,lesson_prompt:prompt,max_tokens:200})
+    });
+    var d = await r.json();
+    var review = (d.analysis||'').substring(0,500);
+    if(review) {
+      log('[REVIEW] ✅ '+review.substring(0,80));
+      localStorage.setItem('gold_weekly_review', JSON.stringify({text:review,time:Date.now()}));
+      tgNotify('📊 *مراجعة أسبوعية*
+
+'+review+'
+
+_WR: '+wr+'% | '+closed.length+' صفقة_');
+      renderSLReport();
+    }
+  } catch(e) { log('[REVIEW] Error: '+e.message); }
+}
+
+// ── عرض تقرير التعلم ──
+function renderSLReport() {
+  var el = document.getElementById('learningLog');
+  if(!el) return;
+
+  var closed   = trades.filter(function(t){return t.result;});
+  var wins     = closed.filter(function(t){return t.result==='WIN';}).length;
+  var losses   = closed.filter(function(t){return t.result==='LOSS';}).length;
+  var wr       = closed.length ? Math.round(wins/closed.length*100) : 0;
+  var wrColor  = wr>=60?'var(--green)':wr>=40?'var(--yellow)':'var(--red)';
+  var review   = JSON.parse(localStorage.getItem('gold_weekly_review')||'null');
+
+  var html = '<div style="padding:4px 0;border-bottom:1px solid rgba(0,180,255,.1);margin-bottom:6px">'
+    +'<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px">'
+    +'<span style="color:rgba(150,180,220,.7)">إجمالي</span>'
+    +'<span style="font-family:JetBrains Mono,monospace;color:var(--gold)">'+closed.length+' صفقة</span></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px">'
+    +'<span style="color:rgba(150,180,220,.7)">Win Rate</span>'
+    +'<span style="font-family:JetBrains Mono,monospace;color:'+wrColor+'">'+wr+'%</span></div>'
+    +'<div style="font-size:9px;color:rgba(150,180,220,.6);margin-top:4px">الأوزان المكتسبة:</div>'
+    +'<div style="font-size:9px;font-family:JetBrains Mono,monospace;color:rgba(0,180,255,.7);line-height:1.6">'
+    +'آسيا BUY: '+SL_WEIGHTS.asian_buy.toFixed(2)
+    +' | Premium SELL: '+SL_WEIGHTS.premium_sell.toFixed(2)
+    +'<br>Discount BUY: '+SL_WEIGHTS.discount_buy.toFixed(2)
+    +' | Cooldown: '+SL_WEIGHTS.cooldown_len+'د'
+    +'</div></div>';
+
+  // الدروس المستفادة
+  if(learningHistory.length) {
+    html += learningHistory.slice(0,5).map(function(e){
+      var col = e.outcome.includes('ربح')||e.outcome.includes('هدف')?'var(--green)':'var(--red)';
+      return '<div style="padding:3px 0;border-bottom:1px solid rgba(0,180,255,.06);font-size:9px">'
+        +'<span style="color:'+col+'">'+(e.direction==='BUY'?'🟢':'🔴')+' #'+e.id+' '+e.outcome+'</span>'
+        +'<div style="color:rgba(200,220,255,.6);font-style:italic;margin-top:1px">🧠 '+e.lesson+'</div>'
+        +'</div>';
+    }).join('');
+  }
+
+  // مراجعة Claude
+  if(review) {
+    var reviewAge = Math.round((Date.now()-review.time)/86400000);
+    html += '<div style="margin-top:6px;padding:5px;background:rgba(0,180,255,.05);border-radius:4px;border:1px solid rgba(0,180,255,.15)">'
+      +'<div style="font-size:8px;color:rgba(0,180,255,.5);margin-bottom:3px">🤖 مراجعة Claude ('+(reviewAge===0?'اليوم':reviewAge+'د')+')</div>'
+      +'<div style="font-size:9px;color:rgba(200,220,255,.7)">'+review.text.substring(0,200)+'</div>'
+      +'</div>';
+  }
+
+  el.innerHTML = html;
+
+  var cnt  = document.getElementById('ll-count');
+  var last = document.getElementById('ll-last');
+  if(cnt)  cnt.textContent  = learningHistory.length;
+  if(last) last.textContent = wins+'W/'+losses+'L — WR '+wr+'%';
+}
+
+// ── أضف زر المراجعة الأسبوعية ──
+function addWeeklyReviewButton() {
+  var el = document.getElementById('learningLog');
+  if(!el || !el.parentNode) return;
+  var btn = document.createElement('button');
+  btn.className = 'btn btn-b';
+  btn.style.fontSize = '10px';
+  btn.style.marginTop = '4px';
+  btn.textContent = '🤖 مراجعة Claude الأسبوعية';
+  btn.onclick = weeklyClaudeReview;
+  el.parentNode.insertBefore(btn, el.nextSibling);
+}
+
 function resetTrades(){
   if(!confirm('هل تريد حذف كل الصفقات؟ لا يمكن التراجع')) return;
-  trades=[];tradeN=0;saveTrades();renderTrades();updateStats();
+  trades=[];tradeN=0;saveTrades();renderTrades();updateStats();renderSLReport();addWeeklyReviewButton();
+// مراجعة أسبوعية تلقائية (كل أسبوع)
+var lastReview = JSON.parse(localStorage.getItem('gold_weekly_review')||'null');
+var reviewAge  = lastReview ? (Date.now()-lastReview.time)/86400000 : 999;
+if(reviewAge > 7){ setTimeout(weeklyClaudeReview, 30000); }
   log('[TRADES] 🗑 Reset — all trades cleared');
 }
 function exportTrades(){const b=new Blob([JSON.stringify({trades,tradeN},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`gold_trades_${new Date().toISOString().slice(0,10)}.json`;a.click();}
-function importTrades(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);trades=d.trades||[];tradeN=d.tradeN||0;saveTrades();renderTrades();updateStats();log(`[IMPORT] ${trades.length} trades`);}catch(err){alert('ملف غير صالح');}};r.readAsText(f);}
+function importTrades(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);trades=d.trades||[];tradeN=d.tradeN||0;saveTrades();renderTrades();updateStats();renderSLReport();addWeeklyReviewButton();
+// مراجعة أسبوعية تلقائية (كل أسبوع)
+var lastReview = JSON.parse(localStorage.getItem('gold_weekly_review')||'null');
+var reviewAge  = lastReview ? (Date.now()-lastReview.time)/86400000 : 999;
+if(reviewAge > 7){ setTimeout(weeklyClaudeReview, 30000); }log(`[IMPORT] ${trades.length} trades`);}catch(err){alert('ملف غير صالح');}};r.readAsText(f);}
 
 // ═══════════════════════════════════════════════
 // AUDIO
@@ -587,7 +796,13 @@ function speak(text) {
       window.speechSynthesis.speak(u);
     }
 
-    const el = document.getElementById('audioStatus');
+    // تنبيه خارج الداشبورد
+    if(text.includes('صفقة')||text.includes('هدف')||text.includes('وقف')){
+      pushNotify('🥇 Gold Bot', text, true);
+    } else {
+      pushNotify('🥇 Gold Bot', text, false);
+    }
+    var el = document.getElementById('audioStatus');
     if (el) { el.className='bdg bok'; el.textContent='🔊 '+text.substring(0,30); }
   } catch(e) {
     const el = document.getElementById('audioStatus');
@@ -689,7 +904,7 @@ function renderCalendar() {
     html += `<div class="cal-event cal-${ev.impact}">
       <div>
         <div class="cal-name">${ev.name}</div>
-        <div class="cal-time">${ev.time} GMT | ${toBeirut(ev.time)} • ${label}</div>
+        <div class="cal-time">${ev.time} GMT | ${toBeirut(ev.time)} بيروت • ${label}</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
         <span style="font-size:9px;font-weight:700;color:${impColor}">${impText}</span>
@@ -709,7 +924,7 @@ async function fetchPrice() {
     const r=await fetch(`${BASE}/api/price?type=price`);
     if(!r.ok){log('[PRICE] HTTP '+r.status);return;}
     const d=await r.json();
-    if(!d||!d.price){log(`[PRICE] ✗ ${d?.error||'no data'}`);return;}
+    if(!d||!d.price){log(`[PRICE] ✗ ${d&&d.error||'no data'}`);return;}
     prevP=price||d.price; price=d.price;
     const el=document.getElementById('livePrice');
     el.textContent='$'+price.toFixed(2);
@@ -892,15 +1107,97 @@ async function autoSignal(dir, p) {
   if(isBuy && !d1bull){
     log('[SIGNAL] ❌ BUY مرفوض — D1 هابط'); return;
   }
+
+  // ══ MOMENTUM FILTER (من تحليل الخسائر) ══
+  // النموذج الخاسر: BUY في منتصف هبوط = catch the knife
+  if(data.length >= 4){
+    const last4 = data.slice(-4);
+    const swing = last4[3].cl - last4[0].cl;
+    const atrNow = calcATR(data);
+    if(isBuy && swing < -atrNow*0.4){
+      log('[SIGNAL] ❌ BUY مرفوض — زخم هابط '+swing.toFixed(1));return;
+    }
+    if(!isBuy && swing > atrNow*0.4){
+      log('[SIGNAL] ❌ SELL مرفوض — زخم صاعد '+swing.toFixed(1));return;
+    }
+    // Confirmation Candle
+    const lastC = data[data.length-1];
+    if(isBuy && lastC.cl < lastC.o && (lastC.o-lastC.cl) > atrNow*0.3){
+      log('[SIGNAL] ❌ BUY مرفوض — شمعة هابطة بدون تأكيد');return;
+    }
+  }
+
+  // ══ COOLDOWN (يمنع Revenge Trading) ══
+  const recentLoss = trades.filter(function(t){
+    return t.result==='LOSS' && t.closeTime && (Date.now()-t.closeTime)<2*60*60*1000;
+  });
+  if(recentLoss.length>=2){
+    log('[SIGNAL] ⏸ Cooldown — '+recentLoss.length+' خسائر في آخر 2 ساعة');return;
+  }
+
+  // ══ ATR MINIMUM ══
+  const atrCheck = calcATR(data);
+  if(atrCheck < 8){
+    log('[SIGNAL] ❌ ATR='+atrCheck.toFixed(1)+' — سوق ضعيف');return;
+  }
   if(!isBuy && d1bull) {
-    // السماح ببيع تصحيحي إذا في Premium + OB Sell
     const _pdA = computePremiumDiscount(data, p);
     const inOBS = obSellZones.some(ob=>p>=ob.bot*.999&&p<=ob.top*1.001);
     const allowSell = _pdA && _pdA.pct >= 70 && (inOBS || !d1bull);
     if(!allowSell){
-      log('[SIGNAL] ❌ SELL مرفوض — D1 صاعد بدون تأكيد Premium+OB'); return;
+      log('[SIGNAL] ❌ SELL مرفوض — D1 صاعد بدون تأكيد'); return;
     }
-    log('[SIGNAL] ⚠️ SELL تصحيحي — Premium '+(_pdA?_pdA.pct:'?')+'% + '+( inOBS?'OB Sell':'D1 هابط'));
+  }
+
+  // ══ MOMENTUM CONFIRMATION ══
+  // النموذج الخاسر: BUY في منتصف هبوط مستمر
+  // الحل: نشترط شمعة ارتداد تأكيدية قبل الدخول
+  if(data.length >= 4) {
+    const last4  = data.slice(-4);
+    const swing  = last4[3].cl - last4[0].cl; // الحركة الأخيرة
+    const atr4   = calcATR(data);
+
+    if(isBuy) {
+      // BUY: يجب أن يكون الزخم الأخير إيجابياً أو محايداً
+      // لا BUY إذا الهبوط مستمر (catch the knife)
+      if(swing < -atr4 * 0.4) {
+        log('[SIGNAL] ❌ BUY مرفوض — زخم هابط مستمر (' + swing.toFixed(1) + ')');
+        return;
+      }
+      // شمعة الدخول يجب أن تكون صاعدة أو محايدة (Confirmation)
+      const lastC = data[data.length-1];
+      if(lastC.cl < lastC.o && (lastC.o - lastC.cl) > atr4 * 0.3) {
+        log('[SIGNAL] ❌ BUY مرفوض — شمعة هابطة بدون تأكيد');
+        return;
+      }
+    } else {
+      // SELL: لا SELL إذا الارتداد مستمر
+      if(swing > atr4 * 0.4) {
+        log('[SIGNAL] ❌ SELL مرفوض — زخم صاعد مستمر (' + swing.toFixed(1) + ')');
+        return;
+      }
+    }
+  }
+
+  // ══ COOLDOWN بعد خسارتين متتاليتين ══
+  // يمنع Revenge Trading
+  const recentClosed = trades.filter(t =>
+    (t.status==='SL' || t.status==='TP2') &&
+    t.closeTime && (Date.now() - t.closeTime) < 2*60*60*1000
+  ).slice(-2);
+  if(recentClosed.length >= 2 &&
+     recentClosed.every(t => t.result==='LOSS')) {
+    log('[SIGNAL] ⏸ Cooldown — خسارتان متتاليتان، انتظر 2 ساعة');
+    return;
+  }
+
+  // ══ ATR FILTER — لا تداول في سوق خائف ══
+  // ATR منخفض جداً = تذبذب بدون اتجاه
+  const currentATR = calcATR(data);
+  const minATR = 8; // الحد الأدنى لتداول الذهب
+  if(currentATR < minATR) {
+    log('[SIGNAL] ❌ ATR منخفض جداً (' + currentATR.toFixed(1) + ') — سوق ضعيف الزخم');
+    return;
   }
   // منع BUY في Premium Zone (>70%) و SELL في Discount (<30%)
   const _pd = computePremiumDiscount(data, p);
@@ -919,7 +1216,7 @@ async function autoSignal(dir, p) {
   if(rr<1.5){log(`[SIGNAL] ❌ R:R ${rr.toFixed(2)} < 1.5`);return;}
   speak('انتبه صفقة');
   showAlert('trade',`🔔 إشارة ${dir} #${tradeN+1}`);
-  const t=createTrade({direction:dir,entry:parseFloat(p.toFixed(2)),sl:parseFloat(sl.toFixed(2)),tp1:parseFloat(tp1.toFixed(2)),tp2:parseFloat(tp2.toFixed(2)),confidence:Math.min(90,Math.round(50+rr*10)),rr:rr.toFixed(2),session:document.getElementById('sSess').textContent||'',reason:`ATR=${atr.toFixed(2)} | OB/FVG | D1:${d1bull?'↑':'↓'} | RR=${rr.toFixed(2)}`,atr:atr.toFixed(2)});
+  const t=createTrade({direction:dir,entry:parseFloat(p.toFixed(2)),sl:parseFloat(sl.toFixed(2)),tp1:parseFloat(tp1.toFixed(2)),tp2:parseFloat(tp2.toFixed(2)),confidence:Math.min(90,Math.round(50+rr*10)),rr:rr.toFixed(2),session:(document.getElementById('sSess')||{}).textContent||'',reason:'ATR='+atr.toFixed(2)+' | OB/FVG | D1:'+(d1bull?'↑':'↓')+' | RR='+rr.toFixed(2),atr:atr.toFixed(2)});
   await tgSendTrade(t,rr);
   // أرسل الشارت تلقائياً مع الإشارة
   setTimeout(()=>sendChartToTelegram(true),1000);
@@ -982,7 +1279,7 @@ async function buildMiniChart(sym, tf) {
   try {
     const r = await fetch(`${BASE}/api/price?type=candles&tf=${tf}&symbol=${sym}&limit=20`);
     const d = await r.json();
-    if (!d.candles?.length) return null;
+    if (!d.candles&&d.candles.length) return null;
     const mc2=document.createElement('canvas');
     mc2.width=800;mc2.height=400;
     drawMiniChartOn(mc2.getContext('2d'),800,400,d.candles.slice(-20),sym+' / USD');
@@ -999,7 +1296,7 @@ async function buildDXYChart(tf) {
     const url=`https://query1.finance.yahoo.com/v8/finance/chart/DX%3DF?interval=${iv}&range=${rg}&includePrePost=false`;
     const r=await fetch(`${BASE}/api/yahoo?url=${encodeURIComponent(url)}`);
     const d=await r.json();
-    if(!d.candles?.length) return null;
+    if(!d.candles&&d.candles.length) return null;
     const mc3=document.createElement('canvas');
     mc3.width=800;mc3.height=400;
     drawMiniChartOn(mc3.getContext('2d'),800,400,d.candles.slice(-20),'DXY (الدولار)');
@@ -1047,8 +1344,11 @@ function drawMiniChartOn(ctx2, W, H, data, label) {
 // ═══════════════════════════════════════════════
 // TRADE MANAGEMENT
 // ═══════════════════════════════════════════════
-function createTrade(d){tradeN++;const t={id:tradeN,...d,status:'OPEN',result:null,entryHit:false,tp1Hit:false,tp2Hit:false,slHit:false,openTime:Date.now(),closeTime:null,pnl:null,aiLesson:null,checkCount:0,lastCheck:Date.now(),priceHistory:[]};trades.push(t);saveTrades();return t;}
-function updTrade(id,upd){const i=trades.findIndex(t=>t.id===id);if(i>=0){trades[i]={...trades[i],...upd};saveTrades();}}
+function createTrade(d){tradeN++;var t=Object.assign({},{id:tradeN},d,{status:'OPEN',result:null,entryHit:false,tp1Hit:false,tp2Hit:false,slHit:false,openTime:Date.now(),closeTime:null,pnl:null,aiLesson:null,checkCount:0,lastCheck:Date.now(),priceHistory:[]});trades.push(t);saveTrades();
+  // تسجيل سياق الصفقة للتعلم
+  try{ recordTradeContext(t, cdata[curTF], price); }catch(e){}
+  return t;}
+function updTrade(id,upd){const i=trades.findIndex(t=>t.id===id);if(i>=0){trades[i]=Object.assign({},trades[i],upd);saveTrades();}}
 
 let lastMon=0;
 function monitorTrades(p){
@@ -1080,6 +1380,7 @@ function monitorTrades(p){
       const pnl=isBuy?t.tp2-t.entry:t.entry-t.tp2;
       updTrade(t.id,{tp2Hit:true,status:'TP2',result:'WIN',pnl,closeTime:Date.now()});
       speak('تحقق الهدف الثاني، صفقة ناجحة');
+      setTimeout(function(){ try{analyzePatternsAndAdjust();}catch(e){} }, 2000);
       showAlert('buy',`🏆 TP2 #${t.id} WIN!`);
       tgNotify(`🏆 *#${t.id} — هدف 2 تحقق!*\n💰 \`+${pnl.toFixed(2)}\` pts\n⏱ ${Math.round(elapsed)}د`);
       getLesson(t,'TP2',p);
@@ -1089,22 +1390,47 @@ function monitorTrades(p){
       updTrade(t.id,{slHit:true,status:'SL',result:'LOSS',pnl,closeTime:Date.now()});
       speak('وقف الخسارة، راجع التحليل');
       showAlert('sell',`❌ SL #${t.id}`);
+      // تحديث الأوزان بعد الخسارة
+      setTimeout(function(){ try{analyzePatternsAndAdjust();}catch(e){} }, 2000);
       tgNotify(`❌ *#${t.id} — وقف خسارة*\n📉 \`${pnl.toFixed(2)}\` pts\n💡 ${t.reason}`);
       getLesson(t,'SL',p);
     }
   }
-  renderTrades();updateStats();
+  renderTrades();updateStats();renderSLReport();addWeeklyReviewButton();
+// مراجعة أسبوعية تلقائية (كل أسبوع)
+var lastReview = JSON.parse(localStorage.getItem('gold_weekly_review')||'null');
+var reviewAge  = lastReview ? (Date.now()-lastReview.time)/86400000 : 999;
+if(reviewAge > 7){ setTimeout(weeklyClaudeReview, 30000); }
 }
 
 async function getLesson(t,outcome,p){
   try{
-    const prompt=`أنت نظام تعلم آلي لتداول الذهب XAU/USD.\nصفقة #${t.id}: ${t.direction} | دخول: ${t.entry} | السعر: ${p} | النتيجة: ${outcome==='TP1'?'هدف 1':outcome==='TP2'?'هدف 2':'وقف خسارة'} | السبب: ${t.reason}\nاكتب درساً واحداً مختصراً (جملة واحدة، أقل من 20 كلمة).`;
-    const r=await fetch(`${BASE}/api/analyze`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lesson_mode:true,prompt_override:prompt,price:p})});
-    const d=await r.json();
-    updTrade(t.id,{aiLesson:d.analysis?.substring(0,150)||''});
-    log(`[AI LEARN] #${t.id}: ${d.analysis?.substring(0,60)}`);
-    renderTrades();
-  }catch(e){log(`[AI LEARN] Error: ${e.message}`);}
+    const outcomeText = outcome==='TP1'?'هدف 1 تحقق':outcome==='TP2'?'هدف 2 تحقق - ربح كامل':'وقف خسارة';
+    const pnlText = t.pnl ? (t.pnl>0?'+':'')+t.pnl.toFixed(2)+' pts' : '';
+    const msg = 'صفقة #'+t.id+': '+t.direction+' | دخول: '+t.entry+' | السعر: '+p.toFixed(2)+' | '+outcomeText+' '+pnlText+' | ATR: '+t.atr+' | R:R: '+t.rr+'\nالسبب الأصلي: '+t.reason+'\n\nاكتب درساً واحداً مختصراً جداً (أقل من 15 كلمة) يفيد في تداولات مستقبلية.';
+    const r = await fetch(BASE+'/api/analyze',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        symbol:'XAUUSD',
+        price:p.toFixed(2),
+        lesson_mode:true,
+        lesson_prompt:msg,
+        max_tokens:80
+      })
+    });
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const d = await r.json();
+    const lesson = (d.analysis||d.lesson||'').substring(0,120);
+    if(lesson){
+      updTrade(t.id,{aiLesson:lesson});
+      log('[LEARN] #'+t.id+': '+lesson.substring(0,50));
+      tgNotify('🧠 *درس #'+t.id+'*\n'+lesson+'\n_'+outcomeText+'_');
+      // تحديث سجل التعلم في الداشبورد
+      updateLearningLog(t.id, lesson, outcomeText, t.direction);
+      renderTrades();
+    }
+  }catch(e){log('[LEARN] Error: '+e.message);}
 }
 
 function renderTrades(){
@@ -1165,7 +1491,7 @@ async function fetchCandles(tf){
   try{
     const r=await fetch(`${BASE}/api/price?type=candles&tf=${tf}&limit=60`);
     const d=await r.json();
-    if(!d.candles?.length){log(`[CANDLES] ✗ ${d.error||'empty'}`);return;}
+    if(!d.candles&&d.candles.length){log(`[CANDLES] ✗ ${d.error||'empty'}`);return;}
     // فرز وتنظيف بسيط فقط
     const raw = d.candles;
     const cleanCandles = raw
@@ -1228,188 +1554,237 @@ function updateLastCandle(p){
 const cv=document.getElementById('mc'),ctx=cv.getContext('2d');
 
 function drawChart(tf){
-  const wrap=document.getElementById('cwrap');
-  cv.width=wrap.clientWidth; cv.height=wrap.clientHeight;
-  const W=cv.width,H=cv.height,allData=cdata[tf];
-  if(!allData||allData.length<2)return;
-  // ── ZOOM: آخر 20 شمعة مرتبة بالوقت ──
-  // فرز بالـ timestamp أولاً
-  const sorted = allData.slice().sort((a,b) => (a.t||0)-(b.t||0));
-  // إزالة الشمعات المكررة أو ذات الـ timestamp الصفري
-  const unique = [];
-  const seen = new Set();
-  for(const c2 of sorted) {
-    const key = c2.t || (c2.o+'_'+c2.cl);
-    if(!seen.has(key) && c2.o > 0 && c2.cl > 0) {
-      seen.add(key);
-      unique.push(c2);
-    }
-  }
-  // فلتر الفجوات الكبيرة — احذف شمعات بعيدة جداً عن متوسط السعر
-  const lastPrice = unique.length > 0 ? unique[unique.length-1].cl : 0;
-  // ── فلتر الشمعات بالـ Median ──
-  // احسب الـ median لإزالة الـ outliers
-  if(unique.length > 0) {
-    const closes = unique.map(c2 => c2.cl).sort((a,b) => a-b);
-    const med = closes[Math.floor(closes.length/2)];
-    // احذف أي شمعة تبعد أكثر من 2% عن الـ median
-    const threshold = med * 0.02;
-    var filtered = unique.filter(c2 => {
-      const valid =
-        c2.h > 0 && c2.l > 0 && c2.o > 0 && c2.cl > 0 &&
-        c2.h >= c2.l && c2.h >= c2.o && c2.h >= c2.cl &&
-        c2.l <= c2.o && c2.l <= c2.cl &&
-        Math.abs(c2.cl - med) <= threshold &&
-        Math.abs(c2.h  - med) <= threshold * 2 &&
-        (c2.h - c2.l) < med * 0.015; // حجم الشمعة أقل من 1.5%
-      return valid;
-    });
-    // إذا فُقد أكثر من 50% من الشمعات — ارجع للـ unique مع فلتر OHLC فقط
-    if(filtered.length < unique.length * 0.5) {
-      filtered = unique.filter(c2 =>
-        c2.h > 0 && c2.l > 0 && c2.o > 0 && c2.cl > 0 &&
-        c2.h >= c2.l && c2.h >= c2.o && c2.h >= c2.cl &&
-        c2.l <= c2.o && c2.l <= c2.cl
-      );
-    }
-  } else {
-    var filtered = unique;
-  }
-  const finalData = filtered.length >= 5 ? filtered : unique;
-  const ZOOM = 20;
-  const data = finalData.slice(-ZOOM);
-  if(!data||data.length<2)return;
+  const wrap = document.getElementById('cwrap');
+  cv.width   = wrap.clientWidth;
+  cv.height  = wrap.clientHeight;
+  const W = cv.width, H = cv.height;
+  const allData = cdata[tf];
+  if(!allData || allData.length < 2) return;
 
-  // خلفية
-  ctx.fillStyle='#0A1628'; ctx.fillRect(0,0,W,H); // Bloomberg Navy chart
+  // آخر 25 شمعة فقط
+  const data = allData.slice(-25);
+  if(data.length < 2) return;
 
-  // grid
-  ctx.strokeStyle='rgba(0,180,255,.08)';ctx.lineWidth=.5;
-  for(let i=0;i<8;i++){const y=H*i/8;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  for(let i=0;i<10;i++){const x=W*i/10;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  // ── خلفية بيضاء احترافية ──
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, W, H);
+
+  // ── حدود الشارت ──
+  const mL = 8, mR = 72, mT = 8, mB = 20;
+  const cW2 = W - mL - mR;
+  const cH2 = H - mT - mB;
 
   // ── Y Scale بالـ Percentile ──
-  const allPrices = data.flatMap(c=>[c.h,c.l]).sort((a,b)=>a-b);
-  const p5  = allPrices[Math.floor(allPrices.length*0.05)];
-  const p95 = allPrices[Math.floor(allPrices.length*0.95)];
-  const rng = (p95 - p5) || 1;
-  const pad = rng * 0.20;
+  const allP = data.flatMap(c2 => [c2.h, c2.l]).sort((a,b) => a-b);
+  const p5   = allP[Math.max(0, Math.floor(allP.length*0.05))];
+  const p95  = allP[Math.min(allP.length-1, Math.floor(allP.length*0.95))];
+  const rng  = (p95 - p5) || 10;
+  const pad  = rng * 0.25;
   const pMin = p5 - pad;
   const pMax = p95 + pad;
-  const toY = p => H - ((p - pMin) / (pMax - pMin)) * (H * 0.88) - H * 0.06;
-  const mL=14,mR=70,chartW=W-mL-mR;
-  const cW=Math.max(4,chartW/data.length-1.5);
+  const toY  = p => mT + cH2 - ((p - pMin) / (pMax - pMin)) * cH2;
 
-  // ══ رسم OB SELL zones (أحمر) ══
-  // OB Sell — شفاف جداً لا يغطي الشمعات
-  obSellZones.slice(-1).forEach((ob,i)=>{
-    ctx.fillStyle='rgba(255,45,85,0.07)';
-    ctx.fillRect(mL,toY(ob.top),chartW,toY(ob.bot)-toY(ob.top));
-    ctx.strokeStyle='rgba(255,45,85,0.35)';ctx.lineWidth=1;ctx.setLineDash([4,3]);
-    ctx.strokeRect(mL,toY(ob.top),chartW,toY(ob.bot)-toY(ob.top));
+  // عرض الشمعة
+  const cW = Math.max(5, cW2 / data.length - 2);
+
+  // ── Grid خطوط أفقية خفيفة ──
+  ctx.strokeStyle = '#F0F0F0';
+  ctx.lineWidth   = 0.5;
+  const steps = 8;
+  for(let i = 0; i <= steps; i++){
+    const price_line = pMin + (pMax - pMin) * i / steps;
+    const y = toY(price_line);
+    ctx.beginPath(); ctx.moveTo(mL, y); ctx.lineTo(W - mR, y); ctx.stroke();
+    // سعر على اليمين
+    ctx.fillStyle   = '#999999';
+    ctx.font        = '9px monospace';
+    ctx.textAlign   = 'left';
+    ctx.fillText(price_line.toFixed(1), W - mR + 3, y + 3);
+  }
+
+  // ── Grid عمودي خفيف ──
+  ctx.strokeStyle = '#F5F5F5';
+  for(let i = 0; i < data.length; i += 4){
+    const x = mL + (i / data.length) * cW2;
+    ctx.beginPath(); ctx.moveTo(x, mT); ctx.lineTo(x, H - mB); ctx.stroke();
+  }
+
+  // ── OB SELL — إطار أحمر بدون fill كثيف ──
+  obSellZones.slice(-1).forEach(ob => {
+    const y1 = toY(ob.top), y2 = toY(ob.bot);
+    const h2 = Math.abs(y2 - y1);
+    // fill شفاف جداً
+    ctx.fillStyle = 'rgba(220, 50, 50, 0.06)';
+    ctx.fillRect(mL, y1, cW2, h2);
+    // إطار واضح
+    ctx.strokeStyle = 'rgba(220, 50, 50, 0.7)';
+    ctx.lineWidth   = 1.5;
+    ctx.setLineDash([5, 3]);
+    ctx.strokeRect(mL, y1, cW2, h2);
     ctx.setLineDash([]);
-    ctx.fillStyle='rgba(255,45,85,.9)';ctx.font='bold 10px monospace';ctx.textAlign='left';
-    ctx.fillText('OB SELL '+ob.bot.toFixed(0)+'–'+ob.top.toFixed(0),mL+4,toY(ob.top)-3);
+    // label أعلى المنطقة — خارج الشارت على اليسار
+    ctx.fillStyle = '#DC3232';
+    ctx.font      = 'bold 9px monospace';
+    ctx.textAlign = 'left';
+    const midY = y1 + h2/2 + 4;
+    ctx.fillText('OB↓ ' + ob.bot.toFixed(1) + '–' + ob.top.toFixed(1), mL + 3, y1 - 3);
   });
 
-  // ══ رسم OB BUY zones (أخضر) ══
-  // OB Buy — شفاف جداً
-  obBuyZones.slice(-1).forEach((ob,i)=>{
-    ctx.fillStyle='rgba(0,255,136,0.07)';
-    ctx.fillRect(mL,toY(ob.top),chartW,toY(ob.bot)-toY(ob.top));
-    ctx.strokeStyle='rgba(0,255,136,0.35)';ctx.lineWidth=1;ctx.setLineDash([4,3]);
-    ctx.strokeRect(mL,toY(ob.top),chartW,toY(ob.bot)-toY(ob.top));
+  // ── OB BUY — إطار أخضر ──
+  obBuyZones.slice(-1).forEach(ob => {
+    const y1 = toY(ob.top), y2 = toY(ob.bot);
+    const h2 = Math.abs(y2 - y1);
+    ctx.fillStyle = 'rgba(30, 160, 80, 0.06)';
+    ctx.fillRect(mL, y1, cW2, h2);
+    ctx.strokeStyle = 'rgba(30, 160, 80, 0.7)';
+    ctx.lineWidth   = 1.5;
+    ctx.setLineDash([5, 3]);
+    ctx.strokeRect(mL, y1, cW2, h2);
     ctx.setLineDash([]);
-    ctx.fillStyle='rgba(0,255,136,.9)';ctx.font='bold 10px monospace';ctx.textAlign='left';
-    ctx.fillText('OB BUY '+ob.bot.toFixed(0)+'–'+ob.top.toFixed(0),mL+4,toY(ob.bot)+12);
+    ctx.fillStyle = '#1EA050';
+    ctx.font      = 'bold 9px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('OB↑ ' + ob.bot.toFixed(1) + '–' + ob.top.toFixed(1), mL + 3, y2 + 12);
   });
 
-  // FVG — شفاف جداً
-  fvgZones.slice(-2).forEach((fvg,i)=>{
-    ctx.fillStyle='rgba(255,160,0,0.06)';
-    ctx.fillRect(mL,toY(fvg.top),chartW,toY(fvg.bot)-toY(fvg.top));
-    ctx.strokeStyle='rgba(255,160,0,0.30)';ctx.lineWidth=.7;ctx.setLineDash([3,3]);
-    ctx.strokeRect(mL,toY(fvg.top),chartW,toY(fvg.bot)-toY(fvg.top));
+  // ── FVG — شفاف مع خط متقطع برتقالي ──
+  fvgZones.slice(-2).forEach(fvg => {
+    const y1 = toY(fvg.top), y2 = toY(fvg.bot);
+    const h2 = Math.abs(y2 - y1);
+    ctx.fillStyle = 'rgba(255, 140, 0, 0.05)';
+    ctx.fillRect(mL, y1, cW2, h2);
+    ctx.strokeStyle = 'rgba(255, 140, 0, 0.5)';
+    ctx.lineWidth   = 1;
+    ctx.setLineDash([3, 4]);
+    ctx.strokeRect(mL, y1, cW2, h2);
     ctx.setLineDash([]);
-    ctx.fillStyle='rgba(255,160,0,.8)';ctx.font='9px monospace';ctx.textAlign='left';
-    ctx.fillText('FVG',mL+4,toY(fvg.top)-2);
+    ctx.fillStyle = '#FF8C00';
+    ctx.font      = '8px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('FVG', mL + 3, y1 - 2);
   });
 
-  // ══ EMA 50 ══
-  ctx.beginPath();ctx.strokeStyle='#00D4FF';ctx.lineWidth=1;
-  let e50=data[0].cl,k50=2/51;
-  data.forEach((c,i)=>{e50=c.cl*k50+e50*(1-k50);const x=mL+(i/data.length)*chartW+cW/2;i?ctx.lineTo(x,toY(e50)):ctx.moveTo(x,toY(e50));});
+  // ── EMA 50 — أزرق رفيع ──
+  const closes = data.map(c2 => c2.cl);
+  let e50 = closes[0], k50 = 2/51;
+  ctx.beginPath();
+  ctx.strokeStyle = '#2196F3';
+  ctx.lineWidth   = 1.2;
+  data.forEach((c2, i) => {
+    e50 = c2.cl * k50 + e50 * (1 - k50);
+    const x = mL + (i / data.length) * cW2 + cW/2;
+    i === 0 ? ctx.moveTo(x, toY(e50)) : ctx.lineTo(x, toY(e50));
+  });
   ctx.stroke();
 
-  // ══ EMA 200 ══
-  ctx.beginPath();ctx.strokeStyle='rgba(255,165,0,.6)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
-  let e200=data[0].cl,k200=2/201;
-  data.forEach((c,i)=>{e200=c.cl*k200+e200*(1-k200);const x=mL+(i/data.length)*chartW+cW/2;i?ctx.lineTo(x,toY(e200)):ctx.moveTo(x,toY(e200));});
-  ctx.stroke();ctx.setLineDash([]);
+  // ── EMA 200 — رمادي متقطع ──
+  let e200 = allData[0].cl, k200 = 2/201;
+  allData.forEach(c2 => { e200 = c2.cl * k200 + e200 * (1 - k200); });
+  const e200y = toY(e200);
+  ctx.beginPath();
+  ctx.strokeStyle = '#AAAAAA';
+  ctx.lineWidth   = 1;
+  ctx.setLineDash([6, 4]);
+  ctx.moveTo(mL, e200y);
+  ctx.lineTo(W - mR, e200y);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  // label EMA200
+  ctx.fillStyle = '#AAAAAA';
+  ctx.font      = '8px monospace';
+  ctx.textAlign = 'right';
+  ctx.fillText('EMA200', W - mR - 3, e200y - 2);
 
-  // ══ الشمعات ══
-  data.forEach((c,i)=>{
-    const x=mL+(i/data.length)*chartW,bull=c.cl>=c.o,cx=x+cW/2;
-    ctx.strokeStyle=bull?'#00FF88':'#FF2D55';ctx.lineWidth=.8;
-    ctx.beginPath();ctx.moveTo(cx,toY(c.h));ctx.lineTo(cx,toY(c.l));ctx.stroke();
-    ctx.fillStyle=bull?'rgba(0,255,136,.75)':'rgba(255,45,85,.75)';
-    const bT=toY(Math.max(c.o,c.cl)),bH=Math.max(1,Math.abs(toY(c.o)-toY(c.cl)));
-    ctx.fillRect(x+.5,bT,Math.max(1,cW-1),bH);
+  // ── الشمعات ──
+  data.forEach((c2, i) => {
+    const x    = mL + (i / data.length) * cW2;
+    const cx   = x + cW / 2;
+    const bull = c2.cl >= c2.o;
+
+    const bodyTop = toY(Math.max(c2.o, c2.cl));
+    const bodyBot = toY(Math.min(c2.o, c2.cl));
+    const bodyH   = Math.max(1.5, bodyBot - bodyTop);
+
+    if(bull){
+      // صاعدة: أخضر غامق مملوء
+      ctx.fillStyle   = '#26A69A';
+      ctx.strokeStyle = '#1B7A72';
+    } else {
+      // هابطة: أحمر غامق مملوء
+      ctx.fillStyle   = '#EF5350';
+      ctx.strokeStyle = '#C62828';
+    }
+
+    // الفتيل
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx, toY(c2.h));
+    ctx.lineTo(cx, toY(c2.l));
+    ctx.stroke();
+
+    // الجسم
+    ctx.fillRect(x + 0.5, bodyTop, Math.max(2, cW - 1), bodyH);
+    ctx.strokeRect(x + 0.5, bodyTop, Math.max(2, cW - 1), bodyH);
   });
 
-  // ══ خطوط الصفقات المفتوحة ══
-  trades.filter(t=>t.status==='OPEN'||t.status==='TP1').forEach(t=>{
-    const drawLine=(y,col,dash,label)=>{
-      ctx.setLineDash(dash||[4,4]);ctx.strokeStyle=col;ctx.lineWidth=1.8;
-      ctx.beginPath();ctx.moveTo(mL,y);ctx.lineTo(W-mR,y);ctx.stroke();
+  // ── خطوط الصفقات المفتوحة ──
+  trades.filter(t => t.status==='OPEN' || t.status==='TP1').forEach(t => {
+    function drawTradeLine(price_val, color, label){
+      const y = toY(price_val);
+      ctx.strokeStyle = color;
+      ctx.lineWidth   = 1.5;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath(); ctx.moveTo(mL, y); ctx.lineTo(W - mR, y); ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle=col;ctx.font='bold 11px monospace';ctx.textAlign='right';
-      ctx.fillText(label,W-mR-2,y-2);
-    };
-    drawLine(toY(t.entry),'rgba(255,215,0,.9)',[],'📍 Entry');
-    drawLine(toY(t.sl),'rgba(255,45,85,.9)',[],'🛑 SL');
-    drawLine(toY(t.tp1),'rgba(0,255,136,.9)',[],t.tp1Hit?'✅ TP1':'🎯 TP1');
-    if(t.tp1Hit) drawLine(toY(t.tp2),'rgba(0,255,136,.6)',[2,4],'🎯 TP2');
+      ctx.fillStyle   = color;
+      ctx.font        = 'bold 9px monospace';
+      ctx.textAlign   = 'right';
+      ctx.fillText(label + ' ' + price_val.toFixed(1), W - mR - 2, y - 2);
+    }
+    drawTradeLine(t.entry, '#1565C0', '📍');
+    drawTradeLine(t.sl,    '#C62828', '🛑');
+    drawTradeLine(t.tp1,   '#1B7A72', t.tp1Hit ? '✅' : '🎯');
   });
 
-  // ══ TP level من السيجنال الحالي ══
-  if(tpLevel>0){
-    ctx.setLineDash([6,3]);ctx.strokeStyle='rgba(0,255,136,.4)';ctx.lineWidth=.8;
-    ctx.beginPath();ctx.moveTo(mL,toY(tpLevel));ctx.lineTo(W-mR,toY(tpLevel));ctx.stroke();
+  // ── السعر الحالي ──
+  if(price > 0){
+    const cy = toY(price);
+    // خط السعر
+    ctx.strokeStyle = '#FF6F00';
+    ctx.lineWidth   = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(mL, cy); ctx.lineTo(W - mR, cy); ctx.stroke();
     ctx.setLineDash([]);
+    // مستطيل السعر
+    ctx.fillStyle = '#FF6F00';
+    ctx.fillRect(W - mR + 1, cy - 9, mR - 2, 18);
+    // النص
+    ctx.fillStyle   = '#FFFFFF';
+    ctx.font        = 'bold 9px monospace';
+    ctx.textAlign   = 'left';
+    ctx.fillText(price.toFixed(2), W - mR + 3, cy + 3);
   }
 
-  // ══ السعر الحالي ══
-  if(price>0){
-    const curY=toY(price);
-    ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(255,215,0,.7)';ctx.lineWidth=.8;
-    ctx.beginPath();ctx.moveTo(mL,curY);ctx.lineTo(W-mR+4,curY);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle='rgba(255,215,0,.95)';ctx.fillRect(W-mR+4,curY-9,mR-3,18);
-    ctx.fillStyle='#0A0800';ctx.font='bold 9px monospace';ctx.textAlign='left';
-    ctx.fillText(price.toFixed(2),W-mR+6,curY+3);
-  }
+  // ── TF label ──
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  ctx.font      = 'bold 14px Orbitron, monospace';
+  ctx.textAlign = 'right';
+  ctx.fillText(tf, W - mR - 5, H - mB - 2);
 
-  // Scale
-  ctx.fillStyle='rgba(255,215,0,.45)';ctx.font='7px monospace';ctx.textAlign='left';
-  for(let i=0;i<=6;i++){const p=pMin+(pMax-pMin)*i/6;ctx.fillText(p.toFixed(1),W-mR+5,toY(p)+3);}
-
-  // TF label
-  ctx.fillStyle='rgba(255,215,0,.3)';ctx.font='bold 11px Orbitron, monospace';ctx.textAlign='right';
-  ctx.fillText(tf,W-mR-10,H-10);
-
-  // تحديث labels
-  const latestOBSell=obSellZones.length?obSellZones[obSellZones.length-1]:null;
-  const latestOBBuy=obBuyZones.length?obBuyZones[obBuyZones.length-1]:null;
-  const latestFVG=fvgZones.length?fvgZones[fvgZones.length-1]:null;
-  document.getElementById('lbl-ob-sell').textContent=latestOBSell?`📦 OB SELL: ${latestOBSell.bot.toFixed(2)}–${latestOBSell.top.toFixed(2)}`:'📦 OB SELL: ---';
-  document.getElementById('lbl-ob-buy').textContent=latestOBBuy?`🧲 OB BUY: ${latestOBBuy.bot.toFixed(2)}–${latestOBBuy.top.toFixed(2)}`:'🧲 OB BUY: ---';
-  document.getElementById('lbl-fvg').textContent=latestFVG?`⚡ FVG: ${latestFVG.bot.toFixed(2)}–${latestFVG.top.toFixed(2)}`:'⚡ FVG: ---';
-  document.getElementById('lbl-tp').textContent=tpLevel>0?`🎯 TP: $${tpLevel.toFixed(2)}`:'🎯 TP: ---';
+  // ── تحديث labels خارج الشارت ──
+  const lOS  = obSellZones.length ? obSellZones[obSellZones.length-1] : null;
+  const lOB  = obBuyZones.length  ? obBuyZones[obBuyZones.length-1]  : null;
+  const lFVG = fvgZones.length    ? fvgZones[fvgZones.length-1]      : null;
+  const lbl1 = document.getElementById('lbl-ob-sell');
+  const lbl2 = document.getElementById('lbl-ob-buy');
+  const lbl3 = document.getElementById('lbl-fvg');
+  const lbl4 = document.getElementById('lbl-tp');
+  if(lbl1) lbl1.textContent = lOS  ? '📦 OB SELL: ' + lOS.bot.toFixed(2) + '–' + lOS.top.toFixed(2) : '📦 OB SELL: ---';
+  if(lbl2) lbl2.textContent = lOB  ? '🧲 OB BUY: '  + lOB.bot.toFixed(2) + '–' + lOB.top.toFixed(2) : '🧲 OB BUY: ---';
+  if(lbl3) lbl3.textContent = lFVG ? '⚡ FVG: '      + lFVG.bot.toFixed(2) + '–' + lFVG.top.toFixed(2): '⚡ FVG: ---';
+  if(lbl4) lbl4.textContent = tpLevel > 0 ? '🎯 TP: $' + tpLevel.toFixed(2) : '🎯 TP: ---';
 }
 
-// ═══════════════════════════════════════════════
-// SPARKLINES
-// ═══════════════════════════════════════════════
 function updateSpark(tf){
   const data=cdata[tf];if(!data||data.length<2)return;
   const bull=data[data.length-1].cl>data[0].cl;
@@ -1465,7 +1840,9 @@ function computeIndicators(){
   document.getElementById('t-h4').textContent=h4bull?'صاعد ↑':'هابط ↓';document.getElementById('t-h4').className='tv '+(h4bull?'tg':'tr');
   document.getElementById('t-h1').textContent=h1bull?'صاعد ↑':'هابط ↓';document.getElementById('t-h1').className='tv '+(h1bull?'tg':'tr');
   document.getElementById('t-align').textContent=aligned?'✅ متوافق':'❌ تعارض';document.getElementById('t-align').className='tv '+(aligned?'tg':'tr');
-  document.getElementById('sch-td').textContent=aligned?(d1bull?'BULL ✓':'BEAR ✓'):'MIXED ✗';document.getElementById('sch-td').style.color=aligned?'var(--green)':'var(--red)';
+  // ══ تحديث تابلو المدارس مع الأرقام والدليل ══
+  updateSchoolsTableau(bos, macd, d1bull, h1bull, atH, bearC, price, vwap,
+                       aligned, inOBSell, inOBBuy, data);
   const bos=closes[n-1]>Math.max(...closes.slice(-10,-1));
   const atH=price>Math.max(...data.map(c=>c.h).slice(-20))*.998;
   const bearC=data[n-1].cl<data[n-1].o;
@@ -1516,7 +1893,8 @@ function computeIndicators(){
   // ── Auto Signal من الإشارة المحسوبة ──
   if(isMarketOpen() && dir !== 'WAIT' && conf >= 60 && aligned && rr >= 1.5) {
     const now = Date.now();
-    if(now - lastAlertT > 300000) { // كل 5 دقائق فقط
+    // كل 5 دقائق كحد أدنى بين الإشارات
+    if(now - lastAlertT > 300000) {
       lastAlertT = now;
       autoSignal(dir, price);
     }
@@ -1576,12 +1954,12 @@ function updateLevels(p){
   const prevOBBuy=obBuyZones.length>1?obBuyZones[obBuyZones.length-2]:null;
   const bullFVG=fvgZones.find(f=>f.type==='bull');
   const bearFVG=fvgZones.find(f=>f.type==='bear');
-  document.getElementById('lR3').textContent=prevOBSell?fmt(prevOBSell.top):data?.length?fmt(Math.max(...data.map(c=>c.h).slice(-50))):'---';
+  document.getElementById('lR3').textContent=prevOBSell?fmt(prevOBSell.top):data&&data.length?fmt(Math.max(...data.map(c=>c.h).slice(-50))):'---';
   document.getElementById('lR2').textContent=latestOBSell?fmt(latestOBSell.top):'---';
   document.getElementById('lR1').textContent=bearFVG?fmt(bearFVG.top):'---';
   document.getElementById('lS1').textContent=bullFVG?fmt(bullFVG.bot):'---';
   document.getElementById('lS2').textContent=latestOBBuy?fmt(latestOBBuy.bot):'---';
-  document.getElementById('lS3').textContent=prevOBBuy?fmt(prevOBBuy.bot):data?.length?fmt(Math.min(...data.map(c=>c.l).slice(-50))):'---';
+  document.getElementById('lS3').textContent=prevOBBuy?fmt(prevOBBuy.bot):data&&data.length?fmt(Math.min(...data.map(c=>c.l).slice(-50))):'---';
 }
 
 // ═══════════════════════════════════════════════
@@ -1618,7 +1996,7 @@ function setTF(el,tf){
   document.querySelectorAll('.tft').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.minic').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
-  document.getElementById('mc-'+tf)?.classList.add('active');
+  var _el=document.getElementById('mc-'+tf);if(_el)_el.classList.add('active');
   curTF=tf;
   if(!ldone[tf])fetchCandles(tf);
   else{detectOBandFVG(cdata[tf]);drawChart(tf);computeIndicators();}
@@ -1637,7 +2015,7 @@ async function runAI(){
   const btn=document.getElementById('aiBtn'),out=document.getElementById('aiOut'),bdg=document.getElementById('aiBdg');
   btn.disabled=true;btn.textContent='⏳ جاري التحليل...';
   out.textContent='';bdg.style.display='none';
-  const data=cdata[curTF],h=data?.map(c=>c.h)||[],l=data?.map(c=>c.l)||[];
+  const data=cdata[curTF],h=data&&data.map(function(c){return c.h;})||[],l=data&&data.map(function(c){return c.l;})||[];
   const atr=calcATR(data||[]);
   const ep=aiModel==='claude'?`${BASE}/api/analyze`:`${BASE}/api/openai`;
   try{
@@ -1668,9 +2046,150 @@ async function runAI(){
   btn.disabled=false;btn.textContent='🤖 تحليل Top-Down الآن';
 }
 
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// SCHOOLS TABLEAU — تابلو المدارس
+// ════════════════════════════════════════════════
+function updateSchoolsTableau(bos,macd,d1bull,h1bull,atH,bearC,p,vwap,aligned,inOBSell,inOBBuy,data) {
+  function setRow(sigId,detId,signal,detail,color) {
+    var s=document.getElementById(sigId);
+    var d=document.getElementById(detId);
+    if(s){s.textContent=signal;s.style.color=color;}
+    if(d){d.textContent=detail;}
+  }
+
+  var G='#00E676', R='#FF4081', Y='#F5C842', B='#00B4FF', GR='rgba(150,180,220,.5)';
+
+  // 1. ICT/SMC — Order Blocks + BOS
+  var ictSig = bos ? 'BUY ↑' : 'SELL ↓';
+  var ictDet = bos
+    ? 'BOS صاعد — فوق القمة السابقة'
+    : 'BOS هابط — تحت القاع السابق';
+  setRow('sch-ict','det-ict', ictSig, ictDet, bos?G:R);
+
+  // 2. Wyckoff — Accumulation/Distribution
+  var wykSig = macd>0 ? 'ACCUM 🟢' : 'DISTRIB 🔴';
+  var wykDet = macd>0
+    ? 'MACD='+macd.toFixed(2)+' موجب ← تراكم'
+    : 'MACD='+macd.toFixed(2)+' سالب ← توزيع';
+  setRow('sch-wyk','det-wyk', wykSig, wykDet, macd>0?G:R);
+
+  // 3. Elliott Wave
+  var ellSig = d1bull ? 'Wave 3 ↑' : 'Wave C ↓';
+  var ellDet = d1bull
+    ? 'EMA200 دعم — موجة صاعدة'
+    : 'تحت EMA200 — موجة تصحيحية';
+  setRow('sch-ell','det-ell', ellSig, ellDet, d1bull?G:R);
+
+  // 4. Supply & Demand
+  var pd2 = computePremiumDiscount(data, p);
+  var sdSig, sdDet, sdCol;
+  if(inOBSell) { sdSig='SUPPLY 🔴'; sdDet='في OB Sell — منطقة عرض'; sdCol=R; }
+  else if(inOBBuy) { sdSig='DEMAND 🟢'; sdDet='في OB Buy — منطقة طلب'; sdCol=G; }
+  else if(pd2 && pd2.pct>=70) { sdSig='PREMIUM ⚠️'; sdDet='%'+pd2.pct.toFixed(0)+' في Premium'; sdCol=Y; }
+  else if(pd2 && pd2.pct<=30) { sdSig='DISCOUNT 🟢'; sdDet='%'+pd2.pct.toFixed(0)+' في Discount'; sdCol=G; }
+  else { sdSig='NEUTRAL ↔'; sdDet='%'+(pd2?pd2.pct.toFixed(0):'50')+' EQ محايد'; sdCol=GR; }
+  setRow('sch-sd','det-sd', sdSig, sdDet, sdCol);
+
+  // 5. Price Action
+  var paSig = bearC ? 'BEAR 🕯️' : 'BULL 🕯️';
+  var paBody = data&&data.length ? Math.abs(data[data.length-1].cl-data[data.length-1].o).toFixed(1) : '?';
+  var paDet = (bearC?'شمعة هابطة':'شمعة صاعدة')+' — جسم '+paBody+' pts';
+  setRow('sch-pa','det-pa', paSig, paDet, bearC?R:G);
+
+  // 6. Top-Down
+  var tdSig = aligned ? (d1bull?'BULL ✅':'BEAR ✅') : 'MIXED ⚠️';
+  var tdDet = aligned
+    ? (d1bull?'D1↑ H4↑ H1↑':'D1↓ H4↓ H1↓')+' — متوافق'
+    : 'تعارض بين التايم فريمات';
+  setRow('sch-td','det-td', tdSig, tdDet, aligned?G:Y);
+
+  // 7. MSS/BOS
+  var mssData = detectMSS(data);
+  var mssSig, mssDet, mssCol;
+  if(mssData){
+    mssSig = mssData.signal;
+    mssDet = mssData.strength+' — '+
+      (mssData.mss?'CHoCH انعكاس':mssData.bos_bull?'كسر صاعد':mssData.bos_bear?'كسر هابط':'لا تغيير');
+    mssCol = mssData.color;
+  } else { mssSig='---'; mssDet='بيانات غير كافية'; mssCol=GR; }
+  setRow('sch-mss','det-mss', mssSig, mssDet, mssCol);
+
+  // 8. Premium/Discount
+  var pdSig = pd2?pd2.zone:'---';
+  var pdDet = pd2?'%'+pd2.pct.toFixed(0)+' من النطاق H4':'---';
+  var pdCol = pd2?pd2.zoneColor:GR;
+  setRow('sch-pd','det-pd', pdSig, pdDet, pdCol);
+
+  // 9. Kill Zone
+  var kz2 = getKillZone();
+  var kzSig = kz2.best?'⭐ مثالي':kz2.active?'🟡 '+kz2.active.name.substring(0,8):'😴 خارج KZ';
+  var kzDet = kz2.best?'London/NY — أفضل وقت':kz2.active?kz2.active.name:'خارج Kill Zones';
+  var kzCol = kz2.best?G:kz2.active?Y:GR;
+  setRow('sch-kz','det-kz', kzSig, kzDet, kzCol);
+
+  // 10. VWAP/POC
+  var vwData = computeVWAP(data);
+  var vwSig = p>vwData.vwap?'ABOVE ↑':'BELOW ↓';
+  var vwDet = 'VWAP='+vwData.vwap.toFixed(1)+' POC='+vwData.poc.toFixed(1);
+  var vwCol = p>vwData.vwap?G:R;
+  setRow('sch-vw','det-vw', vwSig, vwDet, vwCol);
+
+  // CONSENSUS — عدد المدارس الموافقة
+  var buySignals  = [bos, macd>0, d1bull, h1bull, !bearC, p>vwData.vwap, aligned,
+                     !!(pd2&&pd2.pct<=40), !!(kz2.active), !!(mssData&&mssData.bos_bull)];
+  var sellSignals = [!bos, macd<=0, !d1bull, !h1bull, bearC, p<=vwData.vwap, !aligned,
+                     !!(pd2&&pd2.pct>=60), false, !!(mssData&&mssData.bos_bear)];
+  var bCount = buySignals.filter(Boolean).length;
+  var sCount = sellSignals.filter(Boolean).length;
+  var consSig, consDet, consCol;
+  if(bCount>=7)      { consSig='BUY 🟢';  consDet=bCount+'/10 موافق شراء'; consCol=G; }
+  else if(sCount>=7) { consSig='SELL 🔴'; consDet=sCount+'/10 موافق بيع'; consCol=R; }
+  else if(bCount>=5) { consSig='WAIT →';  consDet=bCount+'/10 ميل شراء'; consCol=Y; }
+  else               { consSig='WAIT ←';  consDet=sCount+'/10 ميل بيع'; consCol=Y; }
+  setRow('sch-cons','det-cons', consSig, consDet, consCol);
+}
+
+// ════════════════════════════════════════════════
+// SELF-LEARNING LOG UI
+// ════════════════════════════════════════════════
+var learningHistory = JSON.parse(localStorage.getItem('gold_lessons')||'[]');
+
+function updateLearningLog(tradeId, lesson, outcome, direction) {
+  var entry = {id:tradeId, lesson:lesson, outcome:outcome, direction:direction, time:Date.now()};
+  learningHistory.unshift(entry);
+  if(learningHistory.length > 20) learningHistory = learningHistory.slice(0,20);
+  localStorage.setItem('gold_lessons', JSON.stringify(learningHistory));
+  renderLearningLog();
+}
+
+function renderLearningLog() {
+  var el = document.getElementById('learningLog');
+  var cnt = document.getElementById('ll-count');
+  var last = document.getElementById('ll-last');
+  if(!el) return;
+  if(cnt) cnt.textContent = learningHistory.length;
+  if(last && learningHistory.length) last.textContent = learningHistory[0].lesson.substring(0,20)+'...';
+  if(!learningHistory.length){
+    el.innerHTML = '<div style="color:var(--gdim);font-size:10px;text-align:center">في انتظار نتائج الصفقات...</div>';
+    return;
+  }
+  el.innerHTML = learningHistory.slice(0,8).map(function(e){
+    var col = e.outcome.includes('ربح')||e.outcome.includes('هدف')?'var(--green)':'var(--red)';
+    var dir = e.direction==='BUY'?'🟢':'🔴';
+    var t = new Date(e.time).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
+    return '<div style="padding:4px 0;border-bottom:1px solid rgba(0,180,255,.08);font-size:9px">'
+      +'<div style="display:flex;justify-content:space-between;margin-bottom:2px">'
+      +'<span>'+dir+' #'+e.id+' <span style="color:'+col+'">'+e.outcome+'</span></span>'
+      +'<span style="color:rgba(100,140,180,.5);font-family:JetBrains Mono,monospace">'+t+'</span>'
+      +'</div>'
+      +'<div style="color:rgba(200,220,255,.7);font-style:italic">🧠 '+e.lesson+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+// ════════════════════════════════════════════════
 // TELEGRAM
-// ═══════════════════════════════════════════════
+// ════════════════════════════════════════════════
 async function tgSend(type){
   const logEl=document.getElementById('tgLog');
   logEl.style.display='block';logEl.className='bdg bwrn';logEl.textContent='⏳ إرسال...';
@@ -1964,21 +2483,30 @@ let xagCandles = [], dxyCandles = [];
 
 async function fetchCorrelation(tf) {
   try {
+    log('[CORR] Loading XAG + DXY...');
     // XAG من MetaAPI
-    const r1 = await fetch(`${BASE}/api/price?type=candles&tf=${tf}&symbol=XAGUSD&limit=30`);
-    const d1 = await r1.json();
-    if (d1.candles?.length) xagCandles = d1.candles;
-
-    // DXY من Yahoo proxy
+    const r1 = await fetch(BASE+'/api/price?type=candles&tf='+tf+'&symbol=XAGUSD&limit=30');
+    if(r1.ok){
+      const d1 = await r1.json();
+      if(d1.candles && d1.candles.length) {
+        xagCandles = d1.candles;
+        log('[CORR] XAG: '+d1.candles.length+' candles ✓');
+      }
+    }
+    // DXY عبر Yahoo proxy
     const intMap = {M5:'5m',M15:'15m',M30:'30m',H1:'1h',H4:'1h'};
-    const rngMap = {M5:'5d',M15:'5d',M30:'5d',H1:'1mo',H4:'1mo'};
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/DX%3DF?interval=${intMap[tf]||'15m'}&range=${rngMap[tf]||'5d'}`;
-    const r2 = await fetch(`${BASE}/api/yahoo?url=${encodeURIComponent(url)}`);
-    const d2 = await r2.json();
-    if (d2.candles?.length) dxyCandles = d2.candles;
-
+    const rngMap = {M5:'2d',M15:'2d',M30:'2d',H1:'5d',H4:'1mo'};
+    const yahooUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/DX%3DF?interval='+(intMap[tf]||'15m')+'&range='+(rngMap[tf]||'2d')+'&includePrePost=false';
+    const r2 = await fetch(BASE+'/api/yahoo?url='+encodeURIComponent(yahooUrl));
+    if(r2.ok){
+      const d2 = await r2.json();
+      if(d2.candles && d2.candles.length) {
+        dxyCandles = d2.candles;
+        log('[CORR] DXY: '+d2.candles.length+' candles ✓');
+      }
+    }
     updateCorrelationUI();
-  } catch(e) { log('[CORR] Error: ' + e.message); }
+  } catch(e) { log('[CORR] Error: '+e.message); }
 }
 
 function computeCorrelation() {
@@ -2004,8 +2532,8 @@ function computeCorrelation() {
   const dxyConfirms = (dxyDir === 'up' && xauDir === 'down') ||
                       (dxyDir === 'down' && xauDir === 'up');
 
-  const dxyXagPrice = dxyCandles[dxyCandles.length-1]?.cl || 0;
-  const xagPrice    = xagCandles[xagCandles.length-1]?.cl || 0;
+  const dxyXagPrice = dxyCandles[dxyCandles.length-1]&&dxyCandles[dxyCandles.length-1].cl || 0;
+  const xagPrice    = (xagCandles[xagCandles.length-1]&&xagCandles[xagCandles.length-1].cl) || 0;
 
   return {
     xagDir, dxyDir, xauDir,
@@ -2021,19 +2549,21 @@ function computeCorrelation() {
 }
 
 function updateCorrelationUI() {
-  const corr = computeCorrelation();
-  if (!corr) return;
-  const el = document.getElementById('corrPanel');
-  if (!el) return;
-  el.innerHTML = `
-    <div class="row"><span class="lbl">DXY</span><span class="val" style="color:${corr.dxyDir==='up'?'var(--red)':'var(--green)'}">${corr.dxyPrice} ${corr.dxyDir==='up'?'↑':'↓'}</span></div>
-    <div class="row"><span class="lbl">XAG فضة</span><span class="val" style="color:${corr.xagDir==='up'?'var(--green)':'var(--red)'}">${corr.xagPrice} ${corr.xagDir==='up'?'↑':'↓'}</span></div>
-    <div class="row"><span class="lbl">تأثير DXY</span><span class="val" style="font-size:9px">${corr.dxyImpact}</span></div>
-    <div class="row"><span class="lbl">قيادة XAG</span><span class="val" style="font-size:9px">${corr.xagSignal}</span></div>
-    <div class="row" style="border-top:1px solid var(--bdr);margin-top:4px;padding-top:4px"><span class="lbl">تأكيد الإشارة</span><span class="val" style="color:${corr.color}">${corr.signal}</span></div>`;
+  var corr = computeCorrelation();
+  if(!corr) return;
+  // Panel قديم (إذا موجود)
+  var el = document.getElementById('corrPanel');
+  if(el) el.innerHTML = '<div class="row"><span class="lbl">DXY</span><span class="val" style="color:'+(corr.dxyDir==='up'?'var(--red)':'var(--green)')+'">'+corr.dxyPrice+' '+(corr.dxyDir==='up'?'↑':'↓')+'</span></div>'
+    +'<div class="row"><span class="lbl">XAG</span><span class="val" style="color:'+(corr.xagDir==='up'?'var(--green)':'var(--red)')+'">'+corr.xagPrice+' '+(corr.xagDir==='up'?'↑':'↓')+'</span></div>'
+    +'<div class="row"><span class="lbl">تأكيد</span><span class="val" style="color:'+corr.color+'">'+corr.signal+'</span></div>';
+  // التابلو الجديد
+  var sc = document.getElementById('sch-corr');
+  var dc = document.getElementById('det-corr');
+  if(sc){ sc.textContent = corr.signal; sc.style.color = corr.color; }
+  if(dc) dc.textContent = 'DXY '+corr.dxyPrice+' | XAG '+corr.xagPrice;
 }
 
-// ── MASTER ANALYSIS — يجمع كل التحليلات ──────────────────
+
 function runMasterAnalysis(data, currentPrice) {
   if (!data || data.length < 14) return null;
 
@@ -2103,117 +2633,60 @@ function runMasterAnalysis(data, currentPrice) {
 
 // ── تحديث UI بالتحليل الكامل ─────────────────────────────
 function updateAdvancedUI(analysis) {
-  if (!analysis) return;
-  const { vwap, fib, pd, mss, kz, score, finalDir, confidence, reasons, quality, qualityColor } = analysis;
+  if(!analysis) return;
+  var score=analysis.score, finalDir=analysis.finalDir, confidence=analysis.confidence;
+  var reasons=analysis.reasons, quality=analysis.quality, qualityColor=analysis.qualityColor;
+  var vwap=analysis.vwap, fib=analysis.fib, pd=analysis.pd, mss=analysis.mss, kz=analysis.kz;
 
-  // VWAP Panel
-  const vwapEl = document.getElementById('vwapPanel');
-  if (vwapEl && vwap) {
-    vwapEl.innerHTML = `
-      <div class="row"><span class="lbl">VWAP</span><span class="val" style="color:${price>vwap.vwap?'var(--green)':'var(--red)'}">${vwap.vwap}</span></div>
-      <div class="row"><span class="lbl">POC</span><span class="val" style="color:var(--yellow)">${vwap.poc}</span></div>
-      <div class="row"><span class="lbl">VAH</span><span class="val" style="color:var(--red)">${vwap.vah}</span></div>
-      <div class="row"><span class="lbl">VAL</span><span class="val" style="color:var(--green)">${vwap.val}</span></div>
-      <div class="row"><span class="lbl">الوضع</span><span class="val" style="color:${price>vwap.vwap?'var(--green)':'var(--red)'}">${price>vwap.vwap?'فوق VWAP ↑':'تحت VWAP ↓'}</span></div>`;
+  // ── Master Score جديد ──
+  var msScore=document.getElementById('ms-score'),msBar=document.getElementById('ms-bar');
+  var msDir=document.getElementById('ms-dir'),msQual=document.getElementById('ms-quality');
+  var msReasons=document.getElementById('ms-reasons');
+  if(msScore){msScore.textContent=score;msScore.style.color=qualityColor;}
+  if(msBar)msBar.style.width=score+'%';
+  if(msDir){msDir.textContent=finalDir+' '+confidence+'%';msDir.style.color=finalDir==='BUY'?'var(--green)':finalDir==='SELL'?'var(--red)':'var(--yellow)';}
+  if(msQual){msQual.textContent=quality;msQual.style.color=qualityColor;}
+  if(msReasons&&reasons)msReasons.innerHTML=reasons.slice(0,5).join(' · ');
+
+  // ── Fibonacci في التابلو ──
+  if(fib){
+    var near=function(v){return Math.abs(price-v)<fib.range*0.015?' 👈':'';};
+    var fibSig=Math.abs(price-fib.fib618)<fib.range*0.02?'61.8% 🎯':Math.abs(price-fib.fib382)<fib.range*0.02?'38.2%':Math.abs(price-fib.fib500)<fib.range*0.02?'50% ⚖️':'بين مستويات';
+    var fibCol=Math.abs(price-fib.fib618)<fib.range*0.02?'var(--green)':Math.abs(price-fib.fib382)<fib.range*0.02?'var(--yellow)':'var(--gdim)';
+    var sf=document.getElementById('sch-fib');var df=document.getElementById('det-fib');
+    if(sf){sf.textContent=fibSig;sf.style.color=fibCol;}
+    if(df)df.textContent='$'+fib.fib618+' | $'+fib.fib382;
   }
-
-  // Fibonacci Panel
-  const fibEl = document.getElementById('fibPanel');
-  if (fibEl && fib) {
-    const fmt = v => '$'+v.toFixed(2);
-    const near = (v) => Math.abs(price-v) < fib.range*0.015 ? ' 👈' : '';
-    fibEl.innerHTML = `
-      <div class="row"><span class="lbl">Ext 1.618</span><span class="val" style="color:var(--gold2)">${fmt(fib.ext162)}${near(fib.ext162)}</span></div>
-      <div class="row"><span class="lbl">Ext 1.272</span><span class="val" style="color:var(--gold2)">${fmt(fib.ext127)}${near(fib.ext127)}</span></div>
-      <div class="row"><span class="lbl">Swing High</span><span class="val" style="color:var(--red)">${fmt(fib.swingH)}</span></div>
-      <div class="row"><span class="lbl">23.6%</span><span class="val">${fmt(fib.fib236)}${near(fib.fib236)}</span></div>
-      <div class="row"><span class="lbl">38.2%</span><span class="val" style="color:var(--yellow)">${fmt(fib.fib382)}${near(fib.fib382)}</span></div>
-      <div class="row"><span class="lbl">50.0% ⚖️</span><span class="val" style="color:var(--blue)">${fmt(fib.fib500)}${near(fib.fib500)}</span></div>
-      <div class="row"><span class="lbl">61.8% 🎯</span><span class="val" style="color:var(--green);font-weight:900">${fmt(fib.fib618)}${near(fib.fib618)}</span></div>
-      <div class="row"><span class="lbl">78.6%</span><span class="val" style="color:var(--green)">${fmt(fib.fib786)}${near(fib.fib786)}</span></div>
-      <div class="row"><span class="lbl">Swing Low</span><span class="val" style="color:var(--green)">${fmt(fib.swingL)}</span></div>`;
+  // ── MSS ──
+  if(mss){
+    var sm=document.getElementById('sch-mss');var dm=document.getElementById('det-mss');
+    if(sm){sm.textContent=mss.signal;sm.style.color=mss.color;}
+    if(dm)dm.textContent=mss.strength+(mss.mss?' انعكاس':mss.bos_bull?' كسر↑':mss.bos_bear?' كسر↓':'');
   }
-
-  // Premium/Discount Panel
-  const pdEl = document.getElementById('pdPanel');
-  if (pdEl && pd) {
-    const barWidth = pd.pct + '%';
-    pdEl.innerHTML = `
-      <div style="margin-bottom:6px">
-        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--gdim);margin-bottom:3px">
-          <span>Discount 🟢</span><span>EQ ⚖️</span><span>Premium 🔴</span>
-        </div>
-        <div style="height:8px;background:linear-gradient(90deg,var(--green),var(--yellow),var(--red));border-radius:4px;position:relative">
-          <div style="position:absolute;top:-3px;left:${Math.min(96,Math.max(2,pd.pct))}%;width:3px;height:14px;background:#fff;border-radius:2px;transform:translateX(-50%)"></div>
-        </div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;text-align:center;margin-top:4px;color:${pd.zoneColor};font-weight:700">${pd.zone} — ${pd.pct}%</div>
-      </div>
-      <div class="row"><span class="lbl">أعلى النطاق</span><span class="val" style="color:var(--red)">$${pd.high.toFixed(2)}</span></div>
-      <div class="row"><span class="lbl">Equilibrium 50%</span><span class="val" style="color:var(--blue)">$${pd.eq.toFixed(2)}</span></div>
-      <div class="row"><span class="lbl">أدنى النطاق</span><span class="val" style="color:var(--green)">$${pd.low.toFixed(2)}</span></div>
-      <div class="row"><span class="lbl">النطاق المرجعي</span><span class="val" style="color:var(--gdim)">${pd.tfUsed}</span></div>
-      <div class="row" style="border-top:1px solid var(--bdr);padding-top:4px;margin-top:3px"><span class="lbl">التوصية</span><span class="val" style="color:${pd.zoneColor};font-size:10px">${pd.recommend}</span></div>`;
+  // ── P&D ──
+  if(pd){
+    var sp=document.getElementById('sch-pd');var dp=document.getElementById('det-pd');
+    if(sp){sp.textContent=pd.zone;sp.style.color=pd.zoneColor;}
+    if(dp)dp.textContent=pd.pct.toFixed(0)+'% من H4 ('+pd.tfUsed+')';
   }
-
-  // MSS Panel
-  const mssEl = document.getElementById('mssPanel');
-  if (mssEl && mss) {
-    mssEl.innerHTML = `
-      <div class="row"><span class="lbl">MSS</span><span class="val" style="color:${mss.color}">${mss.signal}</span></div>
-      <div class="row"><span class="lbl">القوة</span><span class="val">${mss.strength}</span></div>
-      <div class="row"><span class="lbl">BOS صاعد</span><span class="val" style="color:${mss.bos_bull?'var(--green)':'var(--gdim)'}">${mss.bos_bull?'✅ نعم':'—'}</span></div>
-      <div class="row"><span class="lbl">BOS هابط</span><span class="val" style="color:${mss.bos_bear?'var(--red)':'var(--gdim)'}">${mss.bos_bear?'🔴 نعم':'—'}</span></div>
-      <div class="row"><span class="lbl">CHoCH</span><span class="val" style="color:${mss.choch_bull||mss.choch_bear?'var(--yellow)':'var(--gdim)'}">${mss.choch_bull?'↑ صاعد':mss.choch_bear?'↓ هابط':'لا يوجد'}</span></div>`;
+  // ── Kill Zone ──
+  if(kz){
+    var sk=document.getElementById('sch-kz');var dk=document.getElementById('det-kz');
+    var kzSig=kz.bestTrade?'⭐ مثالي':kz.active?'🟡 نشط':'😴 خارج KZ';
+    var kzCol=kz.bestTrade?'var(--green)':kz.active?'var(--yellow)':'var(--gdim)';
+    if(sk){sk.textContent=kzSig;sk.style.color=kzCol;}
+    if(dk)dk.textContent=kz.active?kz.active.name:kz.bestTrade?'London/NY':'---';
   }
-
-  // Kill Zone Panel
-  const kzEl = document.getElementById('kzPanel');
-  if (kzEl) {
-    const zones = [
-      { name:'Asian KZ',    gmt:'00:00–03:00', b:'03:00–06:00', color:'#A78BFA' },
-      { name:'London KZ ⭐', gmt:'07:00–10:00', b:'10:00–13:00', color:'var(--green)' },
-      { name:'NY Open KZ ⭐',gmt:'12:00–15:00', b:'15:00–18:00', color:'var(--blue)' },
-      { name:'London Close', gmt:'15:00–17:00', b:'18:00–20:00', color:'var(--orange)' },
-    ];
-    kzEl.innerHTML = zones.map(z => {
-      const isActive = kz.active?.name?.includes(z.name.replace(' ⭐',''));
-      return `<div class="row" style="${isActive?'background:rgba(0,180,255,0.08);border-radius:3px;padding:2px 4px;':''}">`+
-        `<span class="lbl" style="color:${isActive?z.color:'var(--gdim)'}">${z.name}</span>`+
-        `<span class="val" style="font-size:9px;color:${isActive?z.color:'var(--gdim)'}">${z.gmt}<br><span style="color:rgba(255,255,255,0.4)">${z.b}</span></span>`+
-        `</div>`;
-    }).join('') +
-    `<div class="row" style="border-top:1px solid var(--bdr);margin-top:4px;padding-top:4px">`+
-    `<span class="lbl">الوضع الآن</span>`+
-    `<span class="val" style="color:${kz.bestTrade?'var(--green)':kz.isKillZone?'var(--yellow)':'var(--gdim)'}">`+
-    `${kz.bestTrade?'⭐ Kill Zone مثالي':kz.isKillZone?'🟡 Kill Zone نشط':'😴 خارج KZ'}</span></div>`;
-  }
-
-  // Master Score
-  const scoreEl = document.getElementById('masterScore');
-  if (scoreEl) {
-    scoreEl.innerHTML = `
-      <div style="text-align:center;margin-bottom:8px">
-        <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--gdim);letter-spacing:2px">MASTER SCORE</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:900;color:${qualityColor}">${score}</div>
-        <div style="font-size:10px;color:${qualityColor}">${quality}</div>
-      </div>
-      <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;margin-bottom:8px">
-        <div style="height:100%;width:${score}%;background:linear-gradient(90deg,var(--red),var(--yellow),var(--green));border-radius:3px"></div>
-      </div>
-      <div style="font-family:'Orbitron',monospace;font-size:16px;font-weight:900;text-align:center;color:${finalDir==='BUY'?'var(--green)':finalDir==='SELL'?'var(--red)':'var(--yellow)'}">
-        ${finalDir} ${confidence}%
-      </div>
-      <div style="margin-top:8px;font-size:9px;line-height:1.6;color:var(--gdim)">
-        ${reasons.slice(0,4).join('<br>')}
-      </div>`;
+  // ── VWAP ──
+  if(vwap){
+    var sv=document.getElementById('sch-vw');var dv=document.getElementById('det-vw');
+    if(sv){sv.textContent=price>vwap.vwap?'ABOVE ↑':'BELOW ↓';sv.style.color=price>vwap.vwap?'var(--green)':'var(--red)';}
+    if(dv)dv.textContent='VWAP='+vwap.vwap+' POC='+vwap.poc;
   }
 }
 
 
-// ═══════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════
-window.addEventListener('resize',()=>drawChart(curTF));
+
 // iOS Audio: تفعيل عند أول لمس
 document.addEventListener('touchstart', function initAudio() {
   getAudioCtx();
@@ -2226,6 +2699,33 @@ document.addEventListener('click', function initAudioClick() {
   document.removeEventListener('click', initAudioClick);
 }, {once:true});
 if('speechSynthesis' in window){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();}
+// ══ Service Worker — تنبيهات في الخلفية ══
+if('serviceWorker' in navigator){
+  var swCode='self.addEventListener('message',function(e){if(e.data&&e.data.type==='NOTIFY'){self.registration.showNotification(e.data.title||'Gold Bot',{body:e.data.body||'',icon:'/favicon.ico',tag:e.data.tag||'gold',requireInteraction:!!e.data.important});}});';
+  var blob=new Blob([swCode],{type:'application/javascript'});
+  var swUrl=URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).then(function(reg){
+    window._swReg=reg;
+    if(Notification.permission==='default'){
+      Notification.requestPermission().then(function(p){});
+    }
+  }).catch(function(){});
+}
+function pushNotify(title,body,important){
+  if(Notification.permission==='granted'){
+    try{new Notification(title,{body:body,icon:'/favicon.ico'});}catch(e){}
+  }
+  if(window._swReg){
+    try{window._swReg.showNotification(title,{body:body,requireInteraction:!!important});}catch(e){}
+  }
+}
+// resize
+window.addEventListener('resize',function(){drawChart(curTF);});
+// iOS audio
+document.addEventListener('touchstart',function ia(){getAudioCtx();document.removeEventListener('touchstart',ia);},{once:true});
+document.addEventListener('click',function ic(){getAudioCtx();document.removeEventListener('click',ic);},{once:true});
+if('speechSynthesis' in window){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};}
+
 loadTrades();
 updateSessions();
 setInterval(updateSessions,1000);
@@ -2245,7 +2745,11 @@ setTimeout(()=>fetchCandles('M30'),4000);
 setTimeout(()=>fetchCandles('H1'),6000);
 setInterval(()=>{fetchCandles(curTF);renderCalendar();try{const kz=getKillZone();const a=runMasterAnalysis(cdata[curTF],price);if(a)updateAdvancedUI(a);}catch(e){}},60000);
 setInterval(()=>fetchCorrelation(curTF),300000); // correlation كل 5 دقائق
-renderTrades();updateStats();
+renderTrades();updateStats();renderSLReport();addWeeklyReviewButton();
+// مراجعة أسبوعية تلقائية (كل أسبوع)
+var lastReview = JSON.parse(localStorage.getItem('gold_weekly_review')||'null');
+var reviewAge  = lastReview ? (Date.now()-lastReview.time)/86400000 : 999;
+if(reviewAge > 7){ setTimeout(weeklyClaudeReview, 30000); }
 </script>
 </body>
 </html>
