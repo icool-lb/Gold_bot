@@ -101,7 +101,7 @@ export default async function handler(req, res) {
         };
         const yahooSym  = yahooSymMap[symReq] || 'GC%3DF';
         const intMap    = { M5:'5m', M15:'15m', M30:'30m', H1:'1h', H4:'1h', D1:'1d' };
-        const rngMap    = { M5:'5d', M15:'5d',  M30:'5d',  H1:'1mo', H4:'1mo', D1:'6mo' };
+        const rngMap    = { M5:'2d', M15:'2d',  M30:'2d',  H1:'5d',  H4:'1mo', D1:'6mo' };
         const interval  = intMap[tf]  || '15m';
         const range     = rngMap[tf]  || '5d';
 
