@@ -1785,17 +1785,17 @@ function updateSpark(tf){
 // INDICATORS + TOP-DOWN
 // ═══════════════════════════════════════════════
 function computeIndicators(){
-  const data=cdata[curTF];if(!data||data.length<14)return;
-  const closes=data.map(c=>c.cl),n=closes.length;
+  var data=cdata[curTF];if(!data||data.length<14)return;
+  var closes=data.map(c=>c.cl),n=closes.length;
   let g=0,l=0;for(let i=n-14;i<n;i++){const d=closes[i]-closes[i-1];d>0?g+=d:l-=d;}
-  const rsi=100-(100/(1+g/(l||.001)));
+  var rsi=100-(100/(1+g/(l||.001)));
   document.getElementById('i-rsi').textContent=rsi.toFixed(1);
   document.getElementById('i-rsi').style.color=rsi>70?'var(--red)':rsi<30?'var(--green)':'var(--orange)';
   document.getElementById('i-rsi-s').textContent=rsi>70?'OB':rsi<30?'OS':'NEUT';
   document.getElementById('i-rsi-s').style.color=rsi>70?'var(--red)':rsi<30?'var(--green)':'var(--orange)';
   let e12=closes[0],e26=closes[0];
   closes.forEach(p=>{e12=p*2/13+e12*(1-2/13);e26=p*2/27+e26*(1-2/27);});
-  const macd=e12-e26;
+  var macd=e12-e26;
   document.getElementById('i-macd').textContent=macd.toFixed(2);
   document.getElementById('i-macd').style.color=macd>0?'var(--green)':'var(--red)';
   document.getElementById('i-macd-s').textContent=macd>0?'BUY':'SELL';
@@ -1808,16 +1808,16 @@ function computeIndicators(){
   document.getElementById('i-e200').textContent=e200.toFixed(2);
   document.getElementById('i-e200-s').textContent=price>e200?'↑ ABOVE':'↓ BELOW';
   document.getElementById('i-e200-s').style.color=price>e200?'var(--green)':'var(--red)';
-  const vwap=closes.slice(-20).reduce((a,b)=>a+b,0)/20;
+  var vwap=closes.slice(-20).reduce((a,b)=>a+b,0)/20;
   document.getElementById('i-vwap').textContent=vwap.toFixed(2);
   document.getElementById('i-vwap-s').textContent=price>vwap?'ABOVE':'BELOW';
   document.getElementById('i-vwap-s').style.color=price>vwap?'var(--green)':'var(--red)';
-  const atr=calcATR(data);
+  var atr=calcATR(data);
   document.getElementById('i-atr2').textContent=atr.toFixed(2);
   document.getElementById('m-atr').textContent=atr.toFixed(2);
   document.getElementById('t-atr').textContent=atr.toFixed(2);
-  const d1bull=price>e200,h4bull=macd>0,h1bull=price>e50;
-  const aligned=(d1bull&&h4bull&&h1bull)||(!d1bull&&!h4bull&&!h1bull);
+  var d1bull=price>e200,h4bull=macd>0,h1bull=price>e50;
+  var aligned=(d1bull&&h4bull&&h1bull)||(!d1bull&&!h4bull&&!h1bull);
   document.getElementById('t-d1').textContent=d1bull?'صاعد ↑':'هابط ↓';document.getElementById('t-d1').className='tv '+(d1bull?'tg':'tr');
   document.getElementById('t-h4').textContent=h4bull?'صاعد ↑':'هابط ↓';document.getElementById('t-h4').className='tv '+(h4bull?'tg':'tr');
   document.getElementById('t-h1').textContent=h1bull?'صاعد ↑':'هابط ↓';document.getElementById('t-h1').className='tv '+(h1bull?'tg':'tr');
@@ -1825,49 +1825,49 @@ function computeIndicators(){
   // ══ تحديث تابلو المدارس مع الأرقام والدليل ══
   updateSchoolsTableau(bos, macd, d1bull, h1bull, atH, bearC, price, vwap,
                        aligned, inOBSell, inOBBuy, data);
-  const bos=closes[n-1]>Math.max(...closes.slice(-10,-1));
-  const atH=price>Math.max(...data.map(c=>c.h).slice(-20))*.998;
-  const bearC=data[n-1].cl<data[n-1].o;
-  const inOBSell=obSellZones.some(ob=>price>=ob.bot*.999&&price<=ob.top*1.001);
-  const inOBBuy=obBuyZones.some(ob=>price>=ob.bot*.999&&price<=ob.top*1.001);
+  var bos=closes[n-1]>Math.max.apply(null,closes.slice(-10,-1));
+  var atH=price>Math.max.apply(null,data.map(function(c){return c.h;}).slice(-20))*.998;
+  var bearC=data[n-1].cl<data[n-1].o;
+  var inOBSell=obSellZones.some(ob=>price>=ob.bot*.999&&price<=ob.top*1.001);
+  var inOBBuy=obBuyZones.some(ob=>price>=ob.bot*.999&&price<=ob.top*1.001);
   document.getElementById('sch-ict').textContent=bos?'BUY 🟢':'SELL 🔴';document.getElementById('sch-ict').style.color=bos?'var(--green)':'var(--red)';
   document.getElementById('sch-wyk').textContent=macd>0?'ACCUM 🟢':'DIST 🟠';document.getElementById('sch-wyk').style.color=macd>0?'var(--green)':'var(--orange)';
   document.getElementById('sch-ell').textContent=d1bull?'W3 🟢':'W5 END 🔴';document.getElementById('sch-ell').style.color=d1bull?'var(--green)':'var(--red)';
   // Supply/Demand يعتمد على Premium/Discount + OB
-  const _pdSD = computePremiumDiscount(data, price);
-  const sdSignal = inOBSell?'OB SELL 🔴': inOBBuy?'OB BUY 🟢': (_pdSD&&_pdSD.pct>70)?'SUPPLY 🔴': (_pdSD&&_pdSD.pct<30)?'DEMAND 🟢': atH?'SUPPLY 🔴':'DEMAND 🟢';
-  const sdBear = inOBSell || (!!_pdSD&&_pdSD.pct>70) || atH;
+  var _pdSD = computePremiumDiscount(data, price);
+  var sdSignal = inOBSell?'OB SELL 🔴': inOBBuy?'OB BUY 🟢': (_pdSD&&_pdSD.pct>70)?'SUPPLY 🔴': (_pdSD&&_pdSD.pct<30)?'DEMAND 🟢': atH?'SUPPLY 🔴':'DEMAND 🟢';
+  var sdBear = inOBSell || (!!_pdSD&&_pdSD.pct>70) || atH;
   document.getElementById('sch-sd').textContent=sdSignal;
   document.getElementById('sch-sd').style.color=sdBear?'var(--red)':'var(--green)';
   document.getElementById('sch-pa').textContent=bearC?'BEAR 🔴':'BULL 🟢';document.getElementById('sch-pa').style.color=bearC?'var(--red)':'var(--green)';
-  const score=[bos,macd>0,d1bull,h1bull,!atH,!bearC,price>vwap,aligned,inOBBuy&&!inOBSell].filter(Boolean).length;
-  const conf=Math.min(90,Math.round(40+score*7));
+  var score=[bos,macd>0,d1bull,h1bull,!atH,!bearC,price>vwap,aligned,inOBBuy&&!inOBSell].filter(Boolean).length;
+  var conf=Math.min(90,Math.round(40+score*7));
 
   // منطق SELL محسّن — البيع التصحيحي مسموح
-  const _pdCheck = computePremiumDiscount(cdata[curTF], price);
-  const inPremium = _pdCheck && _pdCheck.pct >= 70;
-  const inDiscount = _pdCheck && _pdCheck.pct <= 30;
+  var _pdCheck = computePremiumDiscount(cdata[curTF], price);
+  var inPremium = _pdCheck && _pdCheck.pct >= 70;
+  var inDiscount = _pdCheck && _pdCheck.pct <= 30;
 
   // BUY: score عالي + ليس في Premium
   // SELL: score منخفض أو في Premium + OB Sell + MSS هابط
   // SELL التصحيحي: Premium + OB Sell + D1 ليس صاعداً بقوة
-  const sellCondition = (
+  var sellCondition = (
     score <= 3 || 
     (inPremium && inOBSell) ||
     (inPremium && !bos && bearC)
   );
-  const buyCondition = (
+  var buyCondition = (
     score >= 6 && !inPremium
   );
 
-  const dir = buyCondition ? 'BUY' : sellCondition ? 'SELL' : 'WAIT';
+  var dir = buyCondition ? 'BUY' : sellCondition ? 'SELL' : 'WAIT';
   // حساب RR للتحقق قبل الإشارة
-  const _atr=calcATR(data);
-  const _sl=dir==='BUY'?price-_atr*.5:price+_atr*.5;
-  const _rH=obSellZones.length?obSellZones[obSellZones.length-1].bot:price*1.005;
-  const _rL=obBuyZones.length?obBuyZones[obBuyZones.length-1].top:price*.995;
-  const _tp1=dir==='BUY'?Math.min(_rH,price+_atr*.8):Math.max(_rL,price-_atr*.8);
-  const rr=Math.abs(_tp1-price)/Math.abs(_sl-price);
+  var _atr=calcATR(data);
+  var _sl=dir==='BUY'?price-_atr*.5:price+_atr*.5;
+  var _rH=obSellZones.length?obSellZones[obSellZones.length-1].bot:price*1.005;
+  var _rL=obBuyZones.length?obBuyZones[obBuyZones.length-1].top:price*.995;
+  var _tp1=dir==='BUY'?Math.min(_rH,price+_atr*.8):Math.max(_rL,price-_atr*.8);
+  var rr=Math.abs(_tp1-price)/Math.abs(_sl-price);
   document.getElementById('t-rate').textContent=score+'/10';document.getElementById('t-rate').className='tv '+(score>=6?'tg':score<=3?'tr':'tx');
   document.getElementById('sigQual').textContent=score+'/10';
   updateSigCard(dir,conf,atr,atH,score,d1bull,aligned,inOBSell,inOBBuy);
