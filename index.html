@@ -1028,7 +1028,7 @@ function checkAlerts(p) {
   const tol=p*0.003; // 0.3%
 
   // تحقق من OB Sell
-  for (const ob of obSellZones) {
+  obSellZones.forEach(function(ob){
     if (p >= ob.bot - tol && p <= ob.top + tol) {
       speak('منطقة بيع — Order Block');
       showAlert('sell','📦 OB SELL Zone');
@@ -1040,7 +1040,7 @@ function checkAlerts(p) {
   }
 
   // تحقق من OB Buy
-  for (const ob of obBuyZones) {
+  obBuyZones.forEach(function(ob){
     if (p >= ob.bot - tol && p <= ob.top + tol) {
       speak('منطقة شراء — Order Block');
       showAlert('buy','🧲 OB BUY Zone');
@@ -1052,7 +1052,7 @@ function checkAlerts(p) {
   }
 
   // تحقق من FVG
-  for (const fvg of fvgZones) {
+  fvgZones.forEach(function(fvg){
     if (p >= fvg.bot - tol && p <= fvg.top + tol) {
       const dir = fvg.type==='bull'?'BUY':'SELL';
       speak(`منطقة ${dir==='BUY'?'شراء':'بيع'} — فجوة قيمة عادلة`);
@@ -1309,7 +1309,7 @@ function drawMiniChartOn(ctx2, W, H, data, label) {
   ctx2.fillStyle='#0A1628';ctx2.fillRect(0,0,W,H);
   ctx2.strokeStyle='rgba(255,215,0,.04)';ctx2.lineWidth=.5;
   for(let i=0;i<6;i++){const y=H*i/6;ctx2.beginPath();ctx2.moveTo(0,y);ctx2.lineTo(W,y);ctx2.stroke();}
-  const allP=data.flatMap(c=>[c.h,c.l]);
+  const allP=data.map(function(c){return [c.h,c.l];}).reduce(function(a,b){return a.concat(b);},[]);
   const minP=Math.min(...allP),maxP=Math.max(...allP),pad=(maxP-minP)*.1;
   const pMin=minP-pad,pMax=maxP+pad;
   const toY=p=>H-((p-pMin)/(pMax-pMin))*(H*.88)-H*.05;
@@ -1356,7 +1356,7 @@ function monitorTrades(p){
   lastMon=Date.now();
   const open=trades.filter(t=>t.status==='OPEN'||t.status==='TP1');
   if(!open.length)return;
-  for(const t of open){
+  open.forEach(function(t){
     const isBuy=t.direction==='BUY',elapsed=(Date.now()-t.openTime)/60000;
     updTrade(t.id,{checkCount:(t.checkCount||0)+1,lastCheck:Date.now()});
     if(!t.entryHit&&Math.abs(p-t.entry)<=t.entry*.001){
@@ -1451,7 +1451,7 @@ function renderTrades(){
           <div class="tl"><div class="tln">TP2</div><div class="tlv" style="color:var(--green)">${fmt(t.tp2)}</div></div>
         </div>
         <div class="tpbar"><div class="${isBuy?'tpb':'tpb tpbs'}" style="width:${prog.toFixed(0)}%"></div></div>
-        ${t.aiLesson?`<div class="tai">🧠 ${t.aiLesson}</div>`:''}
+        '+(t.aiLesson?'<div class="tai">🧠 '+t.aiLesson+'</div>':'')+'
         <div class="ttim">ATR:${t.atr} | R:R:${t.rr} | ${t.confidence}% | ${elapsed}د | #${t.checkCount}</div>
       </div>`;
     }).join('');
@@ -1466,7 +1466,7 @@ function renderTrades(){
           <span style="color:${isWin?'var(--green)':'var(--red)'}">${isWin?'+':''}${(t.pnl||0).toFixed(2)} pts</span>
           <span style="color:var(--gdim)">${dur}د</span>
         </div>
-        ${t.aiLesson?`<div class="tai">🧠 ${t.aiLesson}</div>`:''}
+        '+(t.aiLesson?'<div class="tai">🧠 '+t.aiLesson+'</div>':'')+'
       </div>`;
     }).join('');
 }
@@ -1575,7 +1575,7 @@ function drawChart(tf){
   const cH2 = H - mT - mB;
 
   // ── Y Scale بالـ Percentile ──
-  const allP = data.flatMap(c2 => [c2.h, c2.l]).sort((a,b) => a-b);
+  const allP = data.map(function(c2){return [c2.h,c2.l];}).reduce(function(a,b){return a.concat(b);},[]).sort(function(a,b){return a-b;});
   const p5   = allP[Math.max(0, Math.floor(allP.length*0.05))];
   const p95  = allP[Math.min(allP.length-1, Math.floor(allP.length*0.95))];
   const rng  = (p95 - p5) || 10;
@@ -2463,7 +2463,7 @@ function getKillZone() {
   ];
 
   let active = null, next = null;
-  for (const z of zones) {
+  zones.forEach(function(z){
     if (mins >= z.start && mins < z.end) { active = z; break; }
   }
   if (!active) {
@@ -2692,12 +2692,12 @@ document.addEventListener('touchstart', function initAudio() {
   getAudioCtx();
   if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
   document.removeEventListener('touchstart', initAudio);
-}, {once:true});
+});
 document.addEventListener('click', function initAudioClick() {
   getAudioCtx();
   if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
   document.removeEventListener('click', initAudioClick);
-}, {once:true});
+});
 if('speechSynthesis' in window){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();}
 // ══ Service Worker — تنبيهات في الخلفية ══
 if('serviceWorker' in navigator){
@@ -2722,8 +2722,8 @@ function pushNotify(title,body,important){
 // resize
 window.addEventListener('resize',function(){drawChart(curTF);});
 // iOS audio
-document.addEventListener('touchstart',function ia(){getAudioCtx();document.removeEventListener('touchstart',ia);},{once:true});
-document.addEventListener('click',function ic(){getAudioCtx();document.removeEventListener('click',ic);},{once:true});
+document.addEventListener('touchstart',function ia(){getAudioCtx();document.removeEventListener('touchstart',ia);});
+document.addEventListener('click',function ic(){getAudioCtx();document.removeEventListener('click',ic);});
 if('speechSynthesis' in window){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};}
 
 loadTrades();
