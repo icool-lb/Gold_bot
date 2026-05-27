@@ -1,5 +1,4 @@
-// api/price.js — XAU/USD Price + Candles
-// MetaAPI primary → Yahoo Finance fallback
+// api/price.js — XAU/USD via MetaAPI MT5 (primary) + Yahoo (fallback)
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -13,129 +12,131 @@ export default async function handler(req, res) {
   const limit   = parseInt(req.query.limit || '60');
   const symReq  = req.query.symbol || 'XAUUSD';
 
-  const META_BASE = TOKEN && ACCOUNT
+  const BASE = TOKEN && ACCOUNT
     ? `https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/${ACCOUNT}`
     : null;
-  const META_H = { 'auth-token': TOKEN || '', 'Content-Type': 'application/json' };
+  const H = { 'auth-token': TOKEN || '', 'Content-Type': 'application/json' };
 
-  // ══ 1. السعر اللحظي ══════════════════════════════════════
+  // ══ السعر اللحظي ══════════════════════════════════════════
   if (type === 'price') {
-
-    // أولاً: MetaAPI
-    if (META_BASE) {
+    if (BASE) {
       try {
-        const r = await fetch(`${META_BASE}/symbols/${symReq}/current-price`, { headers: META_H });
+        const r = await fetch(`${BASE}/symbols/${symReq}/current-price`, { headers: H });
         if (r.ok) {
-          const d   = await r.json();
+          const d = await r.json();
           const bid = parseFloat(d.bid || 0);
           const ask = parseFloat(d.ask || 0);
-          if (bid > 0 && ask > 0) {
+          if (bid > 0) {
             return res.status(200).json({
               price:  parseFloat(((bid+ask)/2).toFixed(4)),
               bid:    parseFloat(bid.toFixed(4)),
               ask:    parseFloat(ask.toFixed(4)),
               spread: parseFloat((ask-bid).toFixed(4)),
-              symbol: symReq,
-              source: 'metaapi',
-              ts:     Date.now()
+              symbol: symReq, source: 'metaapi', ts: Date.now()
             });
           }
         }
-      } catch(e) { /* fallthrough */ }
+      } catch(e) {}
     }
-
-    // ثانياً: Yahoo Finance كـ fallback للسعر
+    // Yahoo fallback للسعر
     try {
-      const yMap = { XAUUSD:'GC%3DF', XAGUSD:'SI%3DF' };
-      const ySym = yMap[symReq] || 'GC%3DF';
-      const yr   = await fetch(
-        `https://query1.finance.yahoo.com/v8/finance/chart/${ySym}?interval=1m&range=1d`,
-        { headers: { 'User-Agent':'Mozilla/5.0','Accept':'application/json' } }
+      const yMap = { XAUUSD: 'GC%3DF', XAGUSD: 'SI%3DF' };
+      const yr = await fetch(
+        `https://query1.finance.yahoo.com/v8/finance/chart/${yMap[symReq]||'GC%3DF'}?interval=1m&range=1d`,
+        { headers: { 'User-Agent': 'Mozilla/5.0' } }
       );
-      if (!yr.ok) throw new Error('Yahoo price ' + yr.status);
-      const yj  = await yr.json();
-      const res0 = yj && yj.chart && yj.chart.result && yj.chart.result[0];
-      const meta = res0 && res0.meta;
-      if (meta && meta.regularMarketPrice) {
-        const p = parseFloat(meta.regularMarketPrice);
-        return res.status(200).json({
-          price:  p,
-          bid:    parseFloat((p - 0.1).toFixed(2)),
-          ask:    parseFloat((p + 0.1).toFixed(2)),
-          spread: 0.2,
-          symbol: symReq,
-          source: 'yahoo-price',
-          ts:     Date.now()
-        });
+      if (yr.ok) {
+        const yj = await yr.json();
+        const meta = yj && yj.chart && yj.chart.result && yj.chart.result[0] && yj.chart.result[0].meta;
+        if (meta && meta.regularMarketPrice) {
+          const p = parseFloat(meta.regularMarketPrice);
+          return res.status(200).json({
+            price: p, bid: p-0.1, ask: p+0.1, spread: 0.2,
+            symbol: symReq, source: 'yahoo-price', ts: Date.now()
+          });
+        }
       }
-    } catch(e) { /* fallthrough */ }
-
+    } catch(e) {}
     return res.status(500).json({ error: 'Cannot fetch price', price: null });
   }
 
-  // ══ 2. الشمعات ════════════════════════════════════════════
+  // ══ الشمعات ════════════════════════════════════════════════
   if (type === 'candles') {
-    const tfMap = { M1:'1m',M5:'5m',M15:'15m',M30:'30m',H1:'1h',H4:'4h',D1:'1d' };
-    const intMap= { M5:'5m',M15:'15m',M30:'30m',H1:'1h',H4:'1h',D1:'1d' };
-    const rngMap= { M5:'2d',M15:'2d',M30:'2d',H1:'5d',H4:'1mo',D1:'6mo' };
+    const tfMap  = { M1:'1m', M5:'5m', M15:'15m', M30:'30m', H1:'1h', H4:'4h', D1:'1d' };
+    const metaTF = tfMap[tf] || '15m';
 
-    // أولاً: MetaAPI candles
-    if (META_BASE) {
-      try {
-        const metaTF = tfMap[tf] || '15m';
-        const url    = `${META_BASE}/history/candles/${symReq}/${metaTF}?limit=${limit}`;
-        const r      = await fetch(url, { headers: META_H });
-        if (r.ok) {
-          const data = await r.json();
-          if (Array.isArray(data) && data.length > 0) {
-            const candles = data
-              .map(function(c) {
-                return {
-                  t:  new Date(c.time || c.brokerTime || 0).getTime(),
-                  o:  parseFloat((c.open  || 0).toFixed(3)),
-                  h:  parseFloat((c.high  || 0).toFixed(3)),
-                  l:  parseFloat((c.low   || 0).toFixed(3)),
-                  cl: parseFloat((c.close || 0).toFixed(3)),
-                  v:  parseInt(c.tickVolume || c.volume || 1)
-                };
-              })
-              .filter(function(c) {
-                return c.o > 0 && c.cl > 0 && c.h > 0 && c.l > 0 && c.h >= c.l;
-              })
-              .sort(function(a,b){ return a.t - b.t; });
+    // ── MetaAPI: 3 endpoints بالترتيب ──────────────────────
+    if (BASE) {
+      const endpoints = [
+        // 1. Current candles (real-time terminal state)
+        `${BASE}/symbols/${symReq}/current-candles/${metaTF}?limit=${limit}`,
+        // 2. History candles
+        `${BASE}/history/candles/${symReq}/${metaTF}?limit=${limit}`,
+        // 3. Terminal state
+        `${BASE}/terminal-state/candles/${symReq}/${metaTF}?limit=${limit}`,
+      ];
 
-            if (candles.length > 0) {
-              return res.status(200).json({
-                candles, symbol:symReq, tf,
-                count:candles.length, source:'metaapi', ts:Date.now()
-              });
-            }
+      for (const url of endpoints) {
+        try {
+          const r = await fetch(url, { headers: H });
+          if (!r.ok) continue;
+          const raw = await r.json();
+          if (!Array.isArray(raw) || raw.length === 0) continue;
+
+          const candles = raw
+            .map(function(c) {
+              // MetaAPI field names vary by endpoint
+              const t  = c.time || c.brokerTime || c.openTime || 0;
+              const o  = parseFloat(c.open  || c.o || 0);
+              const h  = parseFloat(c.high  || c.h || 0);
+              const l  = parseFloat(c.low   || c.l || 0);
+              const cl = parseFloat(c.close || c.close || c.cl || 0);
+              return {
+                t:  typeof t === 'string' ? new Date(t).getTime() : t * 1000,
+                o:  parseFloat(o.toFixed(3)),
+                h:  parseFloat(h.toFixed(3)),
+                l:  parseFloat(l.toFixed(3)),
+                cl: parseFloat(cl.toFixed(3)),
+                v:  parseInt(c.tickVolume || c.volume || 1)
+              };
+            })
+            .filter(function(c) {
+              return c.o > 0 && c.cl > 0 && c.h >= c.l && c.h > 0;
+            })
+            .sort(function(a, b) { return a.t - b.t; });
+
+          if (candles.length > 0) {
+            return res.status(200).json({
+              candles, symbol: symReq, tf,
+              count: candles.length,
+              source: 'metaapi-mt5',
+              endpoint: url.replace(BASE, ''),
+              ts: Date.now()
+            });
           }
-        }
-      } catch(e) { /* fallthrough to Yahoo */ }
+        } catch(e) { continue; }
+      }
     }
 
-    // ثانياً: Yahoo Finance
+    // ── Yahoo Finance Fallback ──────────────────────────────
     try {
-      const yMap2  = { XAUUSD:'GC%3DF', XAGUSD:'SI%3DF' };
-      const ySym2  = yMap2[symReq] || 'GC%3DF';
-      const itvl   = intMap[tf] || '15m';
-      const range  = rngMap[tf] || '2d';
+      const yMap2 = { XAUUSD: 'GC%3DF', XAGUSD: 'SI%3DF' };
+      const intMap = { M5:'5m', M15:'15m', M30:'30m', H1:'1h', H4:'1h', D1:'1d' };
+      const rngMap = { M5:'2d', M15:'2d', M30:'2d', H1:'5d', H4:'1mo', D1:'6mo' };
 
       const yr = await fetch(
-        `https://query1.finance.yahoo.com/v8/finance/chart/${ySym2}?interval=${itvl}&range=${range}&includePrePost=false`,
-        { headers: { 'User-Agent':'Mozilla/5.0','Accept':'application/json' } }
+        `https://query1.finance.yahoo.com/v8/finance/chart/${yMap2[symReq]||'GC%3DF'}?interval=${intMap[tf]||'15m'}&range=${rngMap[tf]||'2d'}&includePrePost=false`,
+        { headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' } }
       );
-      if (!yr.ok) throw new Error('Yahoo candles ' + yr.status);
+      if (!yr.ok) throw new Error('Yahoo ' + yr.status);
 
       const yj     = await yr.json();
       const result = yj && yj.chart && yj.chart.result && yj.chart.result[0];
       const tss    = (result && result.timestamp) || [];
       const q      = (result && result.indicators && result.indicators.quote && result.indicators.quote[0]) || {};
+      if (!tss.length) throw new Error('No Yahoo data');
 
-      if (!tss.length) throw new Error('No Yahoo candle data');
-
-      const rawCandles = tss.map(function(t, i) {
+      const rawC = tss.map(function(t, i) {
         return {
           t:  t * 1000,
           o:  parseFloat(((q.open  && q.open[i])  || 0).toFixed(3)),
@@ -145,27 +146,28 @@ export default async function handler(req, res) {
           v:  parseInt((q.volume && q.volume[i]) || 1)
         };
       }).filter(function(c) {
-        return c.o > 0 && c.cl > 0 && c.h > 0 && c.l > 0 &&
-               c.h >= c.l && c.h >= c.o && c.h >= c.cl &&
-               c.l <= c.o && c.l <= c.cl;
-      }).sort(function(a,b){ return a.t - b.t; });
+        return c.o > 0 && c.cl > 0 && c.h >= c.l && c.h >= c.o && c.l <= c.o;
+      }).sort(function(a, b) { return a.t - b.t; });
 
       // Median outlier filter
-      var mids = rawCandles.map(function(c){ return (c.h+c.l)/2; }).slice().sort(function(a,b){return a-b;});
+      var mids = rawC.map(function(c){ return (c.h+c.l)/2; }).slice().sort(function(a,b){return a-b;});
       var med  = mids[Math.floor(mids.length/2)] || 0;
       var maxD = med * 0.025;
       var candles = med > 0
-        ? rawCandles.filter(function(c){ return Math.abs((c.h+c.l)/2-med) <= maxD; })
-        : rawCandles;
+        ? rawC.filter(function(c){ return Math.abs((c.h+c.l)/2-med) <= maxD; })
+        : rawC;
 
       return res.status(200).json({
         candles: candles.slice(-limit),
-        symbol:symReq, tf,
-        count:candles.length, source:'yahoo', ts:Date.now()
+        symbol: symReq, tf,
+        count: candles.length,
+        source: 'yahoo-futures',
+        note: 'GC=F futures — offset will be applied client-side',
+        ts: Date.now()
       });
 
     } catch(e2) {
-      return res.status(500).json({ error: e2.message, candles:[] });
+      return res.status(500).json({ error: e2.message, candles: [] });
     }
   }
 
