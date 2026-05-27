@@ -907,7 +907,7 @@ function renderCalendar() {
 // ═══════════════════════════════════════════════
 async function fetchPrice() {
   try {
-    const r=await fetch(`${BASE}/api/price?type=price`);
+    const r=await fetch(BASE+'/api/price?type=price&symbol=XAUUSD');
     if(!r.ok){log('[PRICE] HTTP '+r.status);return;}
     const d=await r.json();
     if(!d||!d.price){log(`[PRICE] ✗ ${d&&d.error||'no data'}`);return;}
@@ -1269,13 +1269,13 @@ async function sendChartToTelegram(auto=false) {
 ⏱ \`${new Date().toUTCString()}\`
 _🥇 Gold AI Bot v3_`;
 
-    await fetch(`${BASE}/api/chart`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:xauB64,caption:xauCaption})});
+    await fetch(BASE+'/api/chart',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:xauB64,caption:xauCaption})});
     log('[CHART] ✅ XAU شارت أُرسل');
 
     // ── شارت XAG/USD (فضة) ──
     const xagChart = await buildMiniChart('XAGUSD', tf);
     if (xagChart) {
-      await fetch(`${BASE}/api/chart`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:xagChart,caption:`📸 *XAG/USD الفضة — ${tf}*
+      await fetch(BASE+'/api/chart',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:xagChart,caption:`📸 *XAG/USD الفضة — ${tf}*
 🔗 مقارنة مع الذهب
 _🥇 Gold AI Bot v3_`})});
       log('[CHART] ✅ XAG شارت أُرسل');
@@ -1284,7 +1284,7 @@ _🥇 Gold AI Bot v3_`})});
     // ── شارت DXY (الدولار) ──
     const dxyChart = await buildDXYChart(tf);
     if (dxyChart) {
-      await fetch(`${BASE}/api/chart`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:dxyChart,caption:`📸 *DXY الدولار — ${tf}*
+      await fetch(BASE+'/api/chart',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:dxyChart,caption:`📸 *DXY الدولار — ${tf}*
 📈 DXY صاعد = ذهب هابط
 _🥇 Gold AI Bot v3_`})});
       log('[CHART] ✅ DXY شارت أُرسل');
@@ -1300,7 +1300,7 @@ _🥇 Gold AI Bot v3_`})});
 // رسم شارت XAG من MetaAPI
 async function buildMiniChart(sym, tf) {
   try {
-    const r = await fetch(`${BASE}/api/price?type=candles&tf=${tf}&symbol=${sym}&limit=20`);
+    const r = await fetch(BASE+'/api/price?type=candles&tf='+tf+'&symbol='+sym+'&limit=20');
     const d = await r.json();
     if (!d.candles&&d.candles.length) return null;
     const mc2=document.createElement('canvas');
@@ -1317,7 +1317,7 @@ async function buildDXYChart(tf) {
     const rngMap={M5:'5d',M15:'5d',M30:'5d',H1:'1mo',H4:'1mo'};
     const iv=intMap[tf]||'15m', rg=rngMap[tf]||'5d';
     const url=`https://query1.finance.yahoo.com/v8/finance/chart/DX%3DF?interval=${iv}&range=${rg}&includePrePost=false`;
-    const r=await fetch(`${BASE}/api/yahoo?url=${encodeURIComponent(url)}`);
+    const r=await fetch(BASE+'/api/yahoo?url='+encodeURIComponent(url));
     const d=await r.json();
     if(!d.candles&&d.candles.length) return null;
     const mc3=document.createElement('canvas');
@@ -1529,7 +1529,7 @@ async function fetchCandles(tf){
   document.getElementById('cload').style.display='block';
   log(`[CANDLES] Loading ${tf}...`);
   try{
-    const r=await fetch(`${BASE}/api/price?type=candles&tf=${tf}&limit=60`);
+    const r=await fetch(BASE+'/api/price?type=candles&tf='+tf+'&limit=60&symbol=XAUUSD');
     const d=await r.json();
     if(!d.candles&&d.candles.length){log(`[CANDLES] ✗ ${d.error||'empty'}`);return;}
     // فرز وتنظيف
@@ -2074,7 +2074,7 @@ async function runAI(){
   out.textContent='';bdg.style.display='none';
   const data=cdata[curTF],h=data&&data.map(function(c){return c.h;})||[],l=data&&data.map(function(c){return c.l;})||[];
   const atr=calcATR(data||[]);
-  const ep=aiModel==='claude'?`${BASE}/api/analyze`:`${BASE}/api/openai`;
+  const ep=aiModel==='claude'?BASE+'/api/analyze':BASE+'/api/openai';
   try{
     const r=await fetch(ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
       symbol:'XAUUSD',price:price.toFixed(2),
@@ -2254,7 +2254,7 @@ async function tgSend(type){
     ?{message:`🥇 *Test — Gold AI Bot v3*\n\n💰 $${price.toFixed(2)}\nBid:${document.getElementById('m-bid').textContent} Spread:${document.getElementById('m-spread').textContent}\nATR:${document.getElementById('m-atr').textContent}\nD1:${document.getElementById('t-d1').textContent}\nOB Sell:${document.getElementById('lbl-ob-sell').textContent}\nOB Buy:${document.getElementById('lbl-ob-buy').textContent}\n${new Date().toUTCString()}`}
     :{message:`📊 *إشارة XAU/USD*\n${document.getElementById('sigDir').textContent} @ $${price.toFixed(2)}\nSL:${document.getElementById('sSL').textContent} TP1:${document.getElementById('sTP1').textContent}\nR:R:${document.getElementById('sRR').textContent}\nD1:${document.getElementById('t-d1').textContent} | ${document.getElementById('t-align').textContent}\n${document.getElementById('lbl-ob-sell').textContent}\n${document.getElementById('lbl-ob-buy').textContent}`};
   try{
-    const r=await fetch(`${BASE}/api/telegram`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const r=await fetch(BASE+'/api/telegram',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const d=await r.json();
     if(d.ok){logEl.className='bdg bok';logEl.textContent='✅ تم الإرسال';log('[TG] ✓');}
     else throw new Error(d.error);
@@ -2264,11 +2264,11 @@ async function tgSend(type){
 async function tgSendTrade(t,rr){
   const isBuy=t.direction==='BUY';
   const msg=`${isBuy?'🟢':'🔴'} *إشارة #${t.id} — XAU/USD*\n━━━━━━━━━━━━━━━━━━━━━\n📊 ${t.direction} | الثقة: ${t.confidence}%\n📍 دخول: \`$${t.entry}\`\n🛑 وقف: \`$${t.sl}\` (ATR×0.5)\n🎯 TP1: \`$${t.tp1}\` (OB/FVG)\n🎯 TP2: \`$${t.tp2}\`\n⚖️ R:R: 1:${rr.toFixed(2)}\n━━━━━━━━━━━━━━━━━━━━━\n💡 ${t.reason}\n🌐 ${t.session}\n⏱ \`${new Date().toUTCString()}\`\n_🥇 Gold AI Bot v3_`;
-  try{await fetch(`${BASE}/api/telegram`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})});}catch(e){}
+  try{await fetch(BASE+'/api/telegram',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})});}catch(e){}
 }
 
 async function tgNotify(text){
-  try{await fetch(`${BASE}/api/telegram`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});}catch(e){}
+  try{await fetch(BASE+'/api/telegram',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});}catch(e){}
 }
 
 // ═══════════════════════════════════════════════
@@ -2288,7 +2288,7 @@ async function runNewsAnalysis() {
 
   const mkt = getMarketStatus();
   try {
-    const r = await fetch(`${BASE}/api/news`, {
+    const r = await fetch(BASE+'/api/news', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
