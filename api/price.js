@@ -157,8 +157,10 @@ export default async function handler(req, res) {
         ? rawC.filter(function(c){ return Math.abs((c.h+c.l)/2-med) <= maxD; })
         : rawC;
 
+      // JSON round-trip لضمان writable objects
+      const writableCandles = JSON.parse(JSON.stringify(candles.slice(-limit)));
       return res.status(200).json({
-        candles: candles.slice(-limit),
+        candles: writableCandles,
         symbol: symReq, tf,
         count: candles.length,
         source: 'yahoo-futures',
