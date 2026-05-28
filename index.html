@@ -1613,10 +1613,16 @@ function updateLastCandle(p){
       if(data.length > 80) data.shift();
       log('[CANDLE] New ' + tf + ' candle opened @ $' + p.toFixed(2));
     } else {
-      // ── نفس الشمعة: عدّل فقط High/Low/Close ──
-      last.cl = p;
-      last.h  = Math.max(last.h, p);
-      last.l  = Math.min(last.l, p);
+      // ── نفس الشمعة: استبدل بـ object جديد ──
+      var idx2 = data.length - 1;
+      cdata[tf][idx2] = {
+        t:  last.t,
+        o:  last.o,
+        h:  Math.max(last.h, p),
+        l:  Math.min(last.l, p),
+        cl: p,
+        v:  (last.v || 1) + 1
+      };
     }
   });
 
