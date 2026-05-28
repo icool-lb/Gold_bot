@@ -1567,7 +1567,17 @@ async function fetchCandles(tf){
       }
     }
 
-    cdata[tf] = cleanCandles;
+    // ═══ ضمان writable objects — منع readonly error ═══
+    cdata[tf] = cleanCandles.map(function(c2){
+      return {
+        t:  c2.t  || 0,
+        o:  parseFloat(c2.o  || 0),
+        h:  parseFloat(c2.h  || 0),
+        l:  parseFloat(c2.l  || 0),
+        cl: parseFloat(c2.cl || 0),
+        v:  parseInt(c2.v   || 1)
+      };
+    });
     ldone[tf]=true;
     document.getElementById('cload').style.display='none';
     log('[CANDLES] ✓ '+tf+': '+cdata[tf].length+'/'+raw.length+' ('+d.source+')');
