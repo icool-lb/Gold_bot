@@ -266,7 +266,7 @@ canvas{display:block}
     </div>
   </div>
   <div class="cwrap" id="cwrap">
-    <canvas id="mc"></canvas>
+    <canvas id="cv"></canvas>
     <div class="clbls">
       <div class="clbl cl-s" id="lbl-ob-sell">📦 OB SELL: ---</div>
       <div class="clbl cl-d" id="lbl-ob-buy">🧲 OB BUY: ---</div>
@@ -1745,6 +1745,9 @@ const cv=document.getElementById('mc'),ctx=cv.getContext('2d');
 function drawChart(tf){
   var wrap = document.getElementById('cwrap');
   if(!wrap) return;
+  var cv = document.getElementById('cv');
+  if(!cv) return;
+  var ctx = cv.getContext('2d');
   cv.width  = wrap.clientWidth;
   cv.height = wrap.clientHeight;
   var W = cv.width, H = cv.height;
