@@ -1537,6 +1537,53 @@ function updateStats(){
 // ═══════════════════════════════════════════════
 // CANDLES
 // ═══════════════════════════════════════════════
+async function fetchPrice(){
+  try{
+    var r=await fetch(BASE+'/api/price?type=price&symbol=XAUUSD');
+    if(!r.ok){log('[PRICE] HTTP '+r.status);return;}
+    var d=await r.json();
+    if(!d||!d.price){log('[PRICE] no data');return;}
+    prevP=price||d.price;
+    price=d.price;
+    var el=document.getElementById('livePrice');
+    if(el){
+      el.textContent='$'+price.toFixed(2);
+      el.style.color=price>prevP?'var(--green)':price<prevP?'var(--red)':'#FFFFFF';
+    }
+    var chg=document.getElementById('priceChange');
+    if(chg&&prevP>0){
+      var diff=price-prevP;
+      var pct=(diff/prevP*100).toFixed(3);
+      chg.textContent='('+pct+'%) '+Math.abs(diff).toFixed(2)+(diff>=0?' ▲':' ▼');
+      chg.style.color=diff>=0?'var(--green)':'var(--red)';
+    }
+    // تحديث Bid/Ask/Spread
+    var askEl=document.getElementById('i-ask');
+    var bidEl=document.getElementById('i-bid');
+    var sprEl=document.getElementById('i-spread');
+    if(askEl) askEl.textContent=d.ask?d.ask.toFixed(2):'---';
+    if(bidEl) bidEl.textContent=d.bid?d.bid.toFixed(2):'---';
+    if(sprEl) sprEl.textContent=d.spread?d.spread.toFixed(2):'---';
+    log('[MT5] $'+price.toFixed(2)+' Bid:'+d.bid+' Ask:'+d.ask);
+    // تصحيح offset للشمعات
+    Object.keys(cdata).forEach(function(tf2){
+      var arr=cdata[tf2];
+      if(!arr||arr.length<2)return;
+      var diff2=price-arr[arr.length-1].cl;
+      if(Math.abs(diff2)>5&&Math.abs(diff2)<100){
+        cdata[tf2]=arr.map(function(c2){
+          return {t:c2.t,o:c2.o+diff2,h:c2.h+diff2,l:c2.l+diff2,cl:c2.cl+diff2,v:c2.v};
+        });
+      }
+    });
+    updateLastCandle(price);
+    updateLevels(price);
+    computeIndicators();
+    checkAlerts(price);
+    monitorTrades(price);
+  }catch(e){log('[PRICE] Error: '+e.message);}
+}
+
 async function fetchCandles(tf){
   var el = document.getElementById('cload');
   if(el) el.style.display='block';
