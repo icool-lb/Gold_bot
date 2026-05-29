@@ -7,14 +7,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Cairo:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --gold:#00B4FF;--gold2:#40CFFF;--gdim:#1A6090;
-  --red:#FF4081;--green:#00E676;--blue:#00B4FF;
-  --orange:#FFA040;--yellow:#F5C842;
-  --bg:#0B1629;--bg2:#0D1F3C;--bg3:#091420;
-  --bdr:rgba(0,180,255,0.15);--bdrB:rgba(0,180,255,0.30)
+  --gold:#D69E2E;--gold2:#F6E05E;--gdim:#718096;
+  --red:#9B2335;--green:#276749;--blue:#2B6CB0;
+  --orange:#C05621;--yellow:#B7791F;
+  --bg:#F7F8FA;--bg2:#FFFFFF;--bg3:#EDF2F7;
+  --bdr:#E2E8F0;--bdrB:#CBD5E0;
+  --navy:#1A202C;--text:#2D3748;
+  --sig-buy-bg:#C6F6D5;--sig-buy-col:#276749;
+  --sig-sell-bg:#FED7D7;--sig-sell-col:#9B2335;
+  --sig-wait-bg:#FEFCBF;--sig-wait-col:#B7791F;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:#F5E6C8;font-family:'Cairo',sans-serif;min-height:100vh;overflow-x:hidden;background-image:radial-gradient(ellipse at 20% 50%,rgba(0,100,200,.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(0,60,120,.05) 0%,transparent 40%)}
+body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;overflow-x:hidden;background-image:radial-gradient(ellipse at 20% 50%,rgba(0,100,200,.06) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(0,60,120,.05) 0%,transparent 40%)}
 .hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:linear-gradient(90deg,rgba(11,22,41,.98),rgba(13,31,60,.98));border-bottom:1px solid var(--bdrB);position:sticky;top:0;z-index:200;backdrop-filter:blur(10px)}
 .logo{font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:var(--gold2);letter-spacing:2px;text-shadow:0 0 15px rgba(255,215,0,.4)}
 .logo span{color:#FFA500}
@@ -140,13 +144,36 @@ canvas{display:block}
 /* CHART SEND BTN */
 .chart-send-btn{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.8);border:1px solid rgba(0,150,255,.5);border-radius:6px;color:var(--blue);padding:6px 12px;cursor:pointer;font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;transition:all .2s;z-index:10}
 .chart-send-btn:hover{background:rgba(0,100,200,.3);box-shadow:0 0 10px rgba(0,150,255,.3)}
-.school-row{display:grid;grid-template-columns:80px 70px 1fr;align-items:center;padding:5px 8px;border-bottom:1px solid rgba(0,180,255,.08);font-size:10px;gap:4px}
+.school-row{display:grid;grid-template-columns:80px 70px 1fr;align-items:center;padding:5px 8px;border-bottom:1px solid #EDF2F7;font-size:10px;gap:4px;cursor:pointer;transition:background .15s}.school-row:hover{background:#F7F8FA}
 .school-row:last-child{border-bottom:none}
-.sch-name{color:rgba(150,180,220,.7);font-size:9px;font-family:'Orbitron',monospace;letter-spacing:.5px}
+.sch-name{color:#718096;font-size:9px;font-family:'Orbitron',monospace;letter-spacing:.5px}
 .sch-signal{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;text-align:center}
-.sch-detail{font-size:9px;color:rgba(120,160,200,.6);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,180,255,.2);border-radius:2px}
-.section-panel{background:rgba(9,20,32,0.8);border:1px solid rgba(0,180,255,0.12);border-radius:6px;padding:8px}
+.sch-detail{font-size:9px;color:#A0AEC0;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+::-webkit-scrollbar{width:3px}
+/* ══ School Detail Modal ══ */
+.school-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.school-modal.open{display:block}
+.sm-header{background:linear-gradient(135deg,rgba(0,20,40,.95),rgba(0,30,60,.95));padding:12px 16px;position:sticky;top:0;z-index:2;border-bottom:1px solid rgba(0,180,255,.2);display:flex;justify-content:space-between;align-items:center}
+.sm-title{font-family:'Orbitron',monospace;font-size:14px;color:#00B4FF;letter-spacing:2px}
+.sm-close{background:rgba(255,50,50,.2);border:1px solid rgba(255,50,50,.4);color:#FF6B6B;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+.sm-body{padding:12px}
+.sm-section{background:#FFFFFF;border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.sm-section-title{font-family:'Orbitron',monospace;font-size:9px;color:rgba(0,180,255,.5);letter-spacing:2px;margin-bottom:8px}
+.sm-signal-big{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:900;text-align:center;padding:10px}
+.sm-tf-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.sm-tf-cell{background:rgba(0,0,0,.3);border-radius:4px;padding:6px 4px;text-align:center}
+.sm-tf-label{font-size:8px;color:rgba(150,180,220,.5);margin-bottom:2px}
+.sm-tf-value{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700}
+.sm-factor-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(0,180,255,.06);font-size:10px}
+.sm-factor-row:last-child{border:none}
+.sm-factor-name{color:rgba(150,180,220,.7)}
+.sm-factor-val{font-family:'JetBrains Mono',monospace;font-size:10px}
+.sm-chart-wrap{height:160px;background:#FFF;border-radius:6px;overflow:hidden;margin-top:6px}
+.sm-explanation{font-size:11px;line-height:1.7;color:rgba(200,220,255,.8);padding:4px 0}
+/* Clickable school rows */
+.school-row{cursor:pointer;transition:background .2s}
+.school-row:active{background:rgba(0,180,255,.1)}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,180,255,.2);border-radius:2px}
+.section-panel{background:#FFFFFF;border:1px solid rgba(0,180,255,0.12);border-radius:6px;padding:8px}
 .row{display:flex;justify-content:space-between;align-items:center;margin:3px 0;font-size:11px}
 .lbl{color:rgba(150,180,220,0.65)}.val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px}
 </style>
@@ -305,10 +332,10 @@ canvas{display:block}
   <!-- 2. MASTER TABLEAU — كل التحليلات في مكان واحد -->
   <div>
     <div class="shdr sg"><span>🏆 MASTER TABLEAU — التحليل الكامل</span></div>
-    <div style="background:rgba(9,20,32,.9);border:1px solid rgba(0,180,255,.2);border-radius:8px;overflow:hidden">
+    <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06)">
 
       <!-- MASTER SCORE ROW -->
-      <div style="background:rgba(0,180,255,.06);padding:10px 12px;border-bottom:1px solid rgba(0,180,255,.15)">
+      <div style="background:#EBF8FF;padding:10px 12px;border-bottom:1px solid #BEE3F8">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <div style="font-family:'Orbitron',monospace;font-size:9px;color:rgba(0,180,255,.6);letter-spacing:2px">MASTER SCORE</div>
           <div id="ms-quality" style="font-size:9px;color:var(--gdim)">---</div>
@@ -328,31 +355,31 @@ canvas{display:block}
       <!-- SCHOOLS TABLEAU -->
       <div id="schoolsTableau">
         <!-- ICT/SMC -->
-        <div class="school-row"><div class="sch-name">ICT/SMC</div><div class="sch-signal" id="sch-ict">---</div><div class="sch-detail" id="det-ict">Order Blocks</div></div>
+        <div class="school-row" onclick="openSchoolModal('ict')" title="اضغط للتفاصيل"><div class="sch-name">ICT/SMC <span style="font-size:7px;opacity:.5">▶</span></div><div class="sch-signal" id="sch-ict">---</div><div class="sch-detail" id="det-ict">Order Blocks</div></div>
         <!-- Wyckoff -->
-        <div class="school-row"><div class="sch-name">Wyckoff</div><div class="sch-signal" id="sch-wyk">---</div><div class="sch-detail" id="det-wyk">Accumulation</div></div>
+        <div class="school-row" onclick="openSchoolModal('wyk')" title="اضغط للتفاصيل"><div class="sch-name">Wyckoff <span style="font-size:7px;opacity:.5">▶</span></div><div class="sch-signal" id="sch-wyk">---</div><div class="sch-detail" id="det-wyk">Accumulation</div></div>
         <!-- Elliott -->
-        <div class="school-row"><div class="sch-name">Elliott</div><div class="sch-signal" id="sch-ell">---</div><div class="sch-detail" id="det-ell">Wave count</div></div>
+        <div class="school-row" onclick="openSchoolModal('ell')" title="اضغط للتفاصيل"><div class="sch-name">Elliott <span style="font-size:7px;opacity:.5">▶</span></div><div class="sch-signal" id="sch-ell">---</div><div class="sch-detail" id="det-ell">Wave count</div></div>
         <!-- S&D -->
-        <div class="school-row"><div class="sch-name">S&D Zones</div><div class="sch-signal" id="sch-sd">---</div><div class="sch-detail" id="det-sd">Supply/Demand</div></div>
+        <div class="school-row" onclick="openSchoolModal('sd')" title="اضغط للتفاصيل"><div class="sch-name">S&D Zones <span style="font-size:7px;opacity:.5">▶</span></div><div class="sch-signal" id="sch-sd">---</div><div class="sch-detail" id="det-sd">Supply/Demand</div></div>
         <!-- Price Action -->
-        <div class="school-row"><div class="sch-name">Price Action</div><div class="sch-signal" id="sch-pa">---</div><div class="sch-detail" id="det-pa">Candle pattern</div></div>
+        <div class="school-row" onclick="openSchoolModal('pa')" title="اضغط للتفاصيل"><div class="sch-name">Price Action <span style="font-size:7px;opacity:.5">▶</span></div><div class="sch-signal" id="sch-pa">---</div><div class="sch-detail" id="det-pa">Candle pattern</div></div>
         <!-- Top-Down -->
-        <div class="school-row"><div class="sch-name">Top-Down</div><div class="sch-signal" id="sch-td">---</div><div class="sch-detail" id="det-td">D1→H4→H1</div></div>
+        <div class="school-row" onclick="openSchoolModal('td')" title="اضغط للتفاصيل"><div class="sch-name">Top-Down <span style="font-size:7px;opacity:.5">▶</span></div><div class="sch-signal" id="sch-td">---</div><div class="sch-detail" id="det-td">D1→H4→H1</div></div>
         <!-- MSS -->
-        <div class="school-row"><div class="sch-name">MSS/BOS</div><div class="sch-signal" id="sch-mss">---</div><div class="sch-detail" id="det-mss">Structure</div></div>
+        <div class="school-row" onclick="openSchoolModal('mss')" title="اضغط للتفاصيل"><div class="sch-name">MSS/BOS <span style="font-size:7px;opacity:.5">▶</span></div><div class="sch-signal" id="sch-mss">---</div><div class="sch-detail" id="det-mss">Structure</div></div>
         <!-- P&D -->
-        <div class="school-row"><div class="sch-name">Prem/Disc</div><div class="sch-signal" id="sch-pd">---</div><div class="sch-detail" id="det-pd">H4 range</div></div>
+        <div class="school-row" onclick="openSchoolModal('pd')" title="اضغط للتفاصيل"><div class="sch-name">Prem/Disc <span style="font-size:7px;opacity:.5">▶</span></div><div class="sch-signal" id="sch-pd">---</div><div class="sch-detail" id="det-pd">H4 range</div></div>
         <!-- Fibonacci -->
-        <div class="school-row"><div class="sch-name">Fibonacci</div><div class="sch-signal" id="sch-fib">---</div><div class="sch-detail" id="det-fib">61.8% level</div></div>
+        <div class="school-row" onclick="openSchoolModal('fib')" title="اضغط للتفاصيل"><div class="sch-name">Fibonacci <span style="font-size:7px;opacity:.5">▶</span></div><div class="sch-signal" id="sch-fib">---</div><div class="sch-detail" id="det-fib">61.8% level</div></div>
         <!-- Kill Zone -->
-        <div class="school-row"><div class="sch-name">Kill Zone</div><div class="sch-signal" id="sch-kz">---</div><div class="sch-detail" id="det-kz">Time-based</div></div>
+        <div class="school-row" onclick="openSchoolModal('kz')" title="اضغط للتفاصيل"><div class="sch-name">Kill Zone <span style="font-size:7px;opacity:.5">▶</span></div><div class="sch-signal" id="sch-kz">---</div><div class="sch-detail" id="det-kz">Time-based</div></div>
         <!-- VWAP -->
-        <div class="school-row"><div class="sch-name">VWAP/POC</div><div class="sch-signal" id="sch-vw">---</div><div class="sch-detail" id="det-vw">Volume</div></div>
+        <div class="school-row" onclick="openSchoolModal('vw')" title="اضغط للتفاصيل"><div class="sch-name">VWAP/POC <span style="font-size:7px;opacity:.5">▶</span></div><div class="sch-signal" id="sch-vw">---</div><div class="sch-detail" id="det-vw">Volume</div></div>
         <!-- Correlation -->
-        <div class="school-row"><div class="sch-name">XAG+DXY</div><div class="sch-signal" id="sch-corr">---</div><div class="sch-detail" id="det-corr">Correlation</div></div>
+        <div class="school-row" onclick="openSchoolModal('corr')" title="اضغط للتفاصيل"><div class="sch-name">XAG+DXY <span style="font-size:7px;opacity:.5">▶</span></div><div class="sch-signal" id="sch-corr">---</div><div class="sch-detail" id="det-corr">Correlation</div></div>
         <!-- CONSENSUS -->
-        <div class="school-row" style="background:rgba(0,180,255,.06);border-top:1px solid rgba(0,180,255,.2)">
+        <div class="school-row" style="background:#EBF8FF;border-top:2px solid #BEE3F8">
           <div class="sch-name" style="color:#00B4FF;font-weight:900">CONSENSUS</div>
           <div class="sch-signal" id="sch-cons" style="font-size:13px;font-weight:900">---</div>
           <div class="sch-detail" id="det-cons" style="color:#00B4FF">0/12 موافق</div>
@@ -398,7 +425,7 @@ canvas{display:block}
   <!-- 6. SELF-LEARNING LOG -->
   <div>
     <div class="shdr sg"><span>🧠 Self-Learning — سجل التعلم</span></div>
-    <div id="learningLog" style="background:rgba(9,20,32,.8);border:1px solid rgba(0,180,255,.12);border-radius:6px;padding:8px;max-height:150px;overflow-y:auto">
+    <div id="learningLog" style="background:#FFFFFF;border:1px solid var(--bdr);border-radius:6px;padding:8px;max-height:150px;overflow-y:auto">
       <div style="color:var(--gdim);font-size:10px;text-align:center">في انتظار نتائج الصفقات...</div>
     </div>
     <div style="margin-top:4px" class="brow">
@@ -656,7 +683,7 @@ function renderSLReport() {
   // الدروس المستفادة
   if(learningHistory.length) {
     html += learningHistory.slice(0,5).map(function(e){
-      var col = e.outcome.includes('ربح')||e.outcome.includes('هدف')?'var(--green)':'var(--red)';
+      var col = e.outcome.indexOf('ربح')>=0||e.outcome.indexOf('هدف')>=0?'var(--green)':'var(--red)';
       return '<div style="padding:3px 0;border-bottom:1px solid rgba(0,180,255,.06);font-size:9px">'
         +'<span style="color:'+col+'">'+(e.direction==='BUY'?'🟢':'🔴')+' #'+e.id+' '+e.outcome+'</span>'
         +'<div style="color:rgba(200,220,255,.6);font-style:italic;margin-top:1px">🧠 '+e.lesson+'</div>'
@@ -667,7 +694,7 @@ function renderSLReport() {
   // مراجعة Claude
   if(review) {
     var reviewAge = Math.round((Date.now()-review.time)/86400000);
-    html += '<div style="margin-top:6px;padding:5px;background:rgba(0,180,255,.05);border-radius:4px;border:1px solid rgba(0,180,255,.15)">'
+    html += '<div style="margin-top:6px;padding:5px;background:rgba(0,180,255,.05);border-radius:4px;border:1px solid var(--bdr)">'
       +'<div style="font-size:8px;color:rgba(0,180,255,.5);margin-bottom:3px">🤖 مراجعة Claude ('+(reviewAge===0?'اليوم':reviewAge+'د')+')</div>'
       +'<div style="font-size:9px;color:rgba(200,220,255,.7)">'+review.text.substring(0,200)+'</div>'
       +'</div>';
@@ -701,14 +728,45 @@ function resetTrades(){
 var lastReview = JSON.parse(localStorage.getItem('gold_weekly_review')||'null');
 var reviewAge  = lastReview ? (Date.now()-lastReview.time)/86400000 : 999;
 if(reviewAge > 7){ setTimeout(weeklyClaudeReview, 30000); }
+
+// ════════════════════════════════════════════════════════
+// SCHOOL DETAIL MODAL
+
+
+
+
+
+
+
+
+// إغلاق بالنقر خارج المحتوى
+document.getElementById('schoolModal') && document.getElementById('schoolModal').addEventListener('click', function(e){
+  if(e.target === this) closeSchoolModal();
+});
   log('[TRADES] 🗑 Reset — all trades cleared');
 }
 function exportTrades(){const b=new Blob([JSON.stringify({trades,tradeN},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`gold_trades_${new Date().toISOString().slice(0,10)}.json`;a.click();}
-function importTrades(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);trades=d.trades||[];tradeN=d.tradeN||0;saveTrades();renderTrades();updateStats();renderSLReport();addWeeklyReviewButton();
+function importTrades(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){try{var d=JSON.parse(ev.target.result);trades=d.trades||[];tradeN=d.tradeN||0;saveTrades();renderTrades();updateStats();renderSLReport();}catch(err){log('[IMPORT] Error: '+err.message);}};r.readAsText(f);}
 // مراجعة أسبوعية تلقائية (كل أسبوع)
 var lastReview = JSON.parse(localStorage.getItem('gold_weekly_review')||'null');
 var reviewAge  = lastReview ? (Date.now()-lastReview.time)/86400000 : 999;
-if(reviewAge > 7){ setTimeout(weeklyClaudeReview, 30000); }log('[IMPORT] '+trades.length+' trades');}catch(err){alert('ملف غير صالح');}};r.readAsText(f);}
+if(reviewAge > 7){ setTimeout(weeklyClaudeReview, 30000); }
+
+// ════════════════════════════════════════════════════════
+// SCHOOL DETAIL MODAL
+
+
+
+
+
+
+
+
+// إغلاق بالنقر خارج المحتوى
+document.getElementById('schoolModal') && document.getElementById('schoolModal').addEventListener('click', function(e){
+  if(e.target === this) closeSchoolModal();
+});
+
 
 // ═══════════════════════════════════════════════
 // AUDIO
@@ -726,7 +784,10 @@ function getAudioCtx() {
 }
 
 // نغمة تنبيه بسيطة (لا تحتاج صوت عربي)
-function playBeep(freq=880, dur=0.15, type='sine') {
+function playBeep(freq, dur, type) {
+  freq=freq!==undefined?freq:880;
+  dur=dur!==undefined?dur:0.15;
+  type=type!==undefined?type:'sine';
   try {
     const ctx = getAudioCtx();
     if (!ctx) return;
@@ -746,27 +807,28 @@ function playBeep(freq=880, dur=0.15, type='sine') {
 
 function playAlert(type) {
   // BUY: نغمتان صاعدتان
-  if (type === 'buy')   { playBeep(660,.12); setTimeout(()=>playBeep(880,.2),150); }
+  if (type === 'buy')   { playBeep(660,.12); setTimeout(function(){playBeep(880,.2);},150); }
   // SELL: نغمتان هابطتان  
-  else if(type==='sell'){ playBeep(880,.12); setTimeout(()=>playBeep(550,.2),150); }
+  else if(type==='sell'){ playBeep(880,.12); setTimeout(function(){playBeep(550,.2);},150); }
   // TRADE: ثلاث نغمات
-  else if(type==='trade'){ playBeep(660,.1); setTimeout(()=>playBeep(780,.1),120); setTimeout(()=>playBeep(1000,.2),240); }
+  else if(type==='trade'){ playBeep(660,.1); setTimeout(function(){playBeep(780,.1);},120); setTimeout(function(){playBeep(1000,.2);},240); }
   // NEWS: نغمة طويلة
   else if(type==='news'){ playBeep(440,.3,'triangle'); }
   // TP: احتفالي
-  else if(type==='tp')  { playBeep(660,.1); setTimeout(()=>playBeep(880,.1),100); setTimeout(()=>playBeep(1100,.3),200); }
+  else if(type==='tp')  { playBeep(660,.1); setTimeout(function(){playBeep(880,.1);},100); setTimeout(function(){playBeep(1100,.3);},200); }
   else { playBeep(660,.2); }
 }
 
 function speak(text) {
   try {
+    enableAudio();
     audioEnabled = true;
     // تشغيل النغمة المناسبة
-    if(text.includes('شراء'))       playAlert('buy');
-    else if(text.includes('بيع'))   playAlert('sell');
-    else if(text.includes('صفقة')) playAlert('trade');
-    else if(text.includes('هدف'))  playAlert('tp');
-    else if(text.includes('خبر'))  playAlert('news');
+    if(text.indexOf('شراء')>=0)       playAlert('buy');
+    else if(text.indexOf('بيع')>=0)   playAlert('sell');
+    else if(text.indexOf('صفقة')>=0) playAlert('trade');
+    else if(text.indexOf('هدف')>=0)  playAlert('tp');
+    else if(text.indexOf('خبر')>=0)  playAlert('news');
     else                             playBeep(660,.15);
 
     // محاولة TTS (اختياري — لا يسبب خطأ إذا فشل)
@@ -777,13 +839,13 @@ function speak(text) {
       u.rate   = 0.9;
       u.volume = 0.8;
       const voices = window.speechSynthesis.getVoices();
-      const ar = voices.find(v => v.lang && v.lang.startsWith('ar'));
+      const ar = voices.find(function(v){return v.lang && v.lang.indexOf('ar')>=0;});
       if (ar) u.voice = ar;
       window.speechSynthesis.speak(u);
     }
 
     // تنبيه خارج الداشبورد
-    if(text.includes('صفقة')||text.includes('هدف')||text.includes('وقف')){
+    if(text.indexOf('صفقة')>=0||text.indexOf('هدف')>=0||text.indexOf('وقف')>=0){
       pushNotify('🥇 Gold Bot', text, true);
     } else {
       pushNotify('🥇 Gold Bot', text, false);
@@ -816,7 +878,7 @@ function showAlert(type, text) {
   const z=document.getElementById('alertZone');
   const c=document.createElement('div');
   c.className=`alert a-${type}`; c.textContent=text;
-  z.appendChild(c); setTimeout(()=>c.remove(),4000);
+  z.appendChild(c); setTimeout(function(){c.remove();},4000);
 }
 
 // ═══════════════════════════════════════════════
@@ -824,9 +886,9 @@ function showAlert(type, text) {
 // ═══════════════════════════════════════════════
 // GMT+3 بيروت
 function toBeirut(gmt) {
-  const [h,m] = gmt.split(':').map(Number);
+  var _d=gmt.split(':').map(Number); var h=_d[0]; var m=_d[1];
   const bh = (h + 3) % 24;
-  return `${String(bh).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  return `${((bh)<10?'0'+(bh):''+(bh))}:${((m)<10?'0'+(m):''+(m))}`;
 }
 const EVENTS = [
   { name:'🇺🇸 CPI y/y',        time:'14:30', impact:'high', days:0 },
@@ -845,124 +907,108 @@ function getEventDate(days, timeStr) {
   const now = new Date();
   const d   = new Date(now);
   d.setUTCDate(d.getUTCDate() + days);
-  const [h,m] = timeStr.split(':');
+  var _d=timeStr.split(':'); var h=_d[0]; var m=_d[1];
   d.setUTCHours(parseInt(h), parseInt(m), 0, 0);
   return d;
 }
 
 function renderCalendar() {
-  const el  = document.getElementById('calEvents');
-  const now = Date.now();
-  let html  = '';
+  var el  = document.getElementById('calEvents');
+  var now = Date.now();
+  if(!el) return;
+  var html = '';
 
-  EVENTS.forEach(ev => {
-    const evDate  = getEventDate(ev.days, ev.time);
-    const diff    = evDate.getTime() - now; // ms
-    const diffMin = Math.round(diff / 60000);
-    const label   = ev.days===0?'اليوم':ev.days===1?'غداً':`+${ev.days}د`;
+  EVENTS.forEach(function(ev) {
+    var evDate  = getEventDate(ev.days, ev.time);
+    var diff    = evDate.getTime() - now;
+    var diffMin = Math.round(diff / 60000);
+    var label   = ev.days===0?'اليوم':ev.days===1?'غداً':'+'+ev.days+'د';
 
-    let cntClass='cnt-normal', cntText='';
-    if (diff > 0) {
-      if (diffMin <= 30) {
-        cntClass='cnt-soon';
-        cntText=`⚠️ ${diffMin}د`;
-        // تنبيه 30 دقيقة قبل الخبر
-        if (diffMin <= 30 && diffMin > 25 && !calAlerted[ev.name]) {
-          calAlerted[ev.name] = true;
-          speak(`تنبيه، خبر مهم بعد ${diffMin} دقيقة — ${ev.name.replace(/[🇺🇸🇨🇳🇪🇺]/g,'')}`);
-          showAlert('news', `📰 ${ev.name} — ${diffMin}د`);
-          tgNotify(`📰 *تنبيه خبر اقتصادي*\n\n${ev.name}\n⏰ بعد ${diffMin} دقيقة\n🕐 ${ev.time} GMT\n⚠️ تجنب الدخول قبل الخبر`);
-          log('[CALENDAR] خبر: '+ev.name+' خلال '+diffMin+'د');
-        }
-      } else if (diffMin <= 60) {
-        cntClass='cnt-warning';
-        cntText=`${diffMin}د`;
-      } else {
-        const hrs=Math.floor(diffMin/60);
-        cntText=hrs<24?`${hrs}س`:`${label} ${ev.time}`;
-      }
-    } else {
-      cntText='مضى';
+    // Beirut time (+3 GMT)
+    var gmtH   = parseInt(ev.time.split(':')[0]);
+    var gmtM   = ev.time.split(':')[1]||'00';
+    var brtH   = (gmtH + 3) % 24;
+    var brtStr = (brtH<10?'0':'')+brtH+':'+gmtM;
+
+    // Status
+    var isPast = diffMin < -30;
+    var isNow  = diffMin >= -30 && diffMin <= 0;
+    var isSoon = diffMin > 0 && diffMin <= 60;
+
+    // Impact color
+    var impColor = ev.impact==='HIGH'?'#E53E3E':ev.impact==='MED'?'#D69E2E':'#718096';
+    var impBg    = ev.impact==='HIGH'?'#FFF5F5':ev.impact==='MED'?'#FFFFF0':'#F7F8FA';
+    var impLabel = ev.impact==='HIGH'?'🔴 عالي':ev.impact==='MED'?'🟡 متوسط':'⚪ منخفض';
+
+    // Timer badge
+    var timerColor='#2B6CB0', timerBg='#EBF8FF';
+    if(isPast){ timerColor='#718096'; timerBg='#F7F8FA'; }
+    else if(isNow){ timerColor='#9B2335'; timerBg='#FED7D7'; }
+    else if(isSoon){ timerColor='#C05621'; timerBg='#FEFCBF'; }
+
+    var timeAgo = isPast ? 'مضى' : diffMin===0?'الآن':
+                  diffMin<60?(diffMin+'د'):Math.round(diffMin/60)+'س';
+
+    html += '<div style="background:'+impBg+';border:1px solid '+
+      (isPast?'#E2E8F0':isNow?'#FEB2B2':isSoon?'#FAF089':'#E2E8F0')+
+      ';border-right:3px solid '+impColor+';border-radius:6px;padding:8px 10px;margin-bottom:6px;'+
+      (isPast?'opacity:.6':'')+'">';
+
+    // Row 1: اسم الخبر + العلم
+    html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px">';
+    html += '<div style="font-size:11px;font-weight:700;color:'+(isPast?'#718096':'#1A202C')+'">'+
+              (ev.flag||'')+'&nbsp;'+ev.name+'</div>';
+    html += '<span style="background:'+timerBg+';color:'+timerColor+
+              ';padding:2px 7px;border-radius:10px;font-size:9px;font-weight:700;font-family:monospace">'+
+              timeAgo+'</span>';
+    html += '</div>';
+
+    // Row 2: التوقيت GMT + بيروت
+    html += '<div style="display:flex;gap:12px;margin-bottom:5px">';
+    html += '<div style="font-size:9px;color:#718096"><span style="opacity:.6">GMT</span> '+
+              '<span style="font-family:monospace;font-weight:700;color:#2D3748">'+ev.time+'</span></div>';
+    html += '<div style="font-size:9px;color:#718096"><span style="opacity:.6">🇱🇧 بيروت</span> '+
+              '<span style="font-family:monospace;font-weight:700;color:#2D3748">'+brtStr+'</span></div>';
+    html += '<div style="font-size:9px;color:#718096">'+label+'</div>';
+    html += '</div>';
+
+    // Row 3: النتائج الاقتصادية (إذا متاحة)
+    if(ev.actual!==undefined || ev.forecast!==undefined || ev.previous!==undefined) {
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;background:#FFFFFF;'+
+                'border:1px solid #E2E8F0;border-radius:4px;padding:5px;margin-top:4px">';
+      // Actual
+      var actColor = ev.actual!==undefined ?
+        (ev.forecast!==undefined ? (ev.actual>ev.forecast?'#276749':'#9B2335') : '#2D3748') : '#A0AEC0';
+      html += '<div style="text-align:center"><div style="font-size:7px;color:#A0AEC0">الفعلي</div>'+
+                '<div style="font-size:11px;font-weight:700;font-family:monospace;color:'+actColor+'">'+
+                (ev.actual!==undefined?ev.actual:'---')+'</div></div>';
+      // Forecast
+      html += '<div style="text-align:center;border-right:1px solid #E2E8F0;border-left:1px solid #E2E8F0">'+
+                '<div style="font-size:7px;color:#A0AEC0">التوقع</div>'+
+                '<div style="font-size:11px;font-weight:700;font-family:monospace;color:#2B6CB0">'+
+                (ev.forecast!==undefined?ev.forecast:'---')+'</div></div>';
+      // Previous
+      html += '<div style="text-align:center"><div style="font-size:7px;color:#A0AEC0">السابق</div>'+
+                '<div style="font-size:11px;font-weight:700;font-family:monospace;color:#718096">'+
+                (ev.previous!==undefined?ev.previous:'---')+'</div></div>';
+      html += '</div>';
+    } else if(!isPast) {
+      // Show impact label
+      html += '<div style="font-size:9px;color:'+impColor+';margin-top:2px">'+impLabel+'</div>';
     }
 
-    const impColor=ev.impact==='high'?'var(--red)':ev.impact==='med'?'var(--orange)':'var(--gdim)';
-    const impText=ev.impact==='high'?'🔴 HIGH':ev.impact==='med'?'🟠 MED':'⚪ LOW';
-    html += `<div class="cal-event cal-${ev.impact}">
-      <div>
-        <div class="cal-name">${ev.name}</div>
-        <div class="cal-time">${ev.time} GMT | ${toBeirut(ev.time)} بيروت • ${label}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
-        <span style="font-size:9px;font-weight:700;color:${impColor}">${impText}</span>
-        <span class="cal-countdown ${cntClass}">${cntText}</span>
-      </div>
-    </div>`;
+    html += '</div>';
   });
 
+  if(!EVENTS.length) html='<div style="text-align:center;color:#718096;padding:10px;font-size:10px">لا توجد أحداث</div>';
   el.innerHTML = html;
 }
 
-// ═══════════════════════════════════════════════
-// PRICE
-// ═══════════════════════════════════════════════
-async function fetchPrice() {
-  try {
-    const r=await fetch(BASE+'/api/price?type=price&symbol=XAUUSD');
-    if(!r.ok){log('[PRICE] HTTP '+r.status);return;}
-    const d=await r.json();
-    if(!d||!d.price){log('[PRICE] ✗ '+(d&&d.error||'no data'));return;}
-    prevP=price||d.price; price=d.price;
-    const el=document.getElementById('livePrice');
-    el.textContent='$'+price.toFixed(2);
-    el.style.color=price>=prevP?'#00B4FF':'#FFA040';
-    const chg=price-prevP,pct=prevP?(chg/prevP*100):0,up=chg>=0;
-    document.getElementById('priceChg').innerHTML=up
-      ?`<span style="color:var(--green)">▲ +${Math.abs(chg).toFixed(2)} (+${Math.abs(pct).toFixed(3)}%)</span>`
-      :`<span style="color:var(--red)">▼ ${Math.abs(chg).toFixed(2)} (${Math.abs(pct).toFixed(3)}%)</span>`;
-    if(d.bid) document.getElementById('m-bid').textContent=d.bid.toFixed(2);
-    if(d.ask) document.getElementById('m-ask').textContent=d.ask.toFixed(2);
-    if(d.spread) document.getElementById('m-spread').textContent=d.spread.toFixed(2);
-    document.getElementById('m-gsr').textContent=(price/74).toFixed(1);
-    document.getElementById('lCur').textContent='$'+price.toFixed(2);
-    updateLastCandle(price);
-    // تصحيح الـ offset عند كل تحديث سعر
-    Object.keys(cdata).forEach(function(tf2){
-      var arr = cdata[tf2];
-      if(!arr || arr.length < 2) return;
-      var lastC = arr[arr.length-1];
-      // إذا الشمعة الأخيرة تختلف بأكثر من 1 نقطة عن السعر الحالي (بعد updateLastCandle)
-      // هذا يعني الـ offset لم يُطبَّق بعد
-      var diff = price - lastC.cl;
-      if(Math.abs(diff) > 5 && Math.abs(diff) < 100) {
-        // إنشاء array جديد بدلاً من تعديل readonly objects
-        cdata[tf2] = arr.map(function(c2){
-          return {
-            t:  c2.t,
-            o:  parseFloat((c2.o  + diff).toFixed(3)),
-            h:  parseFloat((c2.h  + diff).toFixed(3)),
-            l:  parseFloat((c2.l  + diff).toFixed(3)),
-            cl: parseFloat((c2.cl + diff).toFixed(3)),
-            v:  c2.v
-          };
-        });
-        log('[PRICE] Offset '+tf2+': '+diff.toFixed(2));
-      }
-    });
-    updateLevels(price);
-    computeIndicators();
-    checkAlerts(price);
-    monitorTrades(price);
-    log('[MT5] $'+price.toFixed(2)+' Bid:'+d.bid+' Ask:'+d.ask);
-  } catch(e){log('[PRICE] Error: '+e.message);}
-}
-
-// ═══════════════════════════════════════════════
-// ATR
-// ═══════════════════════════════════════════════
-function calcATR(data,n=14){
+function calcATR(data,n){
+  n=n!==undefined?n:14;
   if(!data||data.length<n+1) return 25;
-  const trs=data.slice(-n).map((c,i,a)=>i?Math.max(c.h-c.l,Math.abs(c.h-a[i-1].cl),Math.abs(c.l-a[i-1].cl)):c.h-c.l);
-  return trs.reduce((a,b)=>a+b,0)/n;
+  var trs=data.slice(-n).map(function(c,i,a){return i?Math.max(c.h-c.l,Math.abs(c.h-a[i-1].cl),Math.abs(c.l-a[i-1].cl)):c.h-c.l;});
+  return trs.reduce(function(a,b){return a+b;},0)/n;
 }
 
 // ═══════════════════════════════════════════════
@@ -1123,9 +1169,9 @@ async function autoSignal(dir, p) {
   }
   const data=cdata[curTF];
   if(!data||data.length<20) return;
-  const closes=data.map(c=>c.cl);
-  let e200=closes[0],k200=2/201;closes.forEach(x=>{e200=x*k200+e200*(1-k200);});
-  let e50=closes[0],k50=2/51;closes.forEach(x=>{e50=x*k50+e50*(1-k50);});
+  const closes=data.map(function(c){return c.cl;});
+  let e200=closes[0],k200=2/201;closes.forEach(function(x){e200=x*k200+e200*(1-k200);});
+  let e50=closes[0],k50=2/51;closes.forEach(function(x){e50=x*k50+e50*(1-k50);});
   const d1bull=p>e200, h1bull=p>e50, isBuy=dir==='BUY';
   if(isBuy && !d1bull){
     log('[SIGNAL] ❌ BUY مرفوض — D1 هابط'); return;
@@ -1165,7 +1211,7 @@ async function autoSignal(dir, p) {
   }
   if(!isBuy && d1bull) {
     const _pdA = computePremiumDiscount(data, p);
-    const inOBS = obSellZones.some(ob=>p>=ob.bot*.999&&p<=ob.top*1.001);
+    const inOBS = obSellZones.some(function(ob){return p>=ob.bot*.999&&p<=ob.top*1.001;});
     const allowSell = _pdA && _pdA.pct >= 70 && (inOBS || !d1bull);
     if(!allowSell){
       log('[SIGNAL] ❌ SELL مرفوض — D1 صاعد بدون تأكيد'); return;
@@ -1204,12 +1250,12 @@ async function autoSignal(dir, p) {
 
   // ══ COOLDOWN بعد خسارتين متتاليتين ══
   // يمنع Revenge Trading
-  const recentClosed = trades.filter(t =>
-    (t.status==='SL' || t.status==='TP2') &&
-    t.closeTime && (Date.now() - t.closeTime) < 2*60*60*1000
-  ).slice(-2);
+  var recentClosed = trades.filter(function(t){
+    return (t.status==='SL' || t.status==='TP2') &&
+    t.closeTime && (Date.now() - t.closeTime) < 2*60*60*1000;
+  }).slice(-2);
   if(recentClosed.length >= 2 &&
-     recentClosed.every(t => t.result==='LOSS')) {
+     recentClosed.every(function(t){return t.result==='LOSS';})) {
     log('[SIGNAL] ⏸ Cooldown — خسارتان متتاليتان، انتظر 2 ساعة');
     return;
   }
@@ -1232,8 +1278,8 @@ async function autoSignal(dir, p) {
   const sl=isBuy?p-atr*.5:p+atr*.5;
   // TP عند أقرب OB أو FVG
   let tp1=isBuy?p+atr*.8:p-atr*.8;
-  if(isBuy&&obSellZones.length>0){const nearest=obSellZones.find(ob=>ob.bot>p);if(nearest)tp1=Math.min(nearest.bot,p+atr*.8);}
-  if(!isBuy&&obBuyZones.length>0){const nearest=obBuyZones.find(ob=>ob.top<p);if(nearest)tp1=Math.max(nearest.top,p-atr*.8);}
+  if(isBuy&&obSellZones.length>0){const nearest=obSellZones.find(function(ob){return ob.bot>p;});if(nearest)tp1=Math.min(nearest.bot,p+atr*.8);}
+  if(!isBuy&&obBuyZones.length>0){const nearest=obBuyZones.find(function(ob){return ob.top<p;});if(nearest)tp1=Math.max(nearest.top,p-atr*.8);}
   const tp2=isBuy?p+atr*1.5:p-atr*1.5;
   const rr=Math.abs(tp1-p)/Math.abs(sl-p);
   if(rr<1.5){log('[SIGNAL] R:R '+rr.toFixed(2)+' < 1.5');return;}
@@ -1242,14 +1288,15 @@ async function autoSignal(dir, p) {
   const t=createTrade({direction:dir,entry:parseFloat(p.toFixed(2)),sl:parseFloat(sl.toFixed(2)),tp1:parseFloat(tp1.toFixed(2)),tp2:parseFloat(tp2.toFixed(2)),confidence:Math.min(90,Math.round(50+rr*10)),rr:rr.toFixed(2),session:(document.getElementById('sSess')||{}).textContent||'',reason:'ATR='+atr.toFixed(2)+' | OB/FVG | D1:'+(d1bull?'↑':'↓')+' | RR='+rr.toFixed(2),atr:atr.toFixed(2)});
   await tgSendTrade(t,rr);
   // أرسل الشارت تلقائياً مع الإشارة
-  setTimeout(()=>sendChartToTelegram(true),1000);
+  setTimeout(function(){sendChartToTelegram(true);},1000);
   renderTrades(); updateStats();
 }
 
 // ═══════════════════════════════════════════════
 // SEND CHART TO TELEGRAM
 // ═══════════════════════════════════════════════
-async function sendChartToTelegram(auto=false) {
+async function sendChartToTelegram(auto){
+  auto=auto!==undefined?auto:false;
   const btn=document.getElementById('sendChartBtn');
   if(!auto){btn.textContent='⏳ جاري الإرسال...';btn.disabled=true;}
   const dir=document.getElementById('sigDir').textContent;
@@ -1290,10 +1337,10 @@ _🥇 Gold AI Bot v3_`})});
       log('[CHART] ✅ DXY شارت أُرسل');
     }
 
-    if(!auto){btn.textContent='✅ 3 شارتات أُرسلت';setTimeout(()=>{btn.textContent='📸 إرسال الشارت';btn.disabled=false;},3000);}
+    if(!auto){btn.textContent='✅ 3 شارتات أُرسلت';setTimeout(function(){btn.textContent='📸 إرسال الشارت';btn.disabled=false;},3000);}
   } catch(e) {
     log('[CHART] ✗ '+e.message);
-    if(!auto){btn.textContent='❌ فشل';setTimeout(()=>{btn.textContent='📸 إرسال الشارت';btn.disabled=false;},2000);}
+    if(!auto){btn.textContent='❌ فشل';setTimeout(function(){btn.textContent='📸 إرسال الشارت';btn.disabled=false;},2000);}
   }
 }
 
@@ -1327,42 +1374,7 @@ async function buildDXYChart(tf) {
   } catch(e) { log('[CHART] DXY error: '+e.message); return null; }
 }
 
-function drawMiniChartOn(ctx2, W, H, data, label) {
-  if(!ctx2||!data||data.length<2) return;
-  ctx2.fillStyle='#0A1628';ctx2.fillRect(0,0,W,H);
-  ctx2.strokeStyle='rgba(255,215,0,.04)';ctx2.lineWidth=.5;
-  for(let i=0;i<6;i++){const y=H*i/6;ctx2.beginPath();ctx2.moveTo(0,y);ctx2.lineTo(W,y);ctx2.stroke();}
-  const allP=data.map(function(c){return [c.h,c.l];}).reduce(function(a,b){return a.concat(b);},[]);
-  const minP=Math.min(...allP),maxP=Math.max(...allP),pad=(maxP-minP)*.1;
-  const pMin=minP-pad,pMax=maxP+pad;
-  const toY=p=>H-((p-pMin)/(pMax-pMin))*(H*.88)-H*.05;
-  const mL=10,mR=60,cW=Math.max(3,(W-mL-mR)/data.length-1);
-  // EMA20
-  ctx2.beginPath();ctx2.strokeStyle='#00D4FF';ctx2.lineWidth=1.5;
-  let ema=data[0].cl,k=2/21;
-  data.forEach((c,i)=>{ema=c.cl*k+ema*(1-k);const x=mL+(i/data.length)*(W-mL-mR)+cW/2;i?ctx2.lineTo(x,toY(ema)):ctx2.moveTo(x,toY(ema));});
-  ctx2.stroke();
-  // Candles
-  data.forEach((c,i)=>{
-    const x=mL+(i/data.length)*(W-mL-mR),bull=c.cl>=c.o,cx=x+cW/2;
-    ctx2.strokeStyle=bull?'#00FF88':'#FF2D55';ctx2.lineWidth=1;
-    ctx2.beginPath();ctx2.moveTo(cx,toY(c.h));ctx2.lineTo(cx,toY(c.l));ctx2.stroke();
-    ctx2.fillStyle=bull?'rgba(0,255,136,.8)':'rgba(255,45,85,.8)';
-    const bT=toY(Math.max(c.o,c.cl)),bH=Math.max(2,Math.abs(toY(c.o)-toY(c.cl)));
-    ctx2.fillRect(x+.5,bT,Math.max(2,cW-1),bH);
-  });
-  // Label + Price
-  const lastP=data[data.length-1].cl;
-  ctx2.fillStyle='rgba(255,215,0,.9)';ctx2.fillRect(W-mR+2,toY(lastP)-10,mR-3,20);
-  ctx2.fillStyle='#0A0800';ctx2.font='bold 10px monospace';ctx2.textAlign='left';
-  ctx2.fillText(lastP.toFixed(2),W-mR+5,toY(lastP)+4);
-  // Symbol label
-  ctx2.fillStyle='rgba(255,215,0,.5)';ctx2.font='bold 16px Orbitron,monospace';ctx2.textAlign='left';
-  ctx2.fillText(label,mL+5,25);
-  // Scale
-  ctx2.fillStyle='rgba(255,215,0,.4)';ctx2.font='9px monospace';ctx2.textAlign='left';
-  for(let i=0;i<=5;i++){const p=pMin+(pMax-pMin)*i/5;ctx2.fillText(p.toFixed(2),W-mR+3,toY(p)+3);}
-}
+
 
 // ═══════════════════════════════════════════════
 // TRADE MANAGEMENT
@@ -1371,13 +1383,13 @@ function createTrade(d){tradeN++;var t=Object.assign({},{id:tradeN},d,{status:'O
   // تسجيل سياق الصفقة للتعلم
   try{ recordTradeContext(t, cdata[curTF], price); }catch(e){}
   return t;}
-function updTrade(id,upd){const i=trades.findIndex(t=>t.id===id);if(i>=0){trades[i]=Object.assign({},trades[i],upd);saveTrades();}}
+function updTrade(id,upd){const i=trades.findIndex(function(t){return t.id===id;});if(i>=0){trades[i]=Object.assign({},trades[i],upd);saveTrades();}}
 
 let lastMon=0;
 function monitorTrades(p){
   if(Date.now()-lastMon<60000)return;
   lastMon=Date.now();
-  const open=trades.filter(t=>t.status==='OPEN'||t.status==='TP1');
+  const open=trades.filter(function(t){return t.status==='OPEN'||t.status==='TP1';});
   if(!open.length)return;
   open.forEach(function(t){
     const isBuy=t.direction==='BUY',elapsed=(Date.now()-t.openTime)/60000;
@@ -1453,9 +1465,9 @@ async function getLesson(t,outcome,p){
 }
 
 function renderTrades(){
-  const open=trades.filter(t=>t.status==='OPEN'||t.status==='TP1').reverse();
-  const hist=trades.filter(t=>['TP2','SL'].includes(t.status)).reverse().slice(0,8);
-  const fmt=v=>'$'+parseFloat(v).toFixed(2);
+  const open=trades.filter(function(t){return t.status==='OPEN'||t.status==='TP1';}).reverse();
+  const hist=trades.filter(function(t){return ['TP2','SL'].indexOf(t.status)>=0;}).reverse().slice(0,8);
+  var fmt=function(v){return '$'+parseFloat(v).toFixed(2);};
   document.getElementById('openTrades').innerHTML = buildTradeCards(open, true);
   document.getElementById('tradeHistory').innerHTML = buildTradeCards(hist, false);
 }
@@ -1513,7 +1525,7 @@ function buildTradeCards(list, isOpen) {
 
 function updateStats(){
   const all=trades;
-  const wins=all.filter(t=>t.result==='WIN').length,loss=all.filter(t=>t.result==='LOSS').length,part=all.filter(t=>t.result==='PARTIAL').length,open=all.filter(t=>t.status==='OPEN').length,wr=all.length?Math.round((wins+part*.5)/all.length*100):0;
+  const wins=all.filter(function(t){return t.result==='WIN';}).length,loss=all.filter(function(t){return t.result==='LOSS';}).length,part=all.filter(function(t){return t.result==='PARTIAL';}).length,open=all.filter(function(t){return t.status==='OPEN';}).length,wr=all.length?Math.round((wins+part*.5)/all.length*100):0;
   document.getElementById('st-tot').textContent=all.length;
   document.getElementById('st-win').textContent=wins;
   document.getElementById('st-loss').textContent=loss;
@@ -1526,69 +1538,108 @@ function updateStats(){
 // CANDLES
 // ═══════════════════════════════════════════════
 async function fetchCandles(tf){
-  document.getElementById('cload').style.display='block';
+  var el = document.getElementById('cload');
+  if(el) el.style.display='block';
   log('[CANDLES] Loading '+tf+'...');
   try{
-    const r=await fetch(BASE+'/api/price?type=candles&tf='+tf+'&limit=60&symbol=XAUUSD');
-    const d=await r.json();
-    if(!d.candles||!d.candles.length){log('[CANDLES] ✗ '+(d.error||'empty'));return;}
-    // فرز وتنظيف
-    const raw = d.candles;
-    const now_ts = Date.now();
-    // احتفظ بآخر 8 ساعات فقط (يمنع الشمعات القديمة)
-    const maxAge = {M5:4*3600000, M15:8*3600000, M30:16*3600000, H1:48*3600000, H4:200*3600000};
-    const cutoff = now_ts - (maxAge[tf] || 8*3600000);
-    const cleanCandles = raw
-      .filter(c => c.o > 0 && c.cl > 0 && c.h > 0 && c.l > 0
-               && c.h >= c.l && !isNaN(c.o) && !isNaN(c.cl)
-               && (!c.t || c.t >= cutoff))
-      .sort((a,b) => (a.t||0)-(b.t||0))
-      .slice(-60); // آخر 60 شمعة فقط
-    if(!cleanCandles.length){ log('[CANDLES] ✗ no valid candles after filter'); return; }
-
-    // تصحيح أسعار Yahoo Futures → Spot MetaAPI
-    if(d.source && d.source.indexOf('yahoo') >= 0 && cleanCandles.length > 0) {
-      var lastYClose = cleanCandles[cleanCandles.length-1].cl;
-      var spotPrice = price > 0 ? price : lastYClose;
-      var offset = spotPrice - lastYClose;
-      // طبّق الـ offset دائماً إذا كان هناك فرق
-      if(Math.abs(offset) > 0.05) {
-        cleanCandles = cleanCandles.map(function(c2){
-          return {
-            t:  c2.t,
-            o:  parseFloat((c2.o  + offset).toFixed(3)),
-            h:  parseFloat((c2.h  + offset).toFixed(3)),
-            l:  parseFloat((c2.l  + offset).toFixed(3)),
-            cl: parseFloat((c2.cl + offset).toFixed(3)),
-            v:  c2.v
-          };
+    var r = await fetch(BASE+'/api/price?type=candles&tf='+tf+'&limit=60&symbol=XAUUSD');
+    if(!r.ok){ log('[CANDLES] HTTP '+r.status); if(el) el.style.display='none'; return; }
+    var d = await r.json();
+    if(!d.candles || !d.candles.length){
+      log('[CANDLES] Error: '+(d.error||'empty'));
+      if(el) el.style.display='none';
+      return;
+    }
+    // بناء writable objects جديدة مضمونة
+    var clean = [];
+    var now_ts = Date.now();
+    var maxAge = {M5:4*3600000,M15:8*3600000,M30:16*3600000,H1:48*3600000,H4:200*3600000,D1:9999*3600000};
+    var cutoff = now_ts - (maxAge[tf]||8*3600000);
+    for(var i=0;i<d.candles.length;i++){
+      var c2 = d.candles[i];
+      var t2 = c2.t||0;
+      if(t2 < cutoff) continue;
+      var o2  = parseFloat(c2.o  || 0);
+      var h2  = parseFloat(c2.h  || 0);
+      var l2  = parseFloat(c2.l  || 0);
+      var cl2 = parseFloat(c2.cl || 0);
+      var v2  = parseInt(c2.v    || 1);
+      if(o2>0 && cl2>0 && h2>=l2)
+        clean.push({t:t2, o:o2, h:h2, l:l2, cl:cl2, v:v2});
+    }
+    if(!clean.length){ log('[CANDLES] No valid candles'); if(el) el.style.display='none'; return; }
+    clean.sort(function(a,b){return a.t-b.t;});
+    // تصحيح offset MetaAPI vs Spot
+    if(price>0){
+      var lastCl = clean[clean.length-1].cl;
+      var diff = price - lastCl;
+      if(Math.abs(diff)>0.5 && Math.abs(diff)<100){
+        clean = clean.map(function(c3){
+          return {t:c3.t, o:c3.o+diff, h:c3.h+diff, l:c3.l+diff, cl:c3.cl+diff, v:c3.v};
         });
-        log('[CANDLES] offset: '+offset.toFixed(2));
+        log('[CANDLES] offset: '+diff.toFixed(2));
       }
     }
-
-    // ═══ ضمان writable objects — منع readonly error ═══
-    cdata[tf] = cleanCandles.map(function(c2){
-      return {
-        t:  c2.t  || 0,
-        o:  parseFloat(c2.o  || 0),
-        h:  parseFloat(c2.h  || 0),
-        l:  parseFloat(c2.l  || 0),
-        cl: parseFloat(c2.cl || 0),
-        v:  parseInt(c2.v   || 1)
-      };
-    });
-    ldone[tf]=true;
-    document.getElementById('cload').style.display='none';
-    log('[CANDLES] ✓ '+tf+': '+cdata[tf].length+'/'+raw.length+' ('+d.source+')');
-    if(d.source && d.source.indexOf('yahoo') >= 0) {
-      log('[CANDLES] Yahoo Futures — check offset');
-    }
+    cdata[tf] = clean;
+    log('[CANDLES] ✓ '+tf+': '+clean.length+' ('+d.source+')');
+    if(el) el.style.display='none';
     detectOBandFVG(cdata[tf]);
-    if(tf===curTF)drawChart(tf);
+    if(tf===curTF) drawChart(tf);
     updateSpark(tf);
-    if(tf==='M15')computeIndicators();
-  }catch(e){log('[CANDLES] Error: '+e.message);}
+    if(tf==='M15') computeIndicators();
+  }catch(e){
+    log('[CANDLES] Error: '+e.message);
+    if(el) el.style.display='none';
+  }
+}
+
+// ══ Chart Touch Handlers (Pinch Zoom + Pan) ══
+function initChartTouch() {
+  var cv = document.getElementById('cv');
+  if(!cv) return;
+  
+  // Pinch to zoom
+  cv.addEventListener('touchstart', function(e) {
+    if(e.touches.length === 2) {
+      chartPinchDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      e.preventDefault();
+    }
+  }, {passive: false});
+  
+  cv.addEventListener('touchmove', function(e) {
+    if(e.touches.length === 2) {
+      var newDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      if(chartPinchDist > 0) {
+        var ratio = newDist / chartPinchDist;
+        chartZoom = Math.max(0.3, Math.min(5.0, chartZoom * ratio));
+        chartPinchDist = newDist;
+        drawChart(curTF);
+      }
+      e.preventDefault();
+    }
+  }, {passive: false});
+  
+  cv.addEventListener('touchend', function(e) {
+    chartPinchDist = 0;
+  });
+  
+  // Double tap to reset zoom
+  var lastTap = 0;
+  cv.addEventListener('touchend', function(e) {
+    var now = Date.now();
+    if(now - lastTap < 300) {
+      chartZoom   = 1.0;
+      chartOffset = 0;
+      drawChart(curTF);
+    }
+    lastTap = now;
+  });
 }
 
 function updateLastCandle(p){
@@ -1654,7 +1705,12 @@ function drawChart(tf){
   if(!allData || allData.length < 2){ return; }
 
   // آخر 25 شمعة
-  var data = allData.slice(-25);
+  // Apply zoom: زيادة الزوم = أقل شمعات (تكبير)، تقليل الزوم = أكثر شمعات
+  var baseCnt  = Math.round(25 / chartZoom);
+  var maxCnt   = Math.min(allData.length, Math.max(5, baseCnt));
+  var startIdx = Math.max(0, allData.length - maxCnt - Math.round(chartOffset));
+  var data     = allData.slice(startIdx, startIdx + maxCnt);
+  if(!data.length) data = allData.slice(-25);
   if(data.length < 2) return;
 
   // ── خلفية بيضاء ──
@@ -1834,10 +1890,15 @@ function drawChart(tf){
     }
   }
 
-  // ── TF label ──
+  // ── TF label + Zoom ──
   ctx.fillStyle='rgba(0,0,0,0.12)';
   ctx.font='bold 13px Orbitron,monospace'; ctx.textAlign='right';
   ctx.fillText(tf,W-mR-5,H-mB-2);
+  if(chartZoom !== 1.0) {
+    ctx.fillStyle='rgba(0,0,0,0.15)';
+    ctx.font='10px monospace'; ctx.textAlign='left';
+    ctx.fillText((chartZoom>1?'🔍 ':'🔭 ')+chartZoom.toFixed(1)+'x', mL+3, H-mB-2);
+  }
 
   // ── تحديث labels ──
   var lOS=obSellZones.length?obSellZones[obSellZones.length-1]:null;
@@ -1859,9 +1920,9 @@ function updateSpark(tf){
   const idm={M5:'sp5',M15:'sp15',M30:'sp30',H1:'spH1'};
   const tdm={M5:'mt5',M15:'mt15',M30:'mt30',H1:'mtH1'};
   if(!idm[tf])return;
-  const pts=data.slice(-30),mn=Math.min(...pts.map(c=>c.cl)),mx=Math.max(...pts.map(c=>c.cl));
+  const pts=data.slice(-30),mn=Math.min.apply(null,pts.map(function(c){return c.cl;})),mx=Math.max.apply(null,pts.map(function(c){return c.cl;}));
   const el=document.getElementById(idm[tf]);
-  el.setAttribute('points',pts.map((c,i)=>`${(i/(pts.length-1))*76+2},${23-((c.cl-mn)/(mx-mn||1))*20+1}`).join(' '));
+  el.setAttribute('points',pts.map(function(c,i){return ''+(i/(pts.length-1)*76+2)+','+(23-((c.cl-mn)/(mx-mn||1))*20+1);}).join(' '));
   el.setAttribute('stroke',bull?'#00FF88':'#FF2D55');
   const te=document.getElementById(tdm[tf]);
   te.textContent=bull?'↑ BULL':'↓ BEAR';te.className='mitr '+(bull?'bull':'bear');
@@ -1872,7 +1933,7 @@ function updateSpark(tf){
 // ═══════════════════════════════════════════════
 function computeIndicators(){
   var data=cdata[curTF];if(!data||data.length<14)return;
-  var closes=data.map(c=>c.cl),n=closes.length;
+  var closes=data.map(function(c){return c.cl;}),n=closes.length;
   var g=0,ll=0;for(var i2=n-14;i2<n;i2++){var dd=closes[i2]-closes[i2-1];dd>0?g+=dd:ll-=dd;}
   var rsi=100-(100/(1+g/(ll||.001)));
   document.getElementById('i-rsi').textContent=rsi.toFixed(1);
@@ -1894,7 +1955,7 @@ function computeIndicators(){
   document.getElementById('i-e200').textContent=e200.toFixed(2);
   document.getElementById('i-e200-s').textContent=price>e200?'↑ ABOVE':'↓ BELOW';
   document.getElementById('i-e200-s').style.color=price>e200?'var(--green)':'var(--red)';
-  var vwap=closes.slice(-20).reduce((a,b)=>a+b,0)/20;
+  var vwap=closes.slice(-20).reduce(function(a,b){return a+b;},0)/20;
   document.getElementById('i-vwap').textContent=vwap.toFixed(2);
   document.getElementById('i-vwap-s').textContent=price>vwap?'ABOVE':'BELOW';
   document.getElementById('i-vwap-s').style.color=price>vwap?'var(--green)':'var(--red)';
@@ -1979,7 +2040,7 @@ function computeIndicators(){
 
 function updateSigCard(dir,conf,atr,atH,score,d1bull,aligned,inOBSell,inOBBuy){
   if(!price)return;
-  const fmt=v=>'$'+v.toFixed(2);
+  var fmt=function(v){return '$'+v.toFixed(2);};
   const isBuy=dir==='BUY';
   document.getElementById('sigCard').className='sc '+(dir==='BUY'?'sbuy':dir==='SELL'?'ssell':'swait');
   document.getElementById('sigDir').textContent=dir;
@@ -1990,8 +2051,8 @@ function updateSigCard(dir,conf,atr,atH,score,d1bull,aligned,inOBSell,inOBBuy){
   const sl=isBuy?price-atrV*.5:price+atrV*.5;
   // TP عند أقرب OB أو FVG
   let tp1=isBuy?price+atrV*.8:price-atrV*.8;
-  if(isBuy&&obSellZones.length>0){const n=obSellZones.find(ob=>ob.bot>price);if(n)tp1=Math.min(n.bot,price+atrV*.8);}
-  if(!isBuy&&obBuyZones.length>0){const n=obBuyZones.find(ob=>ob.top<price);if(n)tp1=Math.max(n.top,price-atrV*.8);}
+  if(isBuy&&obSellZones.length>0){const n=obSellZones.find(function(ob){return ob.bot>price;});if(n)tp1=Math.min(n.bot,price+atrV*.8);}
+  if(!isBuy&&obBuyZones.length>0){const n=obBuyZones.find(function(ob){return ob.top<price;});if(n)tp1=Math.max(n.top,price-atrV*.8);}
   const tp2=isBuy?price+atrV*1.5:price-atrV*1.5;
   const rr=Math.abs(tp1-price)/Math.abs(sl-price);
   tpLevel=tp1; // للرسم على الشارت
@@ -2008,7 +2069,7 @@ function updateSigCard(dir,conf,atr,atH,score,d1bull,aligned,inOBSell,inOBBuy){
     inOBBuy&&dir==='BUY'?'✅ في OB BUY — إشارة قوية':
     score>=7?'✅ إشارة قوية':'🔶 إشارة متوسطة';
   document.getElementById('sigWarn').textContent=warn;
-  const setT=(id,txt,cls)=>{document.getElementById(id).textContent=txt;document.getElementById(id).className='tv '+cls;};
+  var setT=function(id,txt,cls){document.getElementById(id).textContent=txt;document.getElementById(id).className='tv '+cls;};
   setT('t-zone',inOBSell?'OB SELL ⛔':inOBBuy?'OB BUY ✅':atH?'عرض':'طلب',inOBSell||atH?'tr':inOBBuy?'tg':'tx');
   setT('t-dec',!aligned||rr<1.5?'انتظر':dir==='BUY'?'شراء':'بيع',!aligned||rr<1.5?'tx':dir==='BUY'?'tg':'tr');
   setT('t-ent',rr>=1.5&&aligned&&dir!=='WAIT'?'مسموح':'Blocked',rr>=1.5&&aligned&&dir!=='WAIT'?'tg':'tr');
@@ -2025,14 +2086,14 @@ function updateLevels(p){
   var prevOBSell   = obSellAbove.length>1 ? obSellAbove[obSellAbove.length-2] : null;
   var latestOBBuy  = obBuyBelow.length ? obBuyBelow[obBuyBelow.length-1] : (obBuyZones.length?obBuyZones[obBuyZones.length-1]:null);
   var prevOBBuy    = obBuyBelow.length>1 ? obBuyBelow[obBuyBelow.length-2] : null;
-  const bullFVG=fvgZones.find(f=>f.type==='bull');
-  const bearFVG=fvgZones.find(f=>f.type==='bear');
-  document.getElementById('lR3').textContent=prevOBSell?fmt(prevOBSell.top):data&&data.length?fmt(Math.max(...data.map(c=>c.h).slice(-50))):'---';
+  const bullFVG=fvgZones.find(function(f){return f.type==='bull';});
+  const bearFVG=fvgZones.find(function(f){return f.type==='bear';});
+  document.getElementById('lR3').textContent=prevOBSell?fmt(prevOBSell.top):data&&data.length?fmt(Math.max.apply(null,data.map(function(c){return c.h;}).slice(-50))):'---';
   document.getElementById('lR2').textContent=latestOBSell?fmt(latestOBSell.top):'---';
   document.getElementById('lR1').textContent=bearFVG?fmt(bearFVG.top):'---';
   document.getElementById('lS1').textContent=bullFVG?fmt(bullFVG.bot):'---';
   document.getElementById('lS2').textContent=latestOBBuy?fmt(latestOBBuy.bot):'---';
-  document.getElementById('lS3').textContent=prevOBBuy?fmt(prevOBBuy.bot):data&&data.length?fmt(Math.min(...data.map(c=>c.l).slice(-50))):'---';
+  document.getElementById('lS3').textContent=prevOBBuy?fmt(prevOBBuy.bot):data&&data.length?fmt(Math.min.apply(null,data.map(function(c){return c.l;}).slice(-50))):'---';
 }
 
 // ═══════════════════════════════════════════════
@@ -2040,20 +2101,20 @@ function updateLevels(p){
 // ═══════════════════════════════════════════════
 function updateSessions(){
   const now=new Date(),h=now.getUTCHours(),m=now.getUTCMinutes(),s=now.getUTCSeconds();
-  const t=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} GMT`;
+  const t=`${((h)<10?'0'+(h):''+(h))}:${((m)<10?'0'+(m):''+(m))}:${((s)<10?'0'+(s):''+(s))} GMT`;
   document.getElementById('srvTime').textContent=t;
   const mktOpen = isMarketOpen();
   // إذا السوق مغلق — كل الجلسات مغلقة
   if(!mktOpen){
-    ['s-eu','s-us','s-as'].forEach(id=>{if(document.getElementById(id))document.getElementById(id).className='sess soff';});
-    ['s-eu-st','s-us-st','s-as-st'].forEach(id=>{if(document.getElementById(id))document.getElementById(id).textContent='○ CLOSED';});
+    ['s-eu','s-us','s-as'].forEach(function(id){if(document.getElementById(id))document.getElementById(id).className='sess soff';});
+    ['s-eu-st','s-us-st','s-as-st'].forEach(function(id){if(document.getElementById(id))document.getElementById(id).textContent='○ CLOSED';});
     const sessEl=document.getElementById('sSess');if(sessEl)sessEl.textContent='السوق مغلق 🔴';
     const mktEl=document.getElementById('mktStatus');
     if(mktEl){const ms=getMarketStatus();mktEl.textContent=ms.text;mktEl.className='bdg berr';}
     // لا return — استمر لتحديث الوقت
   } else {
   const eu=h>=8&&h<17,us=h>=13&&h<22,as=h<9;
-  const set=(id,stId,on)=>{const el=document.getElementById(id);const el2=document.getElementById(stId);if(el)el.className='sess '+(on?'son':'soff');if(el2)el2.textContent=on?'● OPEN':'○ CLOSED';};
+  var set=function(id,stId,on){const el=document.getElementById(id);const el2=document.getElementById(stId);if(el)el.className='sess '+(on?'son':'soff');if(el2)el2.textContent=on?'● OPEN':'○ CLOSED';};
   set('s-eu','s-eu-st',eu);set('s-us','s-us-st',us);set('s-as','s-as-st',as);
   const best=us&&eu?'أوروبا + أمريكا ⭐':us?'أمريكا':eu?'أوروبا':as?'آسيا':'---';
   const sessEl2=document.getElementById('sSess');if(sessEl2)sessEl2.textContent=best;
@@ -2066,8 +2127,8 @@ function updateSessions(){
 // TF SWITCH
 // ═══════════════════════════════════════════════
 function setTF(el,tf){
-  document.querySelectorAll('.tft').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.minic').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('.tft').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.minic').forEach(function(c){c.classList.remove('active');});
   el.classList.add('active');
   var _el=document.getElementById('mc-'+tf);if(_el)_el.classList.add('active');
   curTF=tf;
@@ -2098,9 +2159,9 @@ async function runAI(){
       spread:document.getElementById('m-spread').textContent,rsi:document.getElementById('i-rsi').textContent,
       macd:document.getElementById('i-macd').textContent,ema50:document.getElementById('i-e50').textContent,
       ema200:document.getElementById('i-e200').textContent,atr:atr.toFixed(2),
-      highH1:h.length?Math.max(...h.slice(-10)).toFixed(2):'---',lowH1:l.length?Math.min(...l.slice(-10)).toFixed(2):'---',
-      highH4:h.length?Math.max(...h.slice(-30)).toFixed(2):'---',lowH4:l.length?Math.min(...l.slice(-30)).toFixed(2):'---',
-      highD1:h.length?Math.max(...h.slice(-50)).toFixed(2):'---',lowD1:l.length?Math.min(...l.slice(-50)).toFixed(2):'---',
+      highH1:h.length?Math.max.apply(null,h.slice(-10)).toFixed(2):'---',lowH1:l.length?Math.min.apply(null,l.slice(-10)).toFixed(2):'---',
+      highH4:h.length?Math.max.apply(null,h.slice(-30)).toFixed(2):'---',lowH4:l.length?Math.min.apply(null,l.slice(-30)).toFixed(2):'---',
+      highD1:h.length?Math.max.apply(null,h.slice(-50)).toFixed(2):'---',lowD1:l.length?Math.min.apply(null,l.slice(-50)).toFixed(2):'---',
       session:document.getElementById('sSess').textContent,dxy:'104.2',gsr:document.getElementById('m-gsr').textContent,
       trend:document.getElementById('t-d1').textContent,
       obSell:obSellZones.length?`${obSellZones[obSellZones.length-1].bot.toFixed(2)}–${obSellZones[obSellZones.length-1].top.toFixed(2)}`:'none',
@@ -2247,7 +2308,7 @@ function renderLearningLog() {
     return;
   }
   el.innerHTML = learningHistory.slice(0,8).map(function(e){
-    var col = e.outcome.includes('ربح')||e.outcome.includes('هدف')?'var(--green)':'var(--red)';
+    var col = e.outcome.indexOf('ربح')>=0||e.outcome.indexOf('هدف')>=0?'var(--green)':'var(--red)';
     var dir = e.direction==='BUY'?'🟢':'🔴';
     var t = new Date(e.time).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'});
     return '<div style="padding:4px 0;border-bottom:1px solid rgba(0,180,255,.08);font-size:9px">'
@@ -2359,7 +2420,7 @@ function computeVWAP(data) {
   if (!data || data.length < 2) return { vwap: 0, poc: 0, vah: 0, val: 0 };
   let cumTPV = 0, cumVol = 0;
   const buckets = {};
-  data.forEach(c => {
+  data.forEach(function(c){
     const tp  = (c.h + c.l + c.cl) / 3;
     const vol = c.v || 1;
     cumTPV += tp * vol;
@@ -2371,12 +2432,12 @@ function computeVWAP(data) {
   const vwap = cumVol > 0 ? cumTPV / cumVol : data[data.length-1].cl;
   // POC — Point of Control (highest volume price)
   let maxVol = 0, poc = vwap;
-  Object.entries(buckets).forEach(([p, v]) => { if (v > maxVol) { maxVol = v; poc = parseFloat(p); } });
+  Object.keys(buckets).forEach(function(p){ var v=buckets[p]; if (v > maxVol) { maxVol = v; poc = parseFloat(p); } });
   // VAH/VAL — Value Area (70% of volume)
-  const totalVol = Object.values(buckets).reduce((a,b)=>a+b,0);
-  const sortedBuckets = Object.entries(buckets).sort((a,b)=>parseFloat(b[0])-parseFloat(a[0]));
+  const totalVol = Object.values(buckets).reduce(function(a,b){return a+b;},0);
+  const sortedBuckets = Object.keys(buckets).sort(function(a,b){return parseFloat(b)-parseFloat(a);});
   let target = totalVol * 0.7, accum = 0, vah = poc, val = poc;
-  let hi = sortedBuckets.findIndex(([p])=>parseFloat(p)>=poc);
+  let hi = sortedBuckets.findIndex(function(p){return parseFloat(p)>=poc;});
   let lo = hi;
   while (accum < target && (hi >= 0 || lo < sortedBuckets.length)) {
     const addHi = hi >= 0 ? sortedBuckets[hi][1] : 0;
@@ -2391,10 +2452,10 @@ function computeVWAP(data) {
 function computeFibonacci(data) {
   if (!data || data.length < 10) return null;
   const recent = data.slice(-50);
-  const highs  = recent.map(c => c.h);
-  const lows   = recent.map(c => c.l);
-  const swingH = Math.max(...highs);
-  const swingL = Math.min(...lows);
+  const highs  = recent.map(function(c){return c.h;});
+  const lows   = recent.map(function(c){return c.l;});
+  const swingH = Math.max.apply(null,highs);
+  const swingL = Math.min.apply(null,lows);
   const range  = swingH - swingL;
   const hiIdx  = highs.indexOf(swingH);
   const loIdx  = lows.indexOf(swingL);
@@ -2434,8 +2495,8 @@ function computePremiumDiscount(data, currentPrice) {
     rangeData = data.slice(-200);
   }
 
-  const high  = Math.max(...rangeData.map(c => c.h));
-  const low   = Math.min(...rangeData.map(c => c.l));
+  const high  = Math.max.apply(null,rangeData.map(function(c){return c.h;}));
+  const low   = Math.min.apply(null,rangeData.map(function(c){return c.l;}));
   const range = high - low;
 
   if (range < 5) return null; // بيانات غير كافية
@@ -2482,14 +2543,14 @@ function computePremiumDiscount(data, currentPrice) {
 // ── 4. Market Structure Shift (MSS) ──────────────────────
 function detectMSS(data) {
   if (!data || data.length < 10) return null;
-  const closes = data.map(c => c.cl);
-  const highs  = data.map(c => c.h);
-  const lows   = data.map(c => c.l);
+  const closes = data.map(function(c){return c.cl;});
+  const highs  = data.map(function(c){return c.h;});
+  const lows   = data.map(function(c){return c.l;});
   const n      = closes.length;
 
   // BOS — Break of Structure
-  const prevHigh = Math.max(...highs.slice(-10, -1));
-  const prevLow  = Math.min(...lows.slice(-10, -1));
+  const prevHigh = Math.max.apply(null,highs.slice(-10, -1));
+  const prevLow  = Math.min.apply(null,lows.slice(-10, -1));
   const lastHigh = highs[n-1];
   const lastLow  = lows[n-1];
   const lastClose = closes[n-1];
@@ -2498,8 +2559,8 @@ function detectMSS(data) {
   const bos_bear  = lastClose < prevLow;  // كسر أدنى قاع → هابط
 
   // CHoCH — Change of Character
-  const prevPrevHigh = Math.max(...highs.slice(-20, -10));
-  const prevPrevLow  = Math.min(...lows.slice(-20, -10));
+  const prevPrevHigh = Math.max.apply(null,highs.slice(-20, -10));
+  const prevPrevLow  = Math.min.apply(null,lows.slice(-20, -10));
   const choch_bull   = bos_bear && lastClose > prevPrevHigh; // انعكاس من هابط لصاعد
   const choch_bear   = bos_bull && lastClose < prevPrevLow;  // انعكاس من صاعد لهابط
 
@@ -2527,7 +2588,7 @@ function getKillZone() {
   // Beirut = GMT+3
   const bh   = (h + 3) % 24;
   const bm   = m;
-  const bTime = `${String(bh).padStart(2,'0')}:${String(bm).padStart(2,'0')}`;
+  const bTime = `${((bh)<10?'0'+(bh):''+(bh))}:${((bm)<10?'0'+(bm):''+(bm))}`;
 
   const zones = [
     { name:'Asian Kill Zone',        start:0*60,   end:3*60,   b_start:'03:00', b_end:'06:00', color:'#A78BFA', desc:'سيولة آسيا — حذر' },
@@ -2543,7 +2604,7 @@ function getKillZone() {
     if (mins >= z.start && mins < z.end) { active = z; break; }
   }
   if (!active) {
-    next = zones.find(z => z.start > mins) || zones[0];
+    next = zones.find(function(z){return  z.start > mins;}) || zones[0];
   }
   return {
     active,
@@ -2774,7 +2835,7 @@ document.addEventListener('click', function initAudioClick() {
   if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
   document.removeEventListener('click', initAudioClick);
 });
-if('speechSynthesis' in window){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();}
+if('speechSynthesis' in window){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};}
 // ══ Service Worker — تنبيهات في الخلفية ══
 if('serviceWorker' in navigator){
   var swCode="self.addEventListener('message',function(e){if(e.data&&e.data.type==='NOTIFY'){self.registration.showNotification(e.data.title||'Gold Bot',{body:e.data.body||'',icon:'/favicon.ico',tag:e.data.tag||'gold',requireInteraction:!!e.data.important});}});";
@@ -2798,8 +2859,19 @@ function pushNotify(title,body,important){
 // resize
 window.addEventListener('resize',function(){drawChart(curTF);});
 // iOS audio
-document.addEventListener('touchstart',function ia(){getAudioCtx();document.removeEventListener('touchstart',ia);});
-document.addEventListener('click',function ic(){getAudioCtx();document.removeEventListener('click',ic);});
+// تفعيل الصوت عند أول تفاعل
+function enableAudio(){
+  if(audioEnabled) return;
+  try{
+    if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==='suspended') audioCtx.resume();
+    audioEnabled=true;
+    log('[AUDIO] ✅ مُفعَّل');
+  }catch(e){}
+}
+document.addEventListener('touchstart', enableAudio);
+document.addEventListener('click', enableAudio);
+document.addEventListener('touchend', enableAudio);
 if('speechSynthesis' in window){window.speechSynthesis.getVoices();window.speechSynthesis.onvoiceschanged=function(){window.speechSynthesis.getVoices();};}
 
 loadTrades();
@@ -2813,19 +2885,370 @@ log('[AUDIO] اضغط زر الصوت لتفعيله على iPhone');
 
 renderCalendar();
 fetchPrice();
+initChartTouch();
 setInterval(fetchPrice,10000);
 fetchCandles('M15'); // M15 افتراضي
-setTimeout(()=>fetchCandles('M5'),2000);
-setTimeout(()=>fetchCorrelation(curTF),8000); // Correlation
-setTimeout(()=>fetchCandles('M30'),4000);
-setTimeout(()=>fetchCandles('H1'),6000);
-setInterval(()=>{fetchCandles(curTF);renderCalendar();try{const kz=getKillZone();const a=runMasterAnalysis(cdata[curTF],price);if(a)updateAdvancedUI(a);}catch(e){}},60000);
-setInterval(()=>fetchCorrelation(curTF),300000); // correlation كل 5 دقائق
+setTimeout(function(){fetchCandles('M5');},2000);
+setTimeout(function(){fetchCorrelation(curTF);},8000); // Correlation
+setTimeout(function(){fetchCandles('M30');},4000);
+setTimeout(function(){fetchCandles('H1');},6000);
+setInterval(function(){fetchCandles(curTF);renderCalendar();try{const kz=getKillZone();const a=runMasterAnalysis(cdata[curTF],price);if(a)updateAdvancedUI(a);}catch(e){}},60000);
+setInterval(function(){fetchCorrelation(curTF);},300000); // correlation كل 5 دقائق
 renderTrades();updateStats();renderSLReport();addWeeklyReviewButton();
 // مراجعة أسبوعية تلقائية (كل أسبوع)
 var lastReview = JSON.parse(localStorage.getItem('gold_weekly_review')||'null');
 var reviewAge  = lastReview ? (Date.now()-lastReview.time)/86400000 : 999;
 if(reviewAge > 7){ setTimeout(weeklyClaudeReview, 30000); }
+
+// ════════════════════════════════════════════════════════
+// SCHOOL DETAIL MODAL
+// ════════════════════════════════════════════════════════
+
+var schoolDefs = {
+  ict: {
+    name: 'ICT / SMC',
+    nameAr: 'نظرية ICT ومفهوم السوق الذكي',
+    desc: 'يعتمد على Order Blocks وFair Value Gaps وBreak of Structure لتحديد نقاط الدخول المثلى',
+    tf: 'H4 للاتجاه، H1 للإعداد، M15 للدخول',
+    factors: [
+      {n:'Order Block Sell', id:'sch-ict', desc:'آخر شمعة هابطة قبل كسر صاعد — منطقة عرض'},
+      {n:'BOS / CHoCH', id:'sch-mss', desc:'كسر الهيكل يؤكد الاتجاه أو الانعكاس'},
+      {n:'Fair Value Gap', desc:'فجوة سعرية لم تُملأ — هدف الإعادة'},
+      {n:'Premium/Discount', id:'sch-pd', desc:'نطاق OTE 61.8-78.6% من Fibonacci'},
+    ],
+    explain: 'الذهب يتحرك من OB إلى FVG. ابحث عن BOS صاعد فوق OB Buy في Discount Zone خلال Kill Zone.',
+    bullish: function(){ return window._schoolData && window._schoolData.bos; }
+  },
+  wyk: {
+    name: 'Wyckoff',
+    nameAr: 'نظرية ويكوف',
+    desc: 'يحلل مراحل السوق: تراكم → ارتفاع → توزيع → هبوط. يُحدد مرحلة الذهب الحالية',
+    tf: 'D1 للمرحلة، H4 للتأكيد',
+    factors: [
+      {n:'MACD', id:'i-macd', desc:'موجب = تراكم (Accumulation)، سالب = توزيع (Distribution)'},
+      {n:'Volume', desc:'حجم التداول يؤكد المرحلة'},
+      {n:'Spring/UTAD', desc:'اختبار الدعم أو المقاومة قبل الانعكاس'},
+    ],
+    explain: 'MACD موجب مع حجم متزايد = مرحلة تراكم. MACD سالب = توزيع. ابحث عن Spring فوق الدعم.',
+  },
+  ell: {
+    name: 'Elliott Wave',
+    nameAr: 'نظرية موجات إليوت',
+    desc: 'يحدد الموجة الحالية (1-5 دافعة، A-B-C تصحيحية) لتوقع الهدف القادم',
+    tf: 'D1 للعدّ، H4 للتأكيد',
+    factors: [
+      {n:'EMA 200', id:'i-e200', desc:'فوقه = موجة صاعدة (3 أو 5)، تحته = موجة تصحيحية'},
+      {n:'RSI', id:'i-rsi', desc:'RSI > 50 = موجة دافعة، < 50 = موجة C'},
+      {n:'ATR', id:'i-atr2', desc:'ATR مرتفع = موجة 3 (أقوى الموجات)'},
+    ],
+    explain: 'فوق EMA200 مع RSI>50 = موجة 3 صاعدة. W5 END تعني اقتراب التصحيح.',
+  },
+  sd: {
+    name: 'Supply & Demand',
+    nameAr: 'مناطق العرض والطلب',
+    desc: 'يحدد مناطق تركز الطلبات الكبيرة (مؤسسات) لتوقع الارتداد',
+    tf: 'D1 + H4 لتحديد المناطق، M15 للدخول',
+    factors: [
+      {n:'OB Sell', id:'lR2', desc:'منطقة عرض — البيع من هنا'},
+      {n:'OB Buy', id:'lS2', desc:'منطقة طلب — الشراء من هنا'},
+      {n:'Premium %', id:'sch-pd', desc:'أكثر من 70% = في منطقة عرض'},
+    ],
+    explain: 'السعر في OB Buy مع RSI OS = فرصة شراء. في OB Sell مع RSI OB = فرصة بيع.',
+  },
+  pa: {
+    name: 'Price Action',
+    nameAr: 'حركة السعر',
+    desc: 'يقرأ الشمعات مباشرة دون مؤشرات — الجسم والفتيل يخبران القصة',
+    tf: 'M15 + M5 للدخول',
+    factors: [
+      {n:'آخر شمعة', desc:'Bull (خضراء) أو Bear (حمراء)'},
+      {n:'حجم الجسم', desc:'جسم كبير = زخم قوي'},
+      {n:'الفتيل', desc:'فتيل طويل = رفض من مستوى'},
+      {n:'نمط', desc:'Pin Bar، Engulfing، Inside Bar'},
+    ],
+    explain: 'شمعة انعكاس (Pin Bar) عند OB + حجم جسم كبير = إشارة قوية. شمعة داخلية = انتظر الكسر.',
+  },
+  td: {
+    name: 'Top-Down',
+    nameAr: 'التحليل من أعلى لأسفل',
+    desc: 'يبدأ من D1 لتحديد الاتجاه الرئيسي ثم ينزل لـ H4 ثم H1 للإعداد',
+    tf: 'D1 ← H4 ← H1 ← M15',
+    factors: [
+      {n:'D1 اتجاه', desc:'فوق EMA200 = صاعد رئيسي'},
+      {n:'H4 اتجاه', desc:'تأكيد الاتجاه'},
+      {n:'H1 اتجاه', desc:'إعداد الدخول'},
+      {n:'توافق', desc:'كلها في نفس الاتجاه = إشارة قوية'},
+    ],
+    explain: 'D1↑ + H4↑ + H1↑ = BUY قوي. تعارض بين التايم فريمز = انتظر. لا تخالف D1 أبداً.',
+  },
+  mss: {
+    name: 'MSS / BOS',
+    nameAr: 'تغيير الهيكل وكسر البنية',
+    desc: 'BOS = استمرار الاتجاه. CHoCH/MSS = انعكاس الاتجاه',
+    tf: 'H1 للرئيسي، M15 للدخول',
+    factors: [
+      {n:'BOS صاعد', desc:'كسر القمة السابقة = اتجاه صاعد'},
+      {n:'BOS هابط', desc:'كسر القاع السابق = اتجاه هابط'},
+      {n:'CHoCH', desc:'أول BOS عكس الاتجاه = تحذير انعكاس'},
+    ],
+    explain: 'BOS + OB في نفس الاتجاه = دخول آمن. CHoCH = احذر، الاتجاه قد ينعكس. انتظر تأكيد.',
+  },
+  pd: {
+    name: 'Premium / Discount',
+    nameAr: 'مناطق Premium وDiscount',
+    desc: 'يحدد موقع السعر من نطاق H4 — فوق 50% = Premium (مكلف)، تحت 50% = Discount (رخيص)',
+    tf: 'H4 للنطاق، H1×100 للتوسع',
+    factors: [
+      {n:'% من النطاق', id:'sch-pd', desc:'< 30% = Discount قوي، > 70% = Premium'},
+      {n:'OTE Zone', desc:'61.8-78.6% من أدنى نقطة = منطقة مثلى للشراء'},
+      {n:'Equilibrium', desc:'50% = توازن — انتظر اتجاه واضح'},
+    ],
+    explain: 'ابحث عن BUY في Discount (<40%) + OB Buy. ابحث عن SELL في Premium (>60%) + OB Sell. لا تشتري في Premium!',
+  },
+  fib: {
+    name: 'Fibonacci',
+    nameAr: 'مستويات فيبوناتشي',
+    desc: 'يحدد مستويات الارتداد المهمة: 38.2%، 50%، 61.8%، 78.6%',
+    tf: 'H4 للرسم، M15 للدخول',
+    factors: [
+      {n:'61.8%', id:'sch-fib', desc:'أقوى مستوى — "النسبة الذهبية"'},
+      {n:'38.2%', desc:'ارتداد ضعيف — استمرار محتمل'},
+      {n:'78.6%', desc:'ارتداد عميق — OTE قوية مع OB'},
+    ],
+    explain: 'السعر عند 61.8% + OB Buy + Kill Zone = فرصة ذهبية للشراء. 78.6% مع بيع كميات = نقطة انعكاس.',
+  },
+  kz: {
+    name: 'Kill Zones',
+    nameAr: 'مناطق الصيد الزمنية',
+    desc: 'أوقات يتدخل فيها المؤسسات — أفضل أوقات للدخول',
+    tf: 'GMT',
+    factors: [
+      {n:'London Open', desc:'08:00-10:00 GMT = أفضل وقت للذهب'},
+      {n:'NY Open', desc:'13:30-16:00 GMT = حركة قوية وحجم عالٍ'},
+      {n:'Asian', desc:'00:00-09:00 GMT = تجنب الشراء (خسائر في النظام)'},
+      {n:'London Close', desc:'16:00-17:00 GMT = حذر، تقلبات'},
+    ],
+    explain: 'أفضل إشارات: London Open + NY Open. تجنب الدخول في Asian Session للذهب. الإشارة خارج KZ = ثقة أقل.',
+  },
+  vw: {
+    name: 'VWAP / POC',
+    nameAr: 'متوسط السعر المرجح بالحجم',
+    desc: 'VWAP = متوسط السعر اليومي. POC = أكثر الأسعار تداولاً',
+    tf: 'يومي (يُعاد حسابه كل يوم)',
+    factors: [
+      {n:'فوق VWAP', id:'sch-vw', desc:'شراء مؤسسي — اتجاه صاعد اليوم'},
+      {n:'تحت VWAP', desc:'بيع مؤسسي — اتجاه هابط اليوم'},
+      {n:'POC', desc:'مغناطيس السعر — يعود إليه'},
+      {n:'VAH/VAL', desc:'حدود منطقة القيمة — مقاومة/دعم'},
+    ],
+    explain: 'السعر فوق VWAP = ميل شراء. السعر يرتد من VWAP = دخول جيد. POC = هدف محتمل.',
+  },
+  corr: {
+    name: 'XAG + DXY',
+    nameAr: 'ارتباط الفضة والدولار',
+    desc: 'الذهب يرتبط عكسياً بالدولار ويتحرك مع الفضة — يؤكد أو يرفض الإشارة',
+    tf: 'M15 مباشر',
+    factors: [
+      {n:'DXY صاعد', id:'sch-corr', desc:'عادةً يضغط على الذهب هبوطاً'},
+      {n:'XAG صاعد', desc:'يؤكد صعود الذهب — ارتباط إيجابي'},
+      {n:'تعارض', desc:'XAG هابط + الذهب صاعد = تحذير، قد ينعكس'},
+    ],
+    explain: 'أقوى إشارات الشراء: DXY هابط + XAG صاعد + الذهب في Discount. أقوى إشارات البيع: DXY صاعد + XAG هابط.',
+  },
+};
+
+function openSchoolModal(key) {
+  var def = schoolDefs[key];
+  if(!def) return;
+  var modal = document.getElementById('schoolModal');
+  var title = document.getElementById('smTitle');
+  var body  = document.getElementById('smBody');
+  if(!modal||!title||!body) return;
+
+  title.textContent = def.name;
+  // بناء المحتوى
+  var signal = document.getElementById('sch-'+key);
+  var detail = document.getElementById('det-'+key);
+  var sigText  = signal ? signal.textContent : '---';
+  var sigColor = signal ? signal.style.color  : '#888';
+  var detText  = detail ? detail.textContent  : '';
+
+  // تحليل كل التايم فريمز
+  var tfData = buildTFAnalysis(key);
+
+  var html = '';
+
+  // الإشارة الحالية
+  html += '<div class="sm-section">';
+  html += '<div class="sm-section-title">الإشارة الحالية</div>';
+  html += '<div class="sm-signal-big" style="color:'+sigColor+'">'+sigText+'</div>';
+  html += '<div style="text-align:center;font-size:10px;color:rgba(150,180,220,.7);margin-top:4px">'+detText+'</div>';
+  html += '</div>';
+
+  // تحليل التايم فريمز
+  html += '<div class="sm-section">';
+  html += '<div class="sm-section-title">التحليل عبر التايم فريمز</div>';
+  html += '<div class="sm-tf-grid">';
+  var tfs = ['D1','H4','H1','M30','M15','M5'];
+  tfs.forEach(function(tf) {
+    var td = tfData[tf] || {};
+    html += '<div class="sm-tf-cell">';
+    html += '<div class="sm-tf-label">'+tf+'</div>';
+    html += '<div class="sm-tf-value" style="color:'+(td.color||'#888')+'">'+( td.signal||'---')+'</div>';
+    html += '<div style="font-size:8px;color:rgba(120,160,200,.5);margin-top:1px">'+(td.detail||'')+'</div>';
+    html += '</div>';
+  });
+  html += '</div></div>';
+
+  // شارت M15
+  html += '<div class="sm-section">';
+  html += '<div class="sm-section-title">الشارت الحالي (M15)</div>';
+  html += '<div class="sm-chart-wrap"><canvas id="smChart" style="width:100%;height:100%"></canvas></div>';
+  html += '</div>';
+
+  // العوامل المؤثرة
+  html += '<div class="sm-section">';
+  html += '<div class="sm-section-title">العوامل المؤثرة الآن</div>';
+  def.factors.forEach(function(f) {
+    var val = f.id ? (document.getElementById(f.id)||{}).textContent||'---' : '---';
+    html += '<div class="sm-factor-row">';
+    html += '<span class="sm-factor-name">'+f.n+'</span>';
+    html += '<div style="text-align:left">';
+    if(f.id) html += '<span class="sm-factor-val">'+val+'</span><br>';
+    html += '<span style="font-size:9px;color:rgba(100,140,180,.6)">'+f.desc+'</span>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+
+  // الشرح التفصيلي
+  html += '<div class="sm-section">';
+  html += '<div class="sm-section-title">كيف تقرأ هذه المدرسة؟</div>';
+  html += '<div class="sm-explanation">'+def.explain+'</div>';
+  html += '<div style="margin-top:8px;padding:8px;background:rgba(0,180,255,.05);border-radius:4px;border:1px solid rgba(0,180,255,.1)">';
+  html += '<div style="font-size:9px;color:rgba(0,180,255,.5);margin-bottom:3px">⏱ التايم فريم المناسب</div>';
+  html += '<div style="font-size:10px;color:rgba(200,220,255,.7)">'+def.tf+'</div>';
+  html += '</div></div>';
+
+  // نصيحة
+  html += '<div style="padding:10px;text-align:center;font-size:10px;color:rgba(100,140,180,.5)">اضغط في أي مكان للإغلاق</div>';
+
+  body.innerHTML = html;
+  modal.classList.add('open');
+
+  // ارسم شارت M15 في الـ modal
+  setTimeout(function(){
+    var cv = document.getElementById('smChart');
+    if(cv && cdata['M15'] && cdata['M15'].length > 0) {
+      cv.width  = cv.offsetWidth;
+      cv.height = cv.offsetHeight;
+      drawMiniChartOn(cv, 'M15', key);
+    }
+  }, 100);
+}
+
+function buildTFAnalysis(key) {
+  var result = {};
+  var tfs = ['D1','H4','H1','M30','M15','M5'];
+  tfs.forEach(function(tf) {
+    var data = cdata[tf];
+    if(!data || data.length < 10) { result[tf] = {signal:'---',detail:'',color:'#888'}; return; }
+    var n  = data.length;
+    var closes = data.map(function(c){return c.cl;});
+    // EMA50
+    var e50 = closes[0];
+    for(var i=0;i<closes.length;i++) e50 = closes[i]*2/51 + e50*(1-2/51);
+    var aboveEMA = price > e50;
+    var lastC = data[n-2] || data[n-1];
+    var bull  = lastC.cl >= lastC.o;
+    
+    if(key==='td' || key==='ell') {
+      result[tf] = {
+        signal: aboveEMA ? 'BULL ↑' : 'BEAR ↓',
+        detail: aboveEMA ? 'فوق EMA50' : 'تحت EMA50',
+        color:  aboveEMA ? 'var(--green)' : 'var(--red)'
+      };
+    } else if(key==='pa') {
+      result[tf] = {
+        signal: bull ? 'BULL ↑' : 'BEAR ↓',
+        detail: bull ? 'شمعة صاعدة' : 'شمعة هابطة',
+        color:  bull ? 'var(--green)' : 'var(--red)'
+      };
+    } else if(key==='pd') {
+      var high = Math.max.apply(null, data.slice(-20).map(function(c){return c.h;}));
+      var low  = Math.min.apply(null, data.slice(-20).map(function(c){return c.l;}));
+      var pct  = (high-low)>0 ? Math.round((price-low)/(high-low)*100) : 50;
+      result[tf] = {
+        signal: pct>65 ? 'PREM' : pct<35 ? 'DISC' : 'EQ',
+        detail: pct+'%',
+        color:  pct>65 ? 'var(--red)' : pct<35 ? 'var(--green)' : 'var(--yellow)'
+      };
+    } else {
+      result[tf] = {
+        signal: aboveEMA ? '↑' : '↓',
+        detail: '',
+        color:  aboveEMA ? 'var(--green)' : 'var(--red)'
+      };
+    }
+  });
+  return result;
+}
+
+function drawMiniChartOn(cv, tf, schoolKey) {
+  var data = (cdata[tf]||[]).slice(-30);
+  if(!data.length) return;
+  var ctx2 = cv.getContext('2d');
+  var W = cv.width, H = cv.height;
+  ctx2.fillStyle = '#FFFFFF';
+  ctx2.fillRect(0,0,W,H);
+  var prices = [];
+  data.forEach(function(c){prices.push(c.h,c.l);});
+  prices.sort(function(a,b){return a-b;});
+  var pMin = prices[Math.floor(prices.length*.05)];
+  var pMax = prices[Math.floor(prices.length*.95)];
+  var pad  = (pMax-pMin)*.15;
+  pMin -= pad; pMax += pad;
+  function ty(p){ return H-2-((p-pMin)/(pMax-pMin))*(H-4); }
+  var cw = Math.max(4, (W-10)/data.length - 1);
+  data.forEach(function(c,i){
+    var x   = 5+i/data.length*(W-10);
+    var bull= c.cl>=c.o;
+    ctx2.strokeStyle = bull?'#1B7A72':'#C62828';
+    ctx2.lineWidth   = 0.8;
+    ctx2.beginPath(); ctx2.moveTo(x+cw/2,ty(c.h)); ctx2.lineTo(x+cw/2,ty(c.l)); ctx2.stroke();
+    ctx2.fillStyle   = bull?'#26A69A':'#EF5350';
+    var bTop = ty(Math.max(c.o,c.cl)), bH = Math.max(1,ty(Math.min(c.o,c.cl))-bTop);
+    ctx2.fillRect(x,bTop,Math.max(2,cw-1),bH);
+  });
+  // السعر
+  if(price>0){
+    var cy = ty(price);
+    ctx2.strokeStyle='#FF6F00'; ctx2.lineWidth=1;
+    ctx2.setLineDash([3,3]);
+    ctx2.beginPath(); ctx2.moveTo(0,cy); ctx2.lineTo(W,cy); ctx2.stroke();
+    ctx2.setLineDash([]);
+  }
+}
+
+function closeSchoolModal() {
+  var modal = document.getElementById('schoolModal');
+  if(modal) modal.classList.remove('open');
+}
+
+// إغلاق بالنقر خارج المحتوى
+document.getElementById('schoolModal') && document.getElementById('schoolModal').addEventListener('click', function(e){
+  if(e.target === this) closeSchoolModal();
+});
 </script>
+<!-- ══ School Detail Modal ══ -->
+<div class="school-modal" id="schoolModal">
+  <div class="sm-header">
+    <div class="sm-title" id="smTitle">ICT/SMC</div>
+    <button class="sm-close" onclick="closeSchoolModal()">✕</button>
+  </div>
+  <div class="sm-body" id="smBody">
+    <!-- يُملأ ديناميكياً -->
+  </div>
+</div>
+
 </body>
 </html>
