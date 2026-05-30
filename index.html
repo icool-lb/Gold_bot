@@ -500,6 +500,7 @@ let curTF   = 'M15'; // افتراضي M15
 let price   = 0, prevP = 0;
 const cdata = { M5:[], M15:[], M30:[], H1:[], H4:[] };
 const ldone = { M5:false, M15:false, M30:false, H1:false, H4:false };
+let chartZoom = 1.0;
 let audioEnabled = false;
 
 // OB و FVG zones محسوبة
@@ -724,48 +725,10 @@ function addWeeklyReviewButton() {
 function resetTrades(){
   if(!confirm('هل تريد حذف كل الصفقات؟ لا يمكن التراجع')) return;
   trades=[];tradeN=0;saveTrades();renderTrades();updateStats();renderSLReport();addWeeklyReviewButton();
-// مراجعة أسبوعية تلقائية (كل أسبوع)
-var lastReview = JSON.parse(localStorage.getItem('gold_weekly_review')||'null');
-var reviewAge  = lastReview ? (Date.now()-lastReview.time)/86400000 : 999;
-if(reviewAge > 7){ setTimeout(weeklyClaudeReview, 30000); }
-
-// ════════════════════════════════════════════════════════
-// SCHOOL DETAIL MODAL
-
-
-
-
-
-
-
-
-// إغلاق بالنقر خارج المحتوى
-document.getElementById('schoolModal') && document.getElementById('schoolModal').addEventListener('click', function(e){
-  if(e.target === this) closeSchoolModal();
-});
   log('[TRADES] 🗑 Reset — all trades cleared');
 }
 function exportTrades(){const b=new Blob([JSON.stringify({trades,tradeN},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`gold_trades_${new Date().toISOString().slice(0,10)}.json`;a.click();}
 function importTrades(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){try{var d=JSON.parse(ev.target.result);trades=d.trades||[];tradeN=d.tradeN||0;saveTrades();renderTrades();updateStats();renderSLReport();}catch(err){log('[IMPORT] Error: '+err.message);}};r.readAsText(f);}
-// مراجعة أسبوعية تلقائية (كل أسبوع)
-var lastReview = JSON.parse(localStorage.getItem('gold_weekly_review')||'null');
-var reviewAge  = lastReview ? (Date.now()-lastReview.time)/86400000 : 999;
-if(reviewAge > 7){ setTimeout(weeklyClaudeReview, 30000); }
-
-// ════════════════════════════════════════════════════════
-// SCHOOL DETAIL MODAL
-
-
-
-
-
-
-
-
-// إغلاق بالنقر خارج المحتوى
-document.getElementById('schoolModal') && document.getElementById('schoolModal').addEventListener('click', function(e){
-  if(e.target === this) closeSchoolModal();
-});
 
 
 // ═══════════════════════════════════════════════
@@ -1600,7 +1563,7 @@ async function fetchCandles(tf){
     // بناء writable objects جديدة مضمونة
     var clean = [];
     var now_ts = Date.now();
-    var maxAge = {M5:4*3600000,M15:8*3600000,M30:16*3600000,H1:48*3600000,H4:200*3600000,D1:9999*3600000};
+    var maxAge = {M5:8*3600000,M15:16*3600000,M30:72*3600000,H1:96*3600000,H4:400*3600000,D1:9999*3600000};
     var cutoff = now_ts - (maxAge[tf]||8*3600000);
     for(var i=0;i<d.candles.length;i++){
       var c2 = d.candles[i];
@@ -1740,7 +1703,6 @@ function updateLastCandle(p){
 // ═══════════════════════════════════════════════
 // CHART ENGINE — OB + FVG + TP واضحة
 // ═══════════════════════════════════════════════
-const cv=document.getElementById('mc'),ctx=cv.getContext('2d');
 
 function drawChart(tf){
   var wrap = document.getElementById('cwrap');
