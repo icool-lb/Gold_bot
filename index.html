@@ -494,7 +494,7 @@ canvas{display:block}
 // ═══════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════
-const BASE  = window.location.origin;
+const BASE = (window.location.origin && window.location.origin !== 'null' && window.location.origin !== 'file://') ? window.location.origin : 'https://gold-bot-iota.vercel.app';
 let aiModel = 'claude';
 let curTF   = 'M15'; // افتراضي M15
 let price   = 0, prevP = 0;
