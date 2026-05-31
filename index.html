@@ -44,8 +44,8 @@ body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-h
 .tftabs{display:flex;background:var(--bg3);border-bottom:1px solid var(--bdr)}
 .tft{padding:10px 16px;font-family:'Orbitron',monospace;font-size:10px;cursor:pointer;color:var(--gdim);border-bottom:2px solid transparent;transition:all .2s;letter-spacing:1px}
 .tft.active{color:var(--gold2);border-bottom-color:var(--gold);background:rgba(255,215,0,.05)}
-.cwrap{flex:1;position:relative;background:#FFFFFF;overflow:hidden;min-height:280px}
-canvas{display:block}
+.cwrap{flex:1;position:relative;background:#FFFFFF;overflow:hidden;min-height:280px;height:280px}
+canvas{display:block;width:100%;height:100%}
 .clbls{position:absolute;top:6px;left:6px;display:flex;flex-direction:column;gap:4px;pointer-events:none}
 .clbl{font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 7px;border-radius:3px;backdrop-filter:blur(4px)}
 .cl-s{background:rgba(220,50,50,.9);border:1px solid #DC3232;color:#FFFFFF}
@@ -1761,10 +1761,12 @@ function drawChart(tf){
   var cv = document.getElementById('cv');
   if(!cv) return;
   var ctx = cv.getContext('2d');
-  cv.width  = wrap.clientWidth || 300;
-  cv.height = wrap.clientHeight || 280;
+  var wW = wrap.offsetWidth || wrap.clientWidth || 300;
+  var wH = wrap.offsetHeight || wrap.clientHeight || 280;
+  cv.width  = wW;
+  cv.height = wH;
   var W = cv.width, H = cv.height;
-  if(W < 10 || H < 10) { setTimeout(function(){ drawChart(tf); }, 200); return; }
+  if(W < 10 || H < 10) { setTimeout(function(){ drawChart(tf); }, 300); return; }
   var allData = cdata[tf];
   if(!allData || allData.length < 2){ return; }
 
