@@ -1614,31 +1614,32 @@ async function fetchCandles(tf){
     // بناء writable objects جديدة مضمونة
     var clean = [];
     var now_ts = Date.now();
-    var maxAge = {M5:8*3600000,M15:16*3600000,M30:72*3600000,H1:96*3600000,H4:400*3600000,D1:9999*3600000};
-    var cutoff = now_ts - (maxAge[tf]||8*3600000);
     for(var i=0;i<d.candles.length;i++){
       var c2 = d.candles[i];
-      var t2 = c2.t||0;
-      if(t2 < cutoff) continue;
-      var o2  = parseFloat(c2.o  || 0);
-      var h2  = parseFloat(c2.h  || 0);
-      var l2  = parseFloat(c2.l  || 0);
-      var cl2 = parseFloat(c2.cl || 0);
-      var v2  = parseInt(c2.v    || 1);
-      if(o2>0 && cl2>0 && h2>=l2)
+      // Handle both seconds and milliseconds timestamps
+      var t2 = c2.t||c2.time||c2.timestamp||0;
+      if(t2 > 0 && t2 < 1e10) t2 = t2 * 1000; // convert seconds to ms
+      var o2  = parseFloat(c2.o  || c2.open  || 0);
+      var h2  = parseFloat(c2.h  || c2.high  || 0);
+      var l2  = parseFloat(c2.l  || c2.low   || 0);
+      var cl2 = parseFloat(c2.cl || c2.close || 0);
+      var v2  = parseInt(c2.v    || c2.volume|| 1);
+      if(o2>0 && cl2>0 && h2>0 && l2>0 && h2>=l2)
         clean.push({t:t2, o:o2, h:h2, l:l2, cl:cl2, v:v2});
     }
     if(!clean.length){ log('[CANDLES] No valid candles'); if(el) el.style.display='none'; return; }
+    log('[CANDLES] raw: '+d.candles.length+' parsed: '+clean.length);
     clean.sort(function(a,b){return a.t-b.t;});
-    // تصحيح offset MetaAPI vs Spot
+    // تصحيح offset MetaAPI vs Spot (bid/ask difference)
     if(price>0){
       var lastCl = clean[clean.length-1].cl;
       var diff = price - lastCl;
-      if(Math.abs(diff)>0.5 && Math.abs(diff)<100){
+      // Apply offset for any meaningful difference (MetaAPI uses bid, spot uses mid)
+      if(Math.abs(diff)>0.1 && Math.abs(diff)<200){
         clean = clean.map(function(c3){
           return {t:c3.t, o:c3.o+diff, h:c3.h+diff, l:c3.l+diff, cl:c3.cl+diff, v:c3.v};
         });
-        log('[CANDLES] offset: '+diff.toFixed(2));
+        log('[CANDLES] offset applied: '+diff.toFixed(2));
       }
     }
     cdata[tf] = clean;
