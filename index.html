@@ -8,7 +8,7 @@
 <style>
 :root{
   --gold:#D69E2E;--gold2:#F6E05E;--gdim:#718096;
-  --red:#9B2335;--green:#276749;--blue:#2B6CB0;
+  --red:#E53E3E;--green:#38A169;--blue:#2B6CB0;
   --orange:#C05621;--yellow:#B7791F;
   --bg:#F7F8FA;--bg2:#FFFFFF;--bg3:#EDF2F7;
   --bdr:#E2E8F0;--bdrB:#CBD5E0;
@@ -110,8 +110,8 @@ canvas{display:block}
 @keyframes aIn{from{opacity:0;transform:scale(.85) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
 /* TRADES */
 .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:6px}
-.stat{background:var(--bg3);border:1px solid var(--bdr);border-radius:5px;padding:6px;text-align:center}
-.st-n{font-size:8px;color:var(--gdim)}.st-v{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:900;margin:2px 0}.st-l{font-size:8px;color:#887755}
+.stat{background:#FFFFFF;border:1px solid #CBD5E0;border-radius:5px;padding:6px;text-align:center}
+.st-n{font-size:8px;color:#718096}.st-v{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:900;margin:2px 0;color:#1A202C}.st-l{font-size:8px;color:#4A5568}
 .tcard{background:var(--bg2);border:1px solid;border-radius:6px;padding:8px;margin-bottom:5px}
 .tcard.open{border-color:rgba(255,215,0,.3)}.tcard.win{border-color:rgba(0,255,136,.4)}.tcard.loss{border-color:rgba(255,45,85,.4)}.tcard.partial{border-color:rgba(255,150,0,.4)}
 .thdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
@@ -146,9 +146,9 @@ canvas{display:block}
 .chart-send-btn:hover{background:rgba(0,100,200,.3);box-shadow:0 0 10px rgba(0,150,255,.3)}
 .school-row{display:grid;grid-template-columns:80px 70px 1fr;align-items:center;padding:5px 8px;border-bottom:1px solid #EDF2F7;font-size:10px;gap:4px;cursor:pointer;transition:background .15s}.school-row:hover{background:#F7F8FA}
 .school-row:last-child{border-bottom:none}
-.sch-name{color:#718096;font-size:9px;font-family:'Orbitron',monospace;letter-spacing:.5px}
+.sch-name{color:#2D3748;font-size:9px;font-family:'Orbitron',monospace;letter-spacing:.5px}
 .sch-signal{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px;text-align:center}
-.sch-detail{font-size:9px;color:#A0AEC0;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sch-detail{font-size:9px;color:#4A5568;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 ::-webkit-scrollbar{width:3px}
 /* ══ School Detail Modal ══ */
 .school-modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);z-index:9999;overflow-y:auto;-webkit-overflow-scrolling:touch}
@@ -158,22 +158,28 @@ canvas{display:block}
 .sm-close{background:rgba(255,50,50,.2);border:1px solid rgba(255,50,50,.4);color:#FF6B6B;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
 .sm-body{padding:12px}
 .sm-section{background:#FFFFFF;border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;margin-bottom:10px}
-.sm-section-title{font-family:'Orbitron',monospace;font-size:9px;color:rgba(0,180,255,.5);letter-spacing:2px;margin-bottom:8px}
+.sm-section-title{font-family:'Orbitron',monospace;font-size:9px;color:#1A56DB;letter-spacing:2px;font-weight:700;margin-bottom:8px}
 .sm-signal-big{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:900;text-align:center;padding:10px}
 .sm-tf-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
-.sm-tf-cell{background:rgba(0,0,0,.3);border-radius:4px;padding:6px 4px;text-align:center}
-.sm-tf-label{font-size:8px;color:rgba(150,180,220,.5);margin-bottom:2px}
+.sm-tf-cell{background:#F7F8FA;border:1px solid #E2E8F0;border-radius:4px;padding:6px 4px;text-align:center}
+.sm-tf-label{font-size:8px;color:#4A5568;font-weight:600;margin-bottom:2px}
 .sm-tf-value{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700}
 .sm-factor-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(0,180,255,.06);font-size:10px}
 .sm-factor-row:last-child{border:none}
-.sm-factor-name{color:rgba(150,180,220,.7)}
+.sm-factor-name{color:#2D3748;font-weight:600;font-size:10px}
 .sm-factor-val{font-family:'JetBrains Mono',monospace;font-size:10px}
 .sm-chart-wrap{height:160px;background:#FFF;border-radius:6px;overflow:hidden;margin-top:6px}
-.sm-explanation{font-size:11px;line-height:1.7;color:rgba(200,220,255,.8);padding:4px 0}
+.sm-explanation{font-size:11px;line-height:1.7;color:#2D3748;padding:4px 0}
 /* Clickable school rows */
 .school-row{cursor:pointer;transition:background .2s}
-.school-row:active{background:rgba(0,180,255,.1)}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,180,255,.2);border-radius:2px}
-.section-panel{background:#FFFFFF;border:1px solid rgba(0,180,255,0.12);border-radius:6px;padding:8px}
+.school-row:active{background:rgba(0,180,255,.1)}.sb-alert{display:none;position:fixed;bottom:80px;left:10px;right:10px;border-radius:10px;padding:12px;z-index:1001;font-family:'Cairo',sans-serif;color:#fff;box-shadow:0 4px 20px rgba(0,0,0,.6)}
+.sb-buy{background:linear-gradient(135deg,#064E3B,#065F46);border:2px solid #10B981}
+.sb-sell{background:linear-gradient(135deg,#7F1D1D,#991B1B);border:2px solid #EF4444}
+.breakout-alert{display:none;position:fixed;bottom:80px;left:10px;right:10px;border-radius:10px;padding:12px;z-index:1000;font-family:'Cairo',sans-serif;color:#fff;box-shadow:0 6px 25px rgba(0,0,0,.7)}
+.bo-buy{background:linear-gradient(135deg,#1E3A5F,#1E40AF);border:2px solid #60A5FA}
+.bo-sell{background:linear-gradient(135deg,#4C1D95,#5B21B6);border:2px solid #A78BFA}
+::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,180,255,.2);border-radius:2px}
+.section-panel{background:#FFFFFF;border:1px solid rgba(0,180,255,0.12);border-radius:6px;padding:8px}.sch-sig{color:#1A202C;font-weight:700}.school-row .val{color:#1A202C}
 .row{display:flex;justify-content:space-between;align-items:center;margin:3px 0;font-size:11px}
 .lbl{color:rgba(150,180,220,0.65)}.val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11px}
 </style>
@@ -475,10 +481,33 @@ canvas{display:block}
     <div class="shdr sb"><span>TELEGRAM BOT</span></div>
     <div id="tgSt" class="bdg bok">● Bot يعمل عبر Vercel — Token محمي</div>
     <div style="margin-top:6px" class="brow">
-      <button class="btn" onclick="tgSend('test')" style="font-size:11px">📤 تجريبي</button>
       <button class="btn" onclick="tgSend('signal')" style="font-size:11px">⚡ الإشارة</button>
+      <button class="btn" onclick="tgSend('test')" style="font-size:11px">📤 تجريبي</button>
+    </div>
+    <div style="margin-top:4px" class="brow">
+      <button class="btn" onclick="checkSilverBullet()" style="font-size:10px;background:linear-gradient(135deg,#064E3B,#065F46);color:#fff;border:1px solid #10B981">⚡ Silver Bullet</button>
+      <button class="btn" onclick="checkBreakout()" style="font-size:10px;background:linear-gradient(135deg,#1E3A5F,#1E40AF);color:#fff;border:1px solid #60A5FA">🚀 Breakout</button>
     </div>
     <div id="tgLog" class="bdg" style="margin-top:4px;display:none"></div>
+  </div>
+
+  <!-- 12. SB + BREAKOUT MONITOR -->
+  <div>
+    <div class="shdr" style="border-color:#10B981"><span style="color:#10B981">⚡ SILVER BULLET MONITOR</span></div>
+    <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:6px;padding:8px;font-size:10px;color:#065F46;margin-bottom:6px">
+      <div style="font-weight:700;margin-bottom:4px;font-size:9px;color:#047857">نوافذ التداول (GMT)</div>
+      <div id="sbW1" style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #BBF7D0"><span>🌍 London Open</span><span style="font-family:monospace;font-weight:700">03:00–04:00</span></div>
+      <div id="sbW2" style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #BBF7D0"><span>🇺🇸 Pre-NY</span><span style="font-family:monospace;font-weight:700">10:00–11:00</span></div>
+      <div id="sbW3" style="display:flex;justify-content:space-between;padding:2px 0"><span>🗽 NY Open</span><span style="font-family:monospace;font-weight:700">14:00–15:00</span></div>
+    </div>
+    <div id="sbLast" style="background:#ECFDF5;border:1px solid #6EE7B7;border-radius:6px;padding:8px;font-size:10px;color:#047857;text-align:center">في انتظار إشارة Silver Bullet...</div>
+    <div class="shdr" style="border-color:#3B82F6;margin-top:8px"><span style="color:#3B82F6">🚀 BREAKOUT MONITOR</span></div>
+    <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:8px;font-size:10px;color:#1E40AF;margin-bottom:4px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span>📦 الصندوق</span><span id="boRangeVal" style="font-family:monospace;font-weight:700">---</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:2px"><span>📏 المدى</span><span id="boRangePts" style="font-family:monospace;font-weight:700">---</span></div>
+      <div style="display:flex;justify-content:space-between"><span>📊 الحجم النسبي</span><span id="boVol" style="font-family:monospace;font-weight:700">---</span></div>
+    </div>
+    <div id="boLast" style="background:#EFF6FF;border:1px solid #93C5FD;border-radius:6px;padding:8px;font-size:10px;color:#1E40AF;text-align:center">في انتظار Breakout...</div>
   </div>
 
   <!-- 12. SYSTEM LOG -->
@@ -618,8 +647,8 @@ function analyzePatternsAndAdjust() {
 // ── المستوى 3: Claude الأسبوعي ──
 async function weeklyClaudeReview() {
   var closed = trades.filter(function(t){return t.result;}).slice(-30);
-  if(closed.length < 5) {
-    log('[REVIEW] لا توجد بيانات كافية للمراجعة');
+  if(closed.length < 3) {
+    log('[REVIEW] لا توجد بيانات كافية للمراجعة (تحتاج 3 على الأقل)');
     return;
   }
 
@@ -701,6 +730,8 @@ function renderSLReport() {
       +'</div>';
   }
 
+  // Add review button inline
+  html += '<button onclick="weeklyClaudeReview()" class="btn btn-b" style="font-size:10px;margin-top:6px;width:100%">🤖 تحديث مراجعة Claude</button>';
   el.innerHTML = html;
 
   var cnt  = document.getElementById('ll-count');
@@ -854,26 +885,38 @@ function toBeirut(gmt) {
   return `${((bh)<10?'0'+(bh):''+(bh))}:${((m)<10?'0'+(m):''+(m))}`;
 }
 const EVENTS = [
-  { name:'🇺🇸 CPI y/y',        time:'14:30', impact:'high', days:0 },
-  { name:'🇺🇸 FOMC Minutes',    time:'18:00', impact:'high', days:1 },
-  { name:'🇺🇸 NFP',             time:'13:30', impact:'high', days:4 },
-  { name:'🇺🇸 Fed Chair Speech', time:'17:00', impact:'high', days:4 },
-  { name:'🇨🇳 Industrial Output',time:'02:00', impact:'med',  days:2 },
-  { name:'🇪🇺 ECB Minutes',     time:'11:30', impact:'med',  days:3 },
-  { name:'🇺🇸 PPI m/m',         time:'13:30', impact:'med',  days:3 },
-  { name:'🇺🇸 Jobless Claims',   time:'13:30', impact:'low',  days:2 }
+  { name:'CPI y/y', flag:'🇺🇸', time:'14:30', impact:'high', days:0,
+    gi:{dir:'📈↕️ تقلب كبير',c:'#C05621',r:'أقل من التوقعات: ذهب↑ | أعلى: ذهب↓'} },
+  { name:'FOMC Minutes', flag:'🇺🇸', time:'18:00', impact:'high', days:1,
+    gi:{dir:'↕️ تقلب عالٍ',c:'#C05621',r:'dovish: ذهب↑ | hawkish: ذهب↓'} },
+  { name:'NFP', flag:'🇺🇸', time:'13:30', impact:'high', days:4,
+    gi:{dir:'📉 ضغط إذا قوي',c:'#9B2335',r:'NFP قوي = دولار↑ = ذهب↓'} },
+  { name:'Fed Chair Speech', flag:'🇺🇸', time:'17:00', impact:'high', days:4,
+    gi:{dir:'↕️ حسب الخطاب',c:'#C05621',r:'pause/cut: ذهب↑ | higher for longer: ذهب↓'} },
+  { name:'Industrial Output', flag:'🇨🇳', time:'02:00', impact:'med', days:2,
+    gi:{dir:'📈 إذا ضعيف',c:'#276749',r:'ضعف الصين = طلب على الملاذ الآمن↑'} },
+  { name:'ECB Minutes', flag:'🇪🇺', time:'11:30', impact:'med', days:3,
+    gi:{dir:'تأثير غير مباشر',c:'#718096',r:'EUR قوي = ذهب أقوى نسبياً'} },
+  { name:'PPI m/m', flag:'🇺🇸', time:'13:30', impact:'med', days:3,
+    gi:{dir:'📈 إذا مرتفع',c:'#276749',r:'PPI مرتفع = تضخم قادم = ذهب كتحوط'} },
+  { name:'Jobless Claims', flag:'🇺🇸', time:'13:30', impact:'low', days:2,
+    gi:{dir:'تأثير محدود',c:'#718096',r:'فرق كبير عن التوقعات فقط يحرك الذهب'} }
 ];
 
 let calAlerted = {};
 
 function getEventDate(days, timeStr) {
-  const now = new Date();
-  const d   = new Date(now);
-  d.setUTCDate(d.getUTCDate() + days);
-  var _d=timeStr.split(':'); var h=_d[0]; var m=_d[1];
-  d.setUTCHours(parseInt(h), parseInt(m), 0, 0);
+  var now=new Date(), d=new Date(now), added=0, tries=0;
+  while(added<days&&tries<14){
+    d.setUTCDate(d.getUTCDate()+1);
+    if(d.getUTCDay()!==0&&d.getUTCDay()!==6) added++;
+    tries++;
+  }
+  var _d=timeStr.split(':');
+  d.setUTCHours(parseInt(_d[0]),parseInt(_d[1]||0),0,0);
   return d;
 }
+function isMarketWeekend(){ var d=new Date().getUTCDay(); return d===0||d===6; }
 
 function renderCalendar() {
   var el  = document.getElementById('calEvents');
@@ -935,6 +978,14 @@ function renderCalendar() {
     html += '<div style="font-size:9px;color:#718096">'+label+'</div>';
     html += '</div>';
 
+    // Gold impact + weekend
+    if(isMarketWeekend&&isMarketWeekend()&&ev.days===0)
+      html+='<div style="font-size:9px;color:#92400E;background:#FEF3C7;border-radius:4px;padding:2px 6px;margin-bottom:4px">⚠️ عطلة — السوق مغلق</div>';
+    if(ev.gi)
+      html+='<div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:4px;padding:4px 8px;margin-bottom:4px">'
+        +'<div style="display:flex;justify-content:space-between"><span style="font-size:9px;color:#92400E;font-weight:700">🥇 XAU/USD</span>'
+        +'<span style="font-size:9px;font-weight:700;color:'+ev.gi.c+'">'+ev.gi.dir+'</span></div>'
+        +'<div style="font-size:8px;color:#78350F;margin-top:2px">'+ev.gi.r+'</div></div>';
     // Row 3: النتائج الاقتصادية (إذا متاحة)
     if(ev.actual!==undefined || ev.forecast!==undefined || ev.previous!==undefined) {
       html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;background:#FFFFFF;'+
@@ -1710,9 +1761,10 @@ function drawChart(tf){
   var cv = document.getElementById('cv');
   if(!cv) return;
   var ctx = cv.getContext('2d');
-  cv.width  = wrap.clientWidth;
-  cv.height = wrap.clientHeight;
+  cv.width  = wrap.clientWidth || 300;
+  cv.height = wrap.clientHeight || 280;
   var W = cv.width, H = cv.height;
+  if(W < 10 || H < 10) { setTimeout(function(){ drawChart(tf); }, 200); return; }
   var allData = cdata[tf];
   if(!allData || allData.length < 2){ return; }
 
@@ -2356,6 +2408,142 @@ async function tgSendTrade(t,rr){
   try{await fetch(BASE+'/api/telegram',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})});}catch(e){}
 }
 
+
+// ════════════════════════════════════
+// SILVER BULLET + BREAKOUT
+// ════════════════════════════════════
+var lastSBAlert=0,lastBOAlert=0;
+function closeSBAlert(){var e=document.getElementById('sbAlert');if(e)e.style.display='none';}
+function closeBOAlert(){var e=document.getElementById('breakoutAlert');if(e)e.style.display='none';}
+
+function checkSilverBullet(){
+  var data=cdata['M5'];
+  if(!data||data.length<20||price<=0) return;
+  var now=new Date(),gmtTot=now.getUTCHours()*60+now.getUTCMinutes();
+  var inSB=(gmtTot>=180&&gmtTot<=240)||(gmtTot>=600&&gmtTot<=660)||(gmtTot>=840&&gmtTot<=900);
+  // Highlight windows
+  var windows=[
+    {id:'sbW1',active:gmtTot>=180&&gmtTot<=240},
+    {id:'sbW2',active:gmtTot>=600&&gmtTot<=660},
+    {id:'sbW3',active:gmtTot>=840&&gmtTot<=900}
+  ];
+  windows.forEach(function(w){
+    var el=document.getElementById(w.id);
+    if(el) el.style.fontWeight=w.active?'900':'400';
+    if(el) el.style.color=w.active?'#047857':'#065F46';
+  });
+  if(!inSB||Date.now()-lastSBAlert<300000) return;
+  var recent=data.slice(-10),fvg=null;
+  for(var i=2;i<recent.length;i++){
+    var p2=recent[i-2],cu=recent[i];
+    if(cu.l>p2.h&&cu.cl>cu.o){fvg={type:'BUY',top:cu.l,bot:p2.h,mid:(cu.l+p2.h)/2};break;}
+    if(cu.h<p2.l&&cu.cl<cu.o){fvg={type:'SELL',top:p2.l,bot:cu.h,mid:(p2.l+cu.h)/2};break;}
+  }
+  if(!fvg) return;
+  var hs=recent.map(function(c){return c.h;}),ls=recent.map(function(c){return c.l;});
+  var pH=Math.max.apply(null,hs.slice(0,-3)),pL=Math.min.apply(null,ls.slice(0,-3));
+  var lastCl=recent[recent.length-1].cl;
+  if(!((fvg.type==='BUY'&&lastCl>pH)||(fvg.type==='SELL'&&lastCl<pL))) return;
+  if(Math.abs(price-fvg.mid)>3.0) return;
+  var isBuy=fvg.type==='BUY';
+  var entry=price,sl=isBuy?fvg.bot-1:fvg.top+1,slPts=Math.abs(entry-sl);
+  if(slPts<3||slPts>10) return;
+  var tp1=isBuy?entry+slPts*2:entry-slPts*2;
+  var tp2=isBuy?entry+slPts*3.5:entry-slPts*3.5;
+  var winName=gmtTot<300?'London Open 03-04 GMT':gmtTot<700?'Pre-NY 10-11 GMT':'NY Open 14-15 GMT';
+  lastSBAlert=Date.now();
+  log('[SB] '+(isBuy?'🟢':'🔴')+' Silver Bullet '+fvg.type+' @ $'+entry.toFixed(2));
+  playAlert(isBuy?'buy':'sell');
+  tgNotify('[SB] '+(isBuy?'🟢 BUY':'🔴 SELL')+' @ $'+entry.toFixed(2)
+    +' SL:$'+sl.toFixed(2)+'('+slPts.toFixed(1)+'pts)'
+    +' TP1:$'+tp1.toFixed(2)+' TP2:$'+tp2.toFixed(2)
+    +' | '+winName);
+  var el=document.getElementById('sbAlert');
+  if(el){
+    el.style.display='block';
+    el.className='sb-alert '+(isBuy?'sb-buy':'sb-sell');
+    el.innerHTML='<div style="display:flex;justify-content:space-between;margin-bottom:5px">'
+      +'<b>'+(isBuy?'⚡🟢 SILVER BULLET BUY':'⚡🔴 SILVER BULLET SELL')+'</b>'
+      +'<button onclick="closeSBAlert()" style="background:none;border:none;color:inherit;font-size:16px;cursor:pointer">✕</button>'
+      +'</div>'
+      +'<div style="font-size:9px;opacity:.8;margin-bottom:5px">'+winName+'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;font-family:monospace;font-size:11px">'
+      +'<div>📍 $'+entry.toFixed(2)+'</div><div>🛑 $'+sl.toFixed(2)+' ('+slPts.toFixed(1)+'pts)</div>'
+      +'<div>🎯 TP1 $'+tp1.toFixed(2)+'</div><div>🎯 TP2 $'+tp2.toFixed(2)+'</div>'
+      +'</div>';
+    setTimeout(closeSBAlert,60000);
+  }
+  var sbL=document.getElementById('sbLast');
+  if(sbL){sbL.style.background=isBuy?'#ECFDF5':'#FEF2F2';sbL.style.color=isBuy?'#047857':'#991B1B';
+    sbL.textContent=(isBuy?'🟢 BUY':'🔴 SELL')+' @ $'+entry.toFixed(2)+' | TP1:$'+tp1.toFixed(2);}
+}
+
+function checkBreakout(){
+  var data=cdata['M5'];
+  if(!data||data.length<30||price<=0) return;
+  if(Date.now()-lastBOAlert<600000) return;
+  var n=data.length,r20=data.slice(-20);
+  var boxH=Math.max.apply(null,r20.map(function(c){return c.h;}));
+  var boxL=Math.min.apply(null,r20.map(function(c){return c.l;}));
+  var boxRange=boxH-boxL;
+  // Update UI
+  var bRV=document.getElementById('boRangeVal'),bRP=document.getElementById('boRangePts'),bV=document.getElementById('boVol');
+  if(bRV) bRV.textContent='$'+boxL.toFixed(2)+'-$'+boxH.toFixed(2);
+  if(bRP) bRP.textContent=boxRange.toFixed(1)+' pts';
+  if(boxRange<5) return;
+  var vol3=data.slice(-3).reduce(function(s,c){return s+c.v;},0)/3;
+  var vol17=data.slice(-20,-3).reduce(function(s,c){return s+c.v;},0)/17;
+  if(bV&&vol17>0) bV.textContent='x'+(vol3/vol17).toFixed(1);
+  var volSpike=vol17>0&&vol3>vol17*1.5;
+  var last4=data.slice(-4);
+  var allBull=last4.every(function(c){return c.cl>c.o;});
+  var allBear=last4.every(function(c){return c.cl<c.o;});
+  var atrS3=0;
+  for(var j=Math.max(1,n-14);j<n;j++)
+    atrS3+=Math.max(data[j].h-data[j].l,Math.abs(data[j].h-data[j-1].cl),Math.abs(data[j].l-data[j-1].cl));
+  var atr3=atrS3/14;
+  var brokeUp=price>boxH+atr3*0.3,brokeDown=price<boxL-atr3*0.3;
+  if(!brokeUp&&!brokeDown) return;
+  var reasons=[],isBuy2=brokeUp;
+  if(brokeUp) reasons.push('كسر $'+boxH.toFixed(2));
+  if(brokeDown) reasons.push('كسر $'+boxL.toFixed(2));
+  if(volSpike) reasons.push('حجم x'+(vol3/vol17).toFixed(1));
+  if(allBull&&brokeUp) reasons.push('4 شمعات صاعدة');
+  if(allBear&&brokeDown) reasons.push('4 شمعات هابطة');
+  var cls3=r20.map(function(c){return c.cl;}),e21=cls3[0];
+  for(var j=0;j<cls3.length;j++) e21=cls3[j]*2/22+e21*(1-2/22);
+  if(brokeUp&&price>e21) reasons.push('فوق EMA21');
+  if(brokeDown&&price<e21) reasons.push('تحت EMA21');
+  if(reasons.length<2) return;
+  var entry3=price,sl3=isBuy2?boxH-atr3*0.5:boxL+atr3*0.5;
+  var btp1=isBuy2?entry3+atr3:entry3-atr3,btp2=isBuy2?entry3+atr3*2:entry3-atr3*2,btp3=isBuy2?entry3+atr3*3:entry3-atr3*3;
+  lastBOAlert=Date.now();
+  log('[BO] '+(isBuy2?'🚀':'💥')+' Breakout '+(isBuy2?'BUY':'SELL')+' @ $'+price.toFixed(2)+' '+reasons.join(', '));
+  playAlert(isBuy2?'buy':'sell');
+  tgNotify('[BREAKOUT] '+(isBuy2?'🚀 BUY':'💥 SELL')+' @ $'+price.toFixed(2)
+    +' | صندوق:$'+boxL.toFixed(2)+'-$'+boxH.toFixed(2)
+    +' | TP1:$'+btp1.toFixed(2)+' TP2:$'+btp2.toFixed(2)+' TP3:$'+btp3.toFixed(2)
+    +' | '+reasons.join('+'));
+  var el2=document.getElementById('breakoutAlert');
+  if(el2){
+    el2.style.display='block';
+    el2.className='breakout-alert '+(isBuy2?'bo-buy':'bo-sell');
+    el2.innerHTML='<div style="display:flex;justify-content:space-between;margin-bottom:5px">'
+      +'<b>'+(isBuy2?'🚀 BREAKOUT صاعد':'💥 BREAKOUT هابط')+'</b>'
+      +'<button onclick="closeBOAlert()" style="background:none;border:none;color:inherit;font-size:16px;cursor:pointer">✕</button>'
+      +'</div>'
+      +'<div style="font-size:9px;margin-bottom:4px">📦 $'+boxL.toFixed(2)+'-$'+boxH.toFixed(2)+' | '+reasons.join(' · ')+'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;font-family:monospace;font-size:10px">'
+      +'<div>📍 $'+entry3.toFixed(2)+'</div><div>🛑 $'+sl3.toFixed(2)+'</div><div></div>'
+      +'<div>TP1 $'+btp1.toFixed(2)+'</div><div>TP2 $'+btp2.toFixed(2)+'</div><div>TP3 $'+btp3.toFixed(2)+'</div>'
+      +'</div>';
+    setTimeout(closeBOAlert,90000);
+  }
+  var boL=document.getElementById('boLast');
+  if(boL){boL.style.background=isBuy2?'#EFF6FF':'#FEF2F2';boL.style.color=isBuy2?'#1E40AF':'#991B1B';
+    boL.textContent=(isBuy2?'🚀 BUY':'💥 SELL')+' @ $'+price.toFixed(2)+' TP1:$'+btp1.toFixed(2);}
+}
+
 async function tgNotify(text){
   try{await fetch(BASE+'/api/telegram',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});}catch(e){}
 }
@@ -2905,6 +3093,7 @@ setTimeout(function(){fetchCorrelation(curTF);},8000); // Correlation
 setTimeout(function(){fetchCandles('M30');},4000);
 setTimeout(function(){fetchCandles('H1');},6000);
 setInterval(function(){fetchCandles(curTF);renderCalendar();try{const kz=getKillZone();const a=runMasterAnalysis(cdata[curTF],price);if(a)updateAdvancedUI(a);}catch(e){}},60000);
+setInterval(function(){try{checkSilverBullet();}catch(e){} try{checkBreakout();}catch(e){}},30000);
 setInterval(function(){fetchCorrelation(curTF);},300000); // correlation كل 5 دقائق
 renderTrades();updateStats();renderSLReport();addWeeklyReviewButton();
 // مراجعة أسبوعية تلقائية (كل أسبوع)
@@ -3090,11 +3279,29 @@ function openSchoolModal(key) {
 
   var html = '';
 
-  // الإشارة الحالية
+  // بيانات حية
+  var liveData=cdata['M15']||[];
+  var priceLive=price>0?'$'+price.toFixed(2):'---';
+  var ema50Live='---',atrLive='---';
+  if(liveData.length>14){
+    var cls2=liveData.map(function(c){return c.cl;});
+    var e50=cls2[0];
+    for(var k=0;k<cls2.length;k++) e50=cls2[k]*2/51+e50*(1-2/51);
+    ema50Live='$'+e50.toFixed(2);
+    var atrS2=0;
+    for(var k=Math.max(1,liveData.length-14);k<liveData.length;k++)
+      atrS2+=Math.max(liveData[k].h-liveData[k].l,Math.abs(liveData[k].h-liveData[k-1].cl),Math.abs(liveData[k].l-liveData[k-1].cl));
+    atrLive=(atrS2/14).toFixed(1)+' pts';
+  }
   html += '<div class="sm-section">';
   html += '<div class="sm-section-title">الإشارة الحالية</div>';
-  html += '<div class="sm-signal-big" style="color:'+sigColor+'">'+sigText+'</div>';
-  html += '<div style="text-align:center;font-size:10px;color:rgba(150,180,220,.7);margin-top:4px">'+detText+'</div>';
+  html += '<div style="font-size:20px;font-weight:900;text-align:center;padding:6px 0;color:'+sigColor+'">'+sigText+'</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px">';
+  html += '<div style="text-align:center;background:#EBF8FF;border-radius:6px;padding:6px"><div style="font-size:8px;color:#2C5282">السعر</div><div style="font-size:12px;font-weight:700;color:#1A202C;font-family:monospace">'+priceLive+'</div></div>';
+  html += '<div style="text-align:center;background:#EBF4FF;border-radius:6px;padding:6px"><div style="font-size:8px;color:#2C5282">EMA 50</div><div style="font-size:12px;font-weight:700;color:#2B6CB0;font-family:monospace">'+ema50Live+'</div></div>';
+  html += '<div style="text-align:center;background:#FFFBEB;border-radius:6px;padding:6px"><div style="font-size:8px;color:#744210">ATR 14</div><div style="font-size:12px;font-weight:700;color:#C05621;font-family:monospace">'+atrLive+'</div></div>';
+  html += '</div>';
+  html += '<div style="text-align:center;font-size:10px;color:#4A5568;margin-top:6px">'+detText+'</div>';
   html += '</div>';
 
   // تحليل التايم فريمز
@@ -3107,7 +3314,7 @@ function openSchoolModal(key) {
     html += '<div class="sm-tf-cell">';
     html += '<div class="sm-tf-label">'+tf+'</div>';
     html += '<div class="sm-tf-value" style="color:'+(td.color||'#888')+'">'+( td.signal||'---')+'</div>';
-    html += '<div style="font-size:8px;color:rgba(120,160,200,.5);margin-top:1px">'+(td.detail||'')+'</div>';
+    html += '<div style="font-size:8px;color:#718096;margin-top:1px">'+(td.detail||'')+'</div>';
     html += '</div>';
   });
   html += '</div></div>';
@@ -3127,7 +3334,7 @@ function openSchoolModal(key) {
     html += '<span class="sm-factor-name">'+f.n+'</span>';
     html += '<div style="text-align:left">';
     if(f.id) html += '<span class="sm-factor-val">'+val+'</span><br>';
-    html += '<span style="font-size:9px;color:rgba(100,140,180,.6)">'+f.desc+'</span>';
+    html += '<span style="font-size:9px;color:#4A5568">'+f.desc+'</span>';
     html += '</div></div>';
   });
   html += '</div>';
@@ -3137,12 +3344,12 @@ function openSchoolModal(key) {
   html += '<div class="sm-section-title">كيف تقرأ هذه المدرسة؟</div>';
   html += '<div class="sm-explanation">'+def.explain+'</div>';
   html += '<div style="margin-top:8px;padding:8px;background:rgba(0,180,255,.05);border-radius:4px;border:1px solid rgba(0,180,255,.1)">';
-  html += '<div style="font-size:9px;color:rgba(0,180,255,.5);margin-bottom:3px">⏱ التايم فريم المناسب</div>';
-  html += '<div style="font-size:10px;color:rgba(200,220,255,.7)">'+def.tf+'</div>';
+  html += '<div style="font-size:9px;color:#1A56DB;font-weight:700;margin-bottom:3px">⏱ التايم فريم المناسب</div>';
+  html += '<div style="font-size:10px;color:#1A202C;font-weight:600">'+def.tf+'</div>';
   html += '</div></div>';
 
   // نصيحة
-  html += '<div style="padding:10px;text-align:center;font-size:10px;color:rgba(100,140,180,.5)">اضغط في أي مكان للإغلاق</div>';
+  html += '<div style="padding:10px;text-align:center;font-size:10px;color:#4A5568">اضغط في أي مكان للإغلاق</div>';
 
   body.innerHTML = html;
   modal.classList.add('open');
@@ -3251,6 +3458,9 @@ document.getElementById('schoolModal') && document.getElementById('schoolModal')
   if(e.target === this) closeSchoolModal();
 });
 </script>
+<div id="sbAlert" class="sb-alert"></div>
+<div id="breakoutAlert" class="breakout-alert"></div>
+
 <!-- ══ School Detail Modal ══ -->
 <div class="school-modal" id="schoolModal">
   <div class="sm-header">
