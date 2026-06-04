@@ -231,13 +231,14 @@ canvas{display:block;width:100%!important;height:100%!important}
   color:#64B5F6;border:1px solid rgba(33,150,243,0.4);
 }
 .fs-legend{
-  position:fixed;top:12px;left:12px;
-  background:rgba(19,23,34,0.85);
+  position:fixed;bottom:70px;right:12px;
+  background:rgba(19,23,34,0.88);
   border:1px solid rgba(255,255,255,0.08);
   border-radius:8px;padding:8px 10px;
   font-size:9px;color:rgba(180,190,210,0.8);
   z-index:10001;display:none;
   line-height:1.8;backdrop-filter:blur(4px);
+  max-width:200px;
 }
 .cwrap-fs ~ .fs-legend{display:block!important;}
 ::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,180,255,.2);border-radius:2px}
@@ -348,6 +349,7 @@ canvas{display:block;width:100%!important;height:100%!important}
     <div class="cload" id="cload">⏳ جاري تحميل M15 من MT5...</div>
   </div>
   <button class="fs-close" id="fsClose" onclick="closeChartFS()">✕</button>
+  <button id="fsExitBtn" onclick="closeChartFS()" style="display:none;position:fixed;bottom:16px;left:16px;background:rgba(239,83,80,0.85);color:#fff;border:none;border-radius:20px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;z-index:10002;backdrop-filter:blur(4px)">← خروج</button>
   <div class="fs-tf-bar" id="fsTFBar">
     <button class="fs-tf-btn" onclick="fsTF('M5')">M5</button>
     <button class="fs-tf-btn" onclick="fsTF('M15')">M15</button>
@@ -2226,21 +2228,20 @@ function drawChart(tf){
   ctx.fillStyle='rgba(255,255,255,0.04)'; ctx.font='8px monospace'; ctx.textAlign='left';
   ctx.fillText(n+' candles', mL+4, H-mB-3);
 
-  // ═══ LEGEND ═══
-  var legY=mT+10;
-  var legItems=[
-    {col:'rgba(255,235,59,0.7)',label:'EMA20'},
-    {col:'rgba(33,150,243,0.8)',label:'EMA50'},
-    {col:'rgba(200,200,200,0.4)',label:'EMA200'},
-    {col:'rgba(156,39,176,0.6)',label:'VWAP'},
+  // ═══ LEGEND - bottom left, compact ═══
+  var legItems2=[
+    {col:'rgba(255,235,59,0.8)',label:'EMA20'},
+    {col:'rgba(33,150,243,0.9)',label:'EMA50'},
+    {col:'rgba(200,200,200,0.5)',label:'EMA200'},
+    {col:'rgba(156,39,176,0.7)',label:'VWAP'},
   ];
-  var legX=mL+5;
-  legItems.forEach(function(it){
+  var legX2=mL+4, legY2=H-mB-14;
+  legItems2.forEach(function(it){
     ctx.fillStyle=it.col;
-    ctx.fillRect(legX,legY-5,12,2);
-    ctx.fillStyle='rgba(180,190,210,0.7)'; ctx.font='8px monospace'; ctx.textAlign='left';
-    ctx.fillText(it.label, legX+14, legY);
-    legX+=14+ctx.measureText(it.label).width+8;
+    ctx.fillRect(legX2, legY2-4, 10, 2);
+    ctx.fillStyle='rgba(180,190,210,0.55)'; ctx.font='7px monospace'; ctx.textAlign='left';
+    ctx.fillText(it.label, legX2+12, legY2);
+    legX2+=12+ctx.measureText(it.label).width+6;
   });
 
   // ═══ ZOOM INDICATOR ═══
@@ -2248,6 +2249,93 @@ function drawChart(tf){
     ctx.fillStyle='rgba(255,255,255,0.15)';
     ctx.font='9px monospace'; ctx.textAlign='left';
     ctx.fillText((chartZoom>1?'🔍':'🔭')+chartZoom.toFixed(1)+'x', mL+4, mT+22);
+  }
+
+  // ═══ MINI CORRELATION CHARTS (bottom right) ═══
+  var miniW=80, miniH=30, miniGap=6;
+  var miniX=W-mR-miniW*2-miniGap-4;
+  var miniY=H-mB-miniH-2;
+
+  // XAG mini chart
+  if(xagCandles && xagCandles.length>=3){
+    var xagSlice=xagCandles.slice(-5);
+    var xagH2=Math.max.apply(null,xagSlice.map(function(c){return c.h||c.cl;}));
+    var xagL2=Math.min.apply(null,xagSlice.map(function(c){return c.l||c.cl;}));
+    var xagR=xagH2-xagL2||0.1;
+    var xagBull=xagSlice[xagSlice.length-1].cl>xagSlice[0].cl;
+    // Background
+    ctx.fillStyle='rgba(0,0,0,0.4)';
+    ctx.beginPath(); ctx.roundRect?ctx.roundRect(miniX,miniY,miniW,miniH,3):ctx.rect(miniX,miniY,miniW,miniH);
+    ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=0.5;
+    ctx.strokeRect(miniX,miniY,miniW,miniH);
+    // Candles
+    var xagCW=Math.floor(miniW/xagSlice.length*0.7);
+    xagSlice.forEach(function(c,ci){
+      var cx2=miniX+4+(ci/xagSlice.length)*(miniW-8)+xagCW/2;
+      var bull2=c.cl>=c.o;
+      var bT=miniY+2+(miniH-4)*(1-(Math.max(c.o,c.cl)-xagL2)/xagR);
+      var bB=miniY+2+(miniH-4)*(1-(Math.min(c.o,c.cl)-xagL2)/xagR);
+      var bH2=Math.max(1,bB-bT);
+      ctx.fillStyle=bull2?'#26A69A':'#EF5350';
+      ctx.fillRect(cx2-xagCW/2,bT,xagCW,bH2);
+      ctx.strokeStyle=bull2?'#1B7A72':'#C62828'; ctx.lineWidth=0.3;
+      ctx.beginPath(); ctx.moveTo(cx2,miniY+2+(miniH-4)*(1-(c.h-xagL2)/xagR));
+      ctx.lineTo(cx2,miniY+2+(miniH-4)*(1-(c.l-xagL2)/xagR)); ctx.stroke();
+    });
+    // Label
+    ctx.fillStyle=xagBull?'rgba(38,166,154,0.9)':'rgba(239,83,80,0.9)';
+    ctx.font='bold 7px monospace'; ctx.textAlign='left';
+    ctx.fillText('XAG '+(xagBull?'↑':'↓'), miniX+3, miniY+9);
+    var xagPr=xagSlice[xagSlice.length-1].cl;
+    ctx.fillStyle='rgba(180,190,210,0.6)'; ctx.font='6px monospace';
+    ctx.fillText(xagPr.toFixed(2), miniX+3, miniY+miniH-3);
+  }
+
+  // DXY mini chart
+  var miniX2=miniX+miniW+miniGap;
+  if(dxyCandles && dxyCandles.length>=3){
+    var dxySlice=dxyCandles.slice(-5);
+    var dxyH2=Math.max.apply(null,dxySlice.map(function(c){return c.h||c.cl;}));
+    var dxyL2=Math.min.apply(null,dxySlice.map(function(c){return c.l||c.cl;}));
+    var dxyR=dxyH2-dxyL2||0.1;
+    var dxyBull=dxySlice[dxySlice.length-1].cl>dxySlice[0].cl;
+    // Background
+    ctx.fillStyle='rgba(0,0,0,0.4)';
+    ctx.beginPath(); ctx.roundRect?ctx.roundRect(miniX2,miniY,miniW,miniH,3):ctx.rect(miniX2,miniY,miniW,miniH);
+    ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=0.5;
+    ctx.strokeRect(miniX2,miniY,miniW,miniH);
+    // Candles
+    var dxyCW=Math.floor(miniW/dxySlice.length*0.7);
+    dxySlice.forEach(function(c,ci){
+      var cx3=miniX2+4+(ci/dxySlice.length)*(miniW-8)+dxyCW/2;
+      var bull3=c.cl>=c.o;
+      var bT3=miniY+2+(miniH-4)*(1-(Math.max(c.o,c.cl)-dxyL2)/dxyR);
+      var bB3=miniY+2+(miniH-4)*(1-(Math.min(c.o,c.cl)-dxyL2)/dxyR);
+      var bH3=Math.max(1,bB3-bT3);
+      // DXY inverted colors (DXY up = bad for gold)
+      ctx.fillStyle=bull3?'#EF5350':'#26A69A';
+      ctx.fillRect(cx3-dxyCW/2,bT3,dxyCW,bH3);
+      ctx.strokeStyle=bull3?'#C62828':'#1B7A72'; ctx.lineWidth=0.3;
+      ctx.beginPath(); ctx.moveTo(cx3,miniY+2+(miniH-4)*(1-(c.h-dxyL2)/dxyR));
+      ctx.lineTo(cx3,miniY+2+(miniH-4)*(1-(c.l-dxyL2)/dxyR)); ctx.stroke();
+    });
+    // Label - DXY up = bearish for gold
+    ctx.fillStyle=dxyBull?'rgba(239,83,80,0.9)':'rgba(38,166,154,0.9)';
+    ctx.font='bold 7px monospace'; ctx.textAlign='left';
+    ctx.fillText('DXY '+(dxyBull?'↑🔴':'↓🟢'), miniX2+3, miniY+9);
+    var dxyPr=dxySlice[dxySlice.length-1].cl;
+    ctx.fillStyle='rgba(180,190,210,0.6)'; ctx.font='6px monospace';
+    ctx.fillText(dxyPr.toFixed(3), miniX2+3, miniY+miniH-3);
+  } else {
+    // DXY not loaded - show placeholder
+    ctx.fillStyle='rgba(0,0,0,0.3)';
+    ctx.fillRect(miniX2,miniY,miniW,miniH);
+    ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=0.5;
+    ctx.strokeRect(miniX2,miniY,miniW,miniH);
+    ctx.fillStyle='rgba(180,190,210,0.4)'; ctx.font='7px monospace'; ctx.textAlign='left';
+    ctx.fillText('DXY ···', miniX2+3, miniY+miniH/2+3);
   }
 
   // ═══ UPDATE LABELS ═══
@@ -2976,6 +3064,8 @@ function closeChartFS() {
     screen.orientation.unlock();
   }
   document.body.style.overflow='';
+  var exitBtn2=document.getElementById('fsExitBtn');
+  if(exitBtn2) exitBtn2.style.display='none';
   setTimeout(function(){ drawChart(curTF); }, 100);
 }
 
@@ -3310,17 +3400,33 @@ async function fetchCorrelation(tf) {
         log('[CORR] XAG: '+d1.candles.length+' candles ✓');
       }
     }
-    // DXY عبر Yahoo proxy
+    // DXY - try direct Yahoo first, then proxy
     const intMap = {M5:'5m',M15:'15m',M30:'30m',H1:'1h',H4:'1h'};
     const rngMap = {M5:'2d',M15:'2d',M30:'2d',H1:'5d',H4:'1mo'};
-    const yahooUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/DX%3DF?interval='+(intMap[tf]||'15m')+'&range='+(rngMap[tf]||'2d')+'&includePrePost=false';
-    const r2 = await fetch(BASE+'/api/yahoo?url='+encodeURIComponent(yahooUrl));
-    if(r2.ok){
-      const d2 = await r2.json();
-      if(d2.candles && d2.candles.length) {
-        dxyCandles = d2.candles;
-        log('[CORR] DXY: '+d2.candles.length+' candles ✓');
+    const yahooUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/DX%3DF?interval='+(intMap[tf]||'15m')+'&range='+(rngMap[tf]||'2d')+'&includePrePost=false&corsDomain=finance.yahoo.com';
+    var r2;
+    try {
+      r2 = await fetch(yahooUrl);
+      if(!r2.ok) throw new Error('direct failed');
+      const d2direct = await r2.json();
+      const chart2 = d2direct.chart&&d2direct.chart.result&&d2direct.chart.result[0];
+      if(chart2&&chart2.timestamp){
+        const ts2=chart2.timestamp, q2=chart2.indicators.quote[0];
+        dxyCandles=ts2.map(function(t,ii){return {t:t*1000,o:q2.open[ii]||0,h:q2.high[ii]||0,l:q2.low[ii]||0,cl:q2.close[ii]||0,v:q2.volume[ii]||1};}).filter(function(c){return c.cl>0;});
+        log('[CORR] DXY direct: '+dxyCandles.length+' candles ✓');
       }
+    } catch(e2){
+      // Fallback to proxy
+      try {
+        r2 = await fetch(BASE+'/api/yahoo?url='+encodeURIComponent(yahooUrl));
+        if(r2.ok){
+          const d2 = await r2.json();
+          if(d2.candles && d2.candles.length) {
+            dxyCandles = d2.candles;
+            log('[CORR] DXY proxy: '+d2.candles.length+' candles ✓');
+          }
+        }
+      } catch(e3){ log('[CORR] DXY proxy also failed: '+e3.message); }
     }
     updateCorrelationUI();
   } catch(e) { log('[CORR] Error: '+e.message); }
