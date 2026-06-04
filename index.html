@@ -230,17 +230,8 @@ canvas{display:block;width:100%!important;height:100%!important}
   background:rgba(33,150,243,0.3);
   color:#64B5F6;border:1px solid rgba(33,150,243,0.4);
 }
-.fs-legend{
-  position:fixed;bottom:70px;right:12px;
-  background:rgba(19,23,34,0.88);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:8px;padding:8px 10px;
-  font-size:9px;color:rgba(180,190,210,0.8);
-  z-index:10001;display:none;
-  line-height:1.8;backdrop-filter:blur(4px);
-  max-width:200px;
-}
-.cwrap-fs ~ .fs-legend{display:block!important;}
+
+#chartLegend::-webkit-scrollbar{display:none}
 ::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,180,255,.2);border-radius:2px}
 .section-panel{background:#FFFFFF;border:1px solid rgba(0,180,255,0.12);border-radius:6px;padding:8px}.sch-sig{color:#1A202C;font-weight:700}.school-row .val{color:#1A202C}
 .row{display:flex;justify-content:space-between;align-items:center;margin:3px 0;font-size:11px}
@@ -357,57 +348,34 @@ canvas{display:block;width:100%!important;height:100%!important}
     <button class="fs-tf-btn" onclick="fsTF('H1')">H1</button>
     <button class="fs-tf-btn" onclick="fsTF('H4')">H4</button>
   </div>
-  <div class="fs-legend" id="fsLegend">
-    <div style="font-weight:700;color:#fff;margin-bottom:6px;font-size:10px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:4px">📊 دليل الشارت</div>
-    <div><span style="color:#26A69A">▮</span> شمعة صاعدة &nbsp; <span style="color:#EF5350">▮</span> شمعة هابطة</div>
-    <div style="margin-top:3px;color:rgba(255,255,255,0.4);font-size:8px">— خطوط المتوسطات —</div>
-    <div><span style="color:rgba(255,235,59,0.9)">──</span> EMA20 (زخم قصير)</div>
-    <div><span style="color:rgba(33,150,243,0.9)">──</span> EMA50 (اتجاه متوسط)</div>
-    <div><span style="color:rgba(200,200,200,0.6)">╌╌</span> EMA200 (اتجاه رئيسي)</div>
-    <div><span style="color:rgba(156,39,176,0.8)">╌╌</span> VWAP (متوسط الحجم)</div>
-    <div style="margin-top:3px;color:rgba(255,255,255,0.4);font-size:8px">— مناطق ICT/SMC —</div>
-    <div><span style="color:rgba(239,83,80,0.9)">▬▬</span> OB SELL (مقاومة مؤسسية)</div>
-    <div><span style="color:rgba(38,166,154,0.9)">▬▬</span> OB BUY (دعم مؤسسي)</div>
-    <div><span style="color:rgba(255,152,0,0.9)">▬▬</span> FVG (فجوة القيمة العادلة)</div>
-    <div style="margin-top:3px;color:rgba(255,255,255,0.4);font-size:8px">— مستويات تقنية —</div>
-    <div><span style="color:rgba(239,83,80,0.6)">╌╌</span> R مقاومة (Pivot High)</div>
-    <div><span style="color:rgba(38,166,154,0.6)">╌╌</span> S دعم (Pivot Low)</div>
-    <div><span style="color:rgba(255,215,0,0.8)">╌╌</span> 💧 EQH/EQL سيولة</div>
-    <div style="margin-top:3px;color:rgba(255,255,255,0.4);font-size:8px">— الصفقات المفتوحة —</div>
-    <div><span style="color:rgba(38,166,154,0.9)">▲</span> سهم BUY دخول صفقة</div>
-    <div><span style="color:rgba(239,83,80,0.9)">▼</span> سهم SELL دخول صفقة</div>
-    <div>📍 خط الدخول (أزرق)</div>
-    <div>🛑 خط SL (أحمر متقطع)</div>
-    <div>🎯 خط TP (أخضر متقطع)</div>
-    <div style="margin-top:3px;color:rgba(255,255,255,0.4);font-size:8px">— آخر الشارت —</div>
-    <div><span style="color:#EF5350">─●─</span> خط السعر الحالي</div>
-    <div style="margin-top:5px;color:rgba(38,166,154,0.7);font-size:8px">⬇️ XAG | DXY آخر 5 شمعات</div>
-    <div style="margin-top:4px;color:rgba(180,190,210,0.4);font-size:8px">اضغط ← خروج أو ✕ للإغلاق</div>
-  </div>
-  <div style="background:#1A1E2E;border:1px solid rgba(255,255,255,0.06);border-radius:0 0 6px 6px;padding:5px 8px;display:flex;flex-wrap:wrap;gap:5px;font-size:8px;color:rgba(180,190,210,0.65);font-family:monospace;line-height:1.6">
-    <span title="شمعة صاعدة"><span style="color:#26A69A">▮</span> صاعدة</span>
-    <span title="شمعة هابطة"><span style="color:#EF5350">▮</span> هابطة</span>
-    <span style="color:rgba(255,255,255,0.15)">│</span>
-    <span title="المتوسط المتحرك 20"><span style="color:rgba(255,235,59,0.9)">──</span> EMA20</span>
-    <span title="المتوسط المتحرك 50"><span style="color:rgba(33,150,243,0.9)">──</span> EMA50</span>
-    <span title="المتوسط المتحرك 200"><span style="color:rgba(200,200,200,0.5)">╌╌</span> EMA200</span>
-    <span title="متوسط السعر المرجح بالحجم"><span style="color:rgba(156,39,176,0.8)">╌╌</span> VWAP</span>
-    <span style="color:rgba(255,255,255,0.15)">│</span>
-    <span title="منطقة Order Block بيع (مقاومة مؤسسية)"><span style="color:rgba(239,83,80,0.85)">▬</span> OB↓Sell</span>
-    <span title="منطقة Order Block شراء (دعم مؤسسي)"><span style="color:rgba(38,166,154,0.85)">▬</span> OB↑Buy</span>
-    <span title="فجوة القيمة العادلة"><span style="color:rgba(255,152,0,0.8)">▬</span> FVG</span>
-    <span style="color:rgba(255,255,255,0.15)">│</span>
-    <span title="مقاومة Pivot High"><span style="color:rgba(239,83,80,0.5)">╌╌</span> R مقاومة</span>
-    <span title="دعم Pivot Low"><span style="color:rgba(38,166,154,0.5)">╌╌</span> S دعم</span>
-    <span title="مناطق السيولة Equal Highs/Lows"><span style="color:rgba(255,215,0,0.8)">╌╌</span> 💧EQH/EQL</span>
-    <span style="color:rgba(255,255,255,0.15)">│</span>
-    <span title="صفقة مفتوحة - دخول BUY"><span style="color:rgba(38,166,154,0.9)">▲</span> BUY</span>
-    <span title="صفقة مفتوحة - دخول SELL"><span style="color:rgba(239,83,80,0.9)">▼</span> SELL</span>
-    <span title="خط وقف الخسارة"><span style="color:rgba(239,83,80,0.8)">🛑</span> SL</span>
-    <span title="خط الهدف"><span style="color:rgba(38,166,154,0.8)">🎯</span> TP</span>
-    <span title="خط الدخول"><span style="color:rgba(33,150,243,0.8)">📍</span> Entry</span>
-    <span style="color:rgba(255,255,255,0.15)">│</span>
-    <span style="color:rgba(255,255,255,0.25)">⛶ اضغط للتوسيع</span>
+
+  <div id="chartLegend" style="background:#0F1117;border-top:1px solid rgba(255,255,255,0.06);padding:6px 8px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch">
+    <span style="display:inline-flex;align-items:center;gap:12px;font-size:8.5px;color:rgba(180,190,210,0.65);font-family:monospace">
+      <span style="color:rgba(255,255,255,0.3);font-size:9px;font-weight:700">📊 دليل</span>
+      <span><span style="color:#26A69A;font-size:11px">▮</span> صاعدة</span>
+      <span><span style="color:#EF5350;font-size:11px">▮</span> هابطة</span>
+      <span style="color:rgba(255,255,255,0.15)">|</span>
+      <span><span style="color:rgba(255,235,59,0.9);font-size:10px">━</span> EMA20<span style="color:rgba(180,190,210,0.35);font-size:7px"> زخم</span></span>
+      <span><span style="color:rgba(33,150,243,0.9);font-size:10px">━</span> EMA50<span style="color:rgba(180,190,210,0.35);font-size:7px"> اتجاه</span></span>
+      <span><span style="color:rgba(200,200,200,0.5);font-size:10px">┅</span> EMA200<span style="color:rgba(180,190,210,0.35);font-size:7px"> رئيسي</span></span>
+      <span><span style="color:rgba(156,39,176,0.8);font-size:10px">┅</span> VWAP<span style="color:rgba(180,190,210,0.35);font-size:7px"> حجم</span></span>
+      <span style="color:rgba(255,255,255,0.15)">|</span>
+      <span><span style="color:rgba(239,83,80,0.85);font-size:10px">▬</span> OB↓Sell</span>
+      <span><span style="color:rgba(38,166,154,0.85);font-size:10px">▬</span> OB↑Buy</span>
+      <span><span style="color:rgba(255,152,0,0.85);font-size:10px">▬</span> FVG</span>
+      <span style="color:rgba(255,255,255,0.15)">|</span>
+      <span><span style="color:rgba(239,83,80,0.5)">┅</span> R مقاومة</span>
+      <span><span style="color:rgba(38,166,154,0.5)">┅</span> S دعم</span>
+      <span><span style="color:rgba(255,215,0,0.75)">┅</span> 💧سيولة</span>
+      <span style="color:rgba(255,255,255,0.15)">|</span>
+      <span><span style="color:rgba(38,166,154,0.9);font-size:11px">▲</span> BUY</span>
+      <span><span style="color:rgba(239,83,80,0.9);font-size:11px">▼</span> SELL</span>
+      <span>📍 دخول</span>
+      <span>🛑 SL</span>
+      <span>🎯 TP</span>
+      <span style="color:rgba(255,255,255,0.15)">|</span>
+      <span style="color:rgba(255,255,255,0.25);font-size:8px">⛶ اضغط للتوسيع</span>
+    </span>
   </div>
   <div class="minir">
     <div class="minic" id="mc-M5" onclick="setTF(document.querySelectorAll('.tft')[0],'M5')">
@@ -1476,7 +1444,19 @@ async function sendChartToTelegram(auto){
     if(!cvMain) throw new Error('Canvas not found');
     var xauB64;
     try {
-      xauB64=cvMain.toDataURL('image/png').split(',')[1];
+      // High-res: redraw at 3x resolution
+      var hiCv = document.createElement('canvas');
+      var scale = 3; // 3x resolution for Telegram zoom
+      hiCv.width  = cvMain.width  * scale;
+      hiCv.height = cvMain.height * scale;
+      var hiCtx = hiCv.getContext('2d');
+      hiCtx.scale(scale, scale);
+      // Redraw chart on hi-res canvas
+      var oldCv = document.getElementById('cv');
+      var oldWrap = document.getElementById('cwrap');
+      // Draw the current canvas scaled up
+      hiCtx.drawImage(oldCv, 0, 0, oldCv.width/window.devicePixelRatio, oldCv.height/window.devicePixelRatio);
+      xauB64=hiCv.toDataURL('image/jpeg',0.92).split(',')[1];
     } catch(canvasErr) {
       // CORS/taint error - send text summary instead
       log('[CHART] Canvas tainted, sending text summary');
