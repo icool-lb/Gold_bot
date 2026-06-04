@@ -358,32 +358,56 @@ canvas{display:block;width:100%!important;height:100%!important}
     <button class="fs-tf-btn" onclick="fsTF('H4')">H4</button>
   </div>
   <div class="fs-legend" id="fsLegend">
-    <div style="font-weight:700;color:#fff;margin-bottom:4px;font-size:10px">📊 دليل الشارت</div>
+    <div style="font-weight:700;color:#fff;margin-bottom:6px;font-size:10px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:4px">📊 دليل الشارت</div>
     <div><span style="color:#26A69A">▮</span> شمعة صاعدة &nbsp; <span style="color:#EF5350">▮</span> شمعة هابطة</div>
-    <div><span style="color:rgba(255,235,59,0.9)">─</span> EMA20 &nbsp; <span style="color:rgba(33,150,243,0.9)">─</span> EMA50 &nbsp; <span style="color:rgba(200,200,200,0.6)">╌</span> EMA200</div>
-    <div><span style="color:rgba(156,39,176,0.8)">╌</span> VWAP (متوسط الحجم)</div>
-    <div><span style="color:rgba(239,83,80,0.8)">▬</span> OB SELL (مقاومة مؤسسية)</div>
-    <div><span style="color:rgba(38,166,154,0.8)">▬</span> OB BUY (دعم مؤسسي)</div>
-    <div><span style="color:rgba(255,152,0,0.8)">▬</span> FVG (فجوة السعر)</div>
-    <div><span style="color:rgba(239,83,80,0.6)">╌</span> R مقاومة &nbsp; <span style="color:rgba(38,166,154,0.6)">╌</span> S دعم</div>
-    <div><span style="color:rgba(255,215,0,0.8)">╌</span> 💧 EQH/EQL سيولة</div>
+    <div style="margin-top:3px;color:rgba(255,255,255,0.4);font-size:8px">— خطوط المتوسطات —</div>
+    <div><span style="color:rgba(255,235,59,0.9)">──</span> EMA20 (زخم قصير)</div>
+    <div><span style="color:rgba(33,150,243,0.9)">──</span> EMA50 (اتجاه متوسط)</div>
+    <div><span style="color:rgba(200,200,200,0.6)">╌╌</span> EMA200 (اتجاه رئيسي)</div>
+    <div><span style="color:rgba(156,39,176,0.8)">╌╌</span> VWAP (متوسط الحجم)</div>
+    <div style="margin-top:3px;color:rgba(255,255,255,0.4);font-size:8px">— مناطق ICT/SMC —</div>
+    <div><span style="color:rgba(239,83,80,0.9)">▬▬</span> OB SELL (مقاومة مؤسسية)</div>
+    <div><span style="color:rgba(38,166,154,0.9)">▬▬</span> OB BUY (دعم مؤسسي)</div>
+    <div><span style="color:rgba(255,152,0,0.9)">▬▬</span> FVG (فجوة القيمة العادلة)</div>
+    <div style="margin-top:3px;color:rgba(255,255,255,0.4);font-size:8px">— مستويات تقنية —</div>
+    <div><span style="color:rgba(239,83,80,0.6)">╌╌</span> R مقاومة (Pivot High)</div>
+    <div><span style="color:rgba(38,166,154,0.6)">╌╌</span> S دعم (Pivot Low)</div>
+    <div><span style="color:rgba(255,215,0,0.8)">╌╌</span> 💧 EQH/EQL سيولة</div>
+    <div style="margin-top:3px;color:rgba(255,255,255,0.4);font-size:8px">— الصفقات المفتوحة —</div>
+    <div><span style="color:rgba(38,166,154,0.9)">▲</span> سهم BUY دخول صفقة</div>
+    <div><span style="color:rgba(239,83,80,0.9)">▼</span> سهم SELL دخول صفقة</div>
+    <div>📍 خط الدخول (أزرق)</div>
+    <div>🛑 خط SL (أحمر متقطع)</div>
+    <div>🎯 خط TP (أخضر متقطع)</div>
+    <div style="margin-top:3px;color:rgba(255,255,255,0.4);font-size:8px">— آخر الشارت —</div>
     <div><span style="color:#EF5350">─●─</span> خط السعر الحالي</div>
-    <div style="margin-top:4px;color:rgba(180,190,210,0.5);font-size:8px">اضغط ✕ للخروج</div>
+    <div style="margin-top:5px;color:rgba(38,166,154,0.7);font-size:8px">⬇️ XAG | DXY آخر 5 شمعات</div>
+    <div style="margin-top:4px;color:rgba(180,190,210,0.4);font-size:8px">اضغط ← خروج أو ✕ للإغلاق</div>
   </div>
-  <div style="background:#1E2130;border:1px solid rgba(255,255,255,0.06);border-radius:0 0 6px 6px;padding:5px 8px;display:flex;flex-wrap:wrap;gap:6px;font-size:8px;color:rgba(180,190,210,0.6);font-family:monospace">
-    <span><span style="color:#26A69A">▮</span>صاعدة</span>
-    <span><span style="color:#EF5350">▮</span>هابطة</span>
-    <span><span style="color:rgba(255,235,59,0.9)">─</span>EMA20</span>
-    <span><span style="color:rgba(33,150,243,0.9)">─</span>EMA50</span>
-    <span><span style="color:rgba(200,200,200,0.5)">╌</span>EMA200</span>
-    <span><span style="color:rgba(156,39,176,0.8)">╌</span>VWAP</span>
-    <span><span style="color:rgba(239,83,80,0.7)">▬</span>OB Sell</span>
-    <span><span style="color:rgba(38,166,154,0.7)">▬</span>OB Buy</span>
-    <span><span style="color:rgba(255,152,0,0.7)">▬</span>FVG</span>
-    <span><span style="color:rgba(255,215,0,0.8)">╌</span>💧سيولة</span>
-    <span><span style="color:rgba(239,83,80,0.5)">╌</span>R مقاومة</span>
-    <span><span style="color:rgba(38,166,154,0.5)">╌</span>S دعم</span>
-    <span style="color:rgba(255,255,255,0.3)">⛶ اضغط للتوسيع</span>
+  <div style="background:#1A1E2E;border:1px solid rgba(255,255,255,0.06);border-radius:0 0 6px 6px;padding:5px 8px;display:flex;flex-wrap:wrap;gap:5px;font-size:8px;color:rgba(180,190,210,0.65);font-family:monospace;line-height:1.6">
+    <span title="شمعة صاعدة"><span style="color:#26A69A">▮</span> صاعدة</span>
+    <span title="شمعة هابطة"><span style="color:#EF5350">▮</span> هابطة</span>
+    <span style="color:rgba(255,255,255,0.15)">│</span>
+    <span title="المتوسط المتحرك 20"><span style="color:rgba(255,235,59,0.9)">──</span> EMA20</span>
+    <span title="المتوسط المتحرك 50"><span style="color:rgba(33,150,243,0.9)">──</span> EMA50</span>
+    <span title="المتوسط المتحرك 200"><span style="color:rgba(200,200,200,0.5)">╌╌</span> EMA200</span>
+    <span title="متوسط السعر المرجح بالحجم"><span style="color:rgba(156,39,176,0.8)">╌╌</span> VWAP</span>
+    <span style="color:rgba(255,255,255,0.15)">│</span>
+    <span title="منطقة Order Block بيع (مقاومة مؤسسية)"><span style="color:rgba(239,83,80,0.85)">▬</span> OB↓Sell</span>
+    <span title="منطقة Order Block شراء (دعم مؤسسي)"><span style="color:rgba(38,166,154,0.85)">▬</span> OB↑Buy</span>
+    <span title="فجوة القيمة العادلة"><span style="color:rgba(255,152,0,0.8)">▬</span> FVG</span>
+    <span style="color:rgba(255,255,255,0.15)">│</span>
+    <span title="مقاومة Pivot High"><span style="color:rgba(239,83,80,0.5)">╌╌</span> R مقاومة</span>
+    <span title="دعم Pivot Low"><span style="color:rgba(38,166,154,0.5)">╌╌</span> S دعم</span>
+    <span title="مناطق السيولة Equal Highs/Lows"><span style="color:rgba(255,215,0,0.8)">╌╌</span> 💧EQH/EQL</span>
+    <span style="color:rgba(255,255,255,0.15)">│</span>
+    <span title="صفقة مفتوحة - دخول BUY"><span style="color:rgba(38,166,154,0.9)">▲</span> BUY</span>
+    <span title="صفقة مفتوحة - دخول SELL"><span style="color:rgba(239,83,80,0.9)">▼</span> SELL</span>
+    <span title="خط وقف الخسارة"><span style="color:rgba(239,83,80,0.8)">🛑</span> SL</span>
+    <span title="خط الهدف"><span style="color:rgba(38,166,154,0.8)">🎯</span> TP</span>
+    <span title="خط الدخول"><span style="color:rgba(33,150,243,0.8)">📍</span> Entry</span>
+    <span style="color:rgba(255,255,255,0.15)">│</span>
+    <span style="color:rgba(255,255,255,0.25)">⛶ اضغط للتوسيع</span>
   </div>
   <div class="minir">
     <div class="minic" id="mc-M5" onclick="setTF(document.querySelectorAll('.tft')[0],'M5')">
@@ -1448,8 +1472,30 @@ async function sendChartToTelegram(auto){
 
   try {
     // ── شارت XAU/USD الرئيسي ──
-    const cvMain=document.getElementById('mc');
-    const xauB64=cvMain.toDataURL('image/png').split(',')[1];
+    const cvMain=document.getElementById('cv');
+    if(!cvMain) throw new Error('Canvas not found');
+    var xauB64;
+    try {
+      xauB64=cvMain.toDataURL('image/png').split(',')[1];
+    } catch(canvasErr) {
+      // CORS/taint error - send text summary instead
+      log('[CHART] Canvas tainted, sending text summary');
+      var lOS2=obSellZones.length?obSellZones[obSellZones.length-1]:null;
+      var lOB2=obBuyZones.length?obBuyZones[obBuyZones.length-1]:null;
+      var lFVG2=fvgZones.length?fvgZones[fvgZones.length-1]:null;
+      var textMsg='📊 *XAU/USD '+curTF+' — '+dir+'*'
+        +'\n💰 السعر: $'+price.toFixed(2)
+        +'\n📦 OB Sell: '+(lOS2?lOS2.bot.toFixed(2)+'-'+lOS2.top.toFixed(2):'---')
+        +'\n🧲 OB Buy: '+(lOB2?lOB2.bot.toFixed(2)+'-'+lOB2.top.toFixed(2):'---')
+        +'\n⚡ FVG: '+(lFVG2?lFVG2.bot.toFixed(2)+'-'+lFVG2.top.toFixed(2):'---')
+        +'\n🛑 SL: '+document.getElementById('sSL').textContent
+        +'\n🎯 TP1: '+document.getElementById('sTP1').textContent
+        +'\n📈 ATR: '+document.getElementById('m-atr').textContent
+        +'\n⏱ '+new Date().toUTCString();
+      await tgNotify(textMsg);
+      if(!auto){btn.textContent='✅ أُرسل (نص)';setTimeout(function(){btn.textContent='📸 إرسال الشارت';btn.disabled=false;},3000);}
+      return;
+    }
     const xauCaption=`📸 *XAU/USD — ${tf}*
 💰 السعر: \`$${price.toFixed(2)}\`
 📊 الإشارة: *${dir}*
@@ -2179,21 +2225,60 @@ function drawChart(tf){
     var tr=trades[ti];
     if(tr.status!=='OPEN'&&tr.status!=='TP1') continue;
     var isBuyT=tr.direction==='BUY';
+
     function drawTradeLine(pv,col,lbl,dash){
       var y=toY(pv); if(y<mT||y>H-mB) return;
       ctx.strokeStyle=col; ctx.lineWidth=1.5;
       ctx.setLineDash(dash||[]);
       ctx.beginPath(); ctx.moveTo(mL,y); ctx.lineTo(W-mR,y); ctx.stroke();
       ctx.setLineDash([]);
-      // Tag
-      var tw=52;
-      ctx.fillStyle=col; ctx.fillRect(W-mR,y-9,tw,18);
+      ctx.fillStyle=col; ctx.fillRect(W-mR,y-9,52,18);
       ctx.fillStyle='#fff'; ctx.font='bold 8px monospace'; ctx.textAlign='left';
-      ctx.fillText(lbl+pv.toFixed(0), W-mR+2, y+3);
+      ctx.fillText(lbl+pv.toFixed(1), W-mR+2, y+3);
     }
-    drawTradeLine(tr.entry,'rgba(33,150,243,0.9)','📍',[]); 
+
+    // Draw lines
+    drawTradeLine(tr.entry,'rgba(33,150,243,0.9)','📍',[]);
     drawTradeLine(tr.sl,'rgba(239,83,80,0.9)','🛑',[4,3]);
     if(tr.tp1) drawTradeLine(tr.tp1,'rgba(38,166,154,0.9)',tr.tp1Hit?'✅':'🎯',[4,3]);
+    if(tr.tp2) drawTradeLine(tr.tp2,'rgba(38,166,154,0.6)','🎯2',[4,3]);
+
+    // ── ENTRY ARROW on chart ──
+    var entryY=toY(tr.entry);
+    if(entryY>mT&&entryY<H-mB){
+      var arrowX=mL+cW2*0.1; // Left side of chart
+      var arrowCol=isBuyT?'rgba(38,166,154,0.95)':'rgba(239,83,80,0.95)';
+      var arrowSize=14;
+      ctx.fillStyle=arrowCol;
+      ctx.beginPath();
+      if(isBuyT){
+        // UP arrow
+        ctx.moveTo(arrowX, entryY+arrowSize);
+        ctx.lineTo(arrowX-arrowSize*0.6, entryY+arrowSize*0.3);
+        ctx.lineTo(arrowX-arrowSize*0.2, entryY+arrowSize*0.3);
+        ctx.lineTo(arrowX-arrowSize*0.2, entryY-arrowSize*0.4);
+        ctx.lineTo(arrowX+arrowSize*0.2, entryY-arrowSize*0.4);
+        ctx.lineTo(arrowX+arrowSize*0.2, entryY+arrowSize*0.3);
+        ctx.lineTo(arrowX+arrowSize*0.6, entryY+arrowSize*0.3);
+      } else {
+        // DOWN arrow
+        ctx.moveTo(arrowX, entryY-arrowSize);
+        ctx.lineTo(arrowX-arrowSize*0.6, entryY-arrowSize*0.3);
+        ctx.lineTo(arrowX-arrowSize*0.2, entryY-arrowSize*0.3);
+        ctx.lineTo(arrowX-arrowSize*0.2, entryY+arrowSize*0.4);
+        ctx.lineTo(arrowX+arrowSize*0.2, entryY+arrowSize*0.4);
+        ctx.lineTo(arrowX+arrowSize*0.2, entryY-arrowSize*0.3);
+        ctx.lineTo(arrowX+arrowSize*0.6, entryY-arrowSize*0.3);
+      }
+      ctx.closePath(); ctx.fill();
+      // Shadow
+      ctx.shadowColor=arrowCol; ctx.shadowBlur=8;
+      ctx.fill();
+      ctx.shadowBlur=0;
+      // Label BUY/SELL
+      ctx.fillStyle='#fff'; ctx.font='bold 8px monospace'; ctx.textAlign='center';
+      ctx.fillText(isBuyT?'BUY':'SELL', arrowX, isBuyT?entryY+arrowSize+10:entryY-arrowSize-3);
+    }
   }
 
   // ═══ CURRENT PRICE LINE ═══
@@ -3052,6 +3137,9 @@ function openChartFS(e) {
   updateFSTFBar();
   // Prevent body scroll
   document.body.style.overflow='hidden';
+  // Show exit button
+  var exitBtn=document.getElementById('fsExitBtn');
+  if(exitBtn) exitBtn.style.display='block';
 }
 
 function closeChartFS() {
@@ -3400,34 +3488,89 @@ async function fetchCorrelation(tf) {
         log('[CORR] XAG: '+d1.candles.length+' candles ✓');
       }
     }
-    // DXY - try direct Yahoo first, then proxy
-    const intMap = {M5:'5m',M15:'15m',M30:'30m',H1:'1h',H4:'1h'};
-    const rngMap = {M5:'2d',M15:'2d',M30:'2d',H1:'5d',H4:'1mo'};
-    const yahooUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/DX%3DF?interval='+(intMap[tf]||'15m')+'&range='+(rngMap[tf]||'2d')+'&includePrePost=false&corsDomain=finance.yahoo.com';
-    var r2;
+    // DXY calculated from MT5 currency pairs (ICE formula)
+    // DXY = 50.14348112 × EUR/USD^-0.576 × USD/JPY^0.136 × GBP/USD^-0.119 × USD/CAD^0.091 × USD/SEK^0.042 × USD/CHF^0.036
     try {
-      r2 = await fetch(yahooUrl);
-      if(!r2.ok) throw new Error('direct failed');
-      const d2direct = await r2.json();
-      const chart2 = d2direct.chart&&d2direct.chart.result&&d2direct.chart.result[0];
-      if(chart2&&chart2.timestamp){
-        const ts2=chart2.timestamp, q2=chart2.indicators.quote[0];
-        dxyCandles=ts2.map(function(t,ii){return {t:t*1000,o:q2.open[ii]||0,h:q2.high[ii]||0,l:q2.low[ii]||0,cl:q2.close[ii]||0,v:q2.volume[ii]||1};}).filter(function(c){return c.cl>0;});
-        log('[CORR] DXY direct: '+dxyCandles.length+' candles ✓');
-      }
-    } catch(e2){
-      // Fallback to proxy
-      try {
-        r2 = await fetch(BASE+'/api/yahoo?url='+encodeURIComponent(yahooUrl));
-        if(r2.ok){
-          const d2 = await r2.json();
-          if(d2.candles && d2.candles.length) {
-            dxyCandles = d2.candles;
-            log('[CORR] DXY proxy: '+d2.candles.length+' candles ✓');
+      const dxySymbols = [
+        {sym:'EURUSD', exp:-0.576, inv:false},
+        {sym:'USDJPY', exp: 0.136, inv:false},
+        {sym:'GBPUSD', exp:-0.119, inv:false},
+        {sym:'USDCAD', exp: 0.091, inv:false},
+        {sym:'USDSEK', exp: 0.042, inv:false},
+        {sym:'USDCHF', exp: 0.036, inv:false}
+      ];
+      const DXY_BASE = 50.14348112;
+      const limit = 30;
+      // Fetch all 6 pairs
+      const dxyFetches = dxySymbols.map(function(s){
+        return fetch(BASE+'/api/price?type=candles&tf='+tf+'&symbol='+s.sym+'&limit='+limit)
+          .then(function(r){return r.ok?r.json():null;})
+          .catch(function(){return null;});
+      });
+      const dxyResults = await Promise.all(dxyFetches);
+      // Check all loaded
+      var allLoaded = dxyResults.every(function(d,i){
+        if(!d||!d.candles||!d.candles.length){
+          log('[DXY] '+dxySymbols[i].sym+' failed');
+          return false;
+        }
+        return true;
+      });
+      if(allLoaded){
+        // Find minimum candle count across all pairs
+        var minLen = Math.min.apply(null, dxyResults.map(function(d){return d.candles.length;}));
+        // Build DXY candles
+        dxyCandles = [];
+        for(var ci=0; ci<minLen; ci++){
+          var dxyVal = DXY_BASE;
+          var valid = true;
+          dxySymbols.forEach(function(s,si){
+            var c = dxyResults[si].candles[ci];
+            var cl = parseFloat(c.cl||c.close||0);
+            if(!cl){valid=false;return;}
+            dxyVal *= Math.pow(cl, s.exp);
+          });
+          if(!valid) continue;
+          // Build OHLC from close approximation
+          var dxyO = DXY_BASE;
+          dxySymbols.forEach(function(s,si){
+            var c = dxyResults[si].candles[ci];
+            dxyO *= Math.pow(parseFloat(c.o||c.open||c.cl||1), s.exp);
+          });
+          var dxyH = DXY_BASE;
+          dxySymbols.forEach(function(s,si){
+            var c = dxyResults[si].candles[ci];
+            // H/L for DXY: EUR bearish = DXY bullish (inverted for EUR/GBP)
+            var exv = s.exp < 0 ? parseFloat(c.l||c.cl||1) : parseFloat(c.h||c.cl||1);
+            dxyH *= Math.pow(exv, s.exp);
+          });
+          var dxyL = DXY_BASE;
+          dxySymbols.forEach(function(s,si){
+            var c = dxyResults[si].candles[ci];
+            var exv = s.exp < 0 ? parseFloat(c.h||c.cl||1) : parseFloat(c.l||c.cl||1);
+            dxyL *= Math.pow(exv, s.exp);
+          });
+          var t = dxyResults[0].candles[ci].t||0;
+          if(t>0&&t<1e10) t*=1000;
+          dxyCandles.push({t:t, o:dxyO, h:Math.max(dxyH,dxyL), l:Math.min(dxyH,dxyL), cl:dxyVal, v:1});
+        }
+        log('[DXY] ✓ Calculated from MT5: '+dxyCandles.length+' candles | DXY='+( dxyCandles.length?dxyCandles[dxyCandles.length-1].cl.toFixed(3):'---'));
+        // Update DXY display
+        if(dxyCandles.length){
+          var latestDXY = dxyCandles[dxyCandles.length-1].cl;
+          var prevDXY   = dxyCandles[Math.max(0,dxyCandles.length-2)].cl;
+          var mdxy = document.getElementById('m-dxy');
+          var mdxyd = document.getElementById('m-dxy-dir');
+          if(mdxy) mdxy.textContent = latestDXY.toFixed(2);
+          if(mdxyd){ 
+            mdxyd.textContent = latestDXY>prevDXY ? '↑ BEAR' : '↓ BULL';
+            mdxyd.style.color = latestDXY>prevDXY ? 'var(--red)' : 'var(--green)';
           }
         }
-      } catch(e3){ log('[CORR] DXY proxy also failed: '+e3.message); }
-    }
+      } else {
+        log('[DXY] بعض العملات غير متاحة — استخدام القيمة الأخيرة');
+      }
+    } catch(e2){ log('[DXY] Error: '+e2.message); }
     updateCorrelationUI();
   } catch(e) { log('[CORR] Error: '+e.message); }
 }
