@@ -45,6 +45,18 @@ body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-h
 .tft{padding:10px 16px;font-family:'Orbitron',monospace;font-size:10px;cursor:pointer;color:var(--gdim);border-bottom:2px solid transparent;transition:all .2s;letter-spacing:1px}
 .tft.active{color:var(--gold2);border-bottom-color:var(--gold);background:rgba(255,215,0,.05)}
 .cwrap{flex:1;position:relative;background:#131722;overflow:hidden;min-height:320px;height:320px;border-radius:4px}
+/* ══ Chart filter bar ══ */
+.fltbar{display:flex;gap:5px;overflow-x:auto;white-space:nowrap;padding:6px 8px;background:#0F1117;border-bottom:1px solid rgba(255,255,255,.06);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.fltbar::-webkit-scrollbar{display:none}
+.flt{flex:0 0 auto;font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:700;padding:5px 9px;border-radius:14px;cursor:pointer;border:1px solid transparent;transition:all .15s;user-select:none;display:inline-flex;align-items:center;gap:3px}
+.flt-on{background:rgba(33,150,243,.18);border-color:rgba(33,150,243,.55);color:#5BB8FF}
+.flt-off{background:rgba(120,130,150,.1);border-color:rgba(120,130,150,.25);color:rgba(160,170,190,.55)}
+.flt-on::before{content:'●';font-size:7px;opacity:.9}
+.flt-off::before{content:'○';font-size:7px;opacity:.5}
+/* ══ Chart zoom/pan controls ══ */
+.chartCtl{position:absolute;bottom:8px;left:8px;display:flex;gap:4px;z-index:11}
+.chartCtl button{width:30px;height:30px;border-radius:7px;border:1px solid rgba(255,255,255,.15);background:rgba(19,23,34,.85);color:#cfd6e4;font-size:15px;font-weight:700;cursor:pointer;backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-family:monospace;line-height:1;padding:0}
+.chartCtl button:active{background:rgba(33,150,243,.4)}
 canvas{display:block;width:100%!important;height:100%!important}
 .clbls{position:absolute;top:6px;left:6px;display:flex;flex-direction:column;gap:4px;pointer-events:none}
 .clbl{font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 7px;border-radius:3px;backdrop-filter:blur(4px)}
@@ -325,35 +337,21 @@ canvas{display:block;width:100%!important;height:100%!important}
       <span style="color:var(--blue)">─</span>EMA
     </div>
   </div>
-  <div id="chartLegend" style="background:#0F1117;border-bottom:1px solid rgba(255,255,255,0.06);padding:5px 8px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch">
-    <span style="display:inline-flex;align-items:center;gap:12px;font-size:8.5px;color:rgba(180,190,210,0.65);font-family:monospace">
-      <span style="color:rgba(255,255,255,0.3);font-size:9px;font-weight:700">📊 دليل</span>
-      <span><span style="color:#26A69A;font-size:11px">▮</span> صاعدة</span>
-      <span><span style="color:#EF5350;font-size:11px">▮</span> هابطة</span>
-      <span style="color:rgba(255,255,255,0.15)">|</span>
-      <span><span style="color:rgba(255,235,59,0.9);font-size:10px">━</span> EMA20<span style="color:rgba(180,190,210,0.35);font-size:7px"> زخم</span></span>
-      <span><span style="color:rgba(33,150,243,0.9);font-size:10px">━</span> EMA50<span style="color:rgba(180,190,210,0.35);font-size:7px"> اتجاه</span></span>
-      <span><span style="color:rgba(200,200,200,0.5);font-size:10px">┅</span> EMA200<span style="color:rgba(180,190,210,0.35);font-size:7px"> رئيسي</span></span>
-      <span><span style="color:rgba(156,39,176,0.8);font-size:10px">┅</span> VWAP<span style="color:rgba(180,190,210,0.35);font-size:7px"> حجم</span></span>
-      <span style="color:rgba(255,255,255,0.15)">|</span>
-      <span><span style="color:rgba(239,83,80,0.85);font-size:10px">▬</span> OB↓Sell</span>
-      <span><span style="color:rgba(38,166,154,0.85);font-size:10px">▬</span> OB↑Buy</span>
-      <span><span style="color:rgba(255,152,0,0.85);font-size:10px">▬</span> FVG</span>
-      <span style="color:rgba(255,255,255,0.15)">|</span>
-      <span><span style="color:rgba(239,83,80,0.5)">┅</span> R مقاومة</span>
-      <span><span style="color:rgba(38,166,154,0.5)">┅</span> S دعم</span>
-      <span><span style="color:rgba(255,215,0,0.75)">┅</span> 💧سيولة</span>
-      <span style="color:rgba(255,255,255,0.15)">|</span>
-      <span><span style="color:rgba(38,166,154,0.9);font-size:11px">▲</span> BUY</span>
-      <span><span style="color:rgba(239,83,80,0.9);font-size:11px">▼</span> SELL</span>
-      <span>📍 دخول</span>
-      <span>🛑 SL</span>
-      <span>🎯 TP</span>
-      <span style="color:rgba(255,255,255,0.15)">|</span>
-      <span style="color:rgba(255,255,255,0.25);font-size:8px">⛶ اضغط للتوسيع</span>
-    </span>
+  <div class="fltbar" id="fltBar">
+    <span style="flex:0 0 auto;color:rgba(255,255,255,.3);font-size:9px;font-weight:700;align-self:center;font-family:monospace;padding-right:2px">🎛️ طبقات</span>
+    <span class="flt flt-on" id="flt-ema20"   onclick="toggleFilter('ema20')">EMA20</span>
+    <span class="flt flt-on" id="flt-ema50"   onclick="toggleFilter('ema50')">EMA50</span>
+    <span class="flt flt-on" id="flt-ema200"  onclick="toggleFilter('ema200')">EMA200</span>
+    <span class="flt flt-on" id="flt-vwap"    onclick="toggleFilter('vwap')">VWAP</span>
+    <span class="flt flt-on" id="flt-ob"      onclick="toggleFilter('ob')">OB</span>
+    <span class="flt flt-on" id="flt-fvg"     onclick="toggleFilter('fvg')">FVG</span>
+    <span class="flt flt-on" id="flt-liq"     onclick="toggleFilter('liq')">💧سيولة</span>
+    <span class="flt flt-on" id="flt-sr"      onclick="toggleFilter('sr')">دعم/مقاومة</span>
+    <span class="flt flt-off" id="flt-fib"    onclick="toggleFilter('fib')">Fibonacci</span>
+    <span class="flt flt-off" id="flt-killzone" onclick="toggleFilter('killzone')">⏰KillZone</span>
+    <span class="flt flt-on" id="flt-bias"    onclick="toggleFilter('bias')">🎯اتجاه</span>
   </div>
-  <div class="cwrap" id="cwrap" onclick="openChartFS(event)">
+  <div class="cwrap" id="cwrap">
     <canvas id="cv"></canvas>
     <button class="fs-btn" id="fsBtnHint" onclick="openChartFS(event)" style="right:8px">⛶</button>
     <div style="position:absolute;top:8px;left:8px;display:flex;gap:4px;z-index:10">
@@ -369,6 +367,13 @@ canvas{display:block;width:100%!important;height:100%!important}
     <button class="chart-send-btn" onclick="sendChartToTelegram()" id="sendChartBtn">
       📸 إرسال الشارت
     </button>
+    <div class="chartCtl" id="chartCtl">
+      <button onclick="chartZoomBtn(1.3);event.stopPropagation()" title="تكبير">+</button>
+      <button onclick="chartZoomBtn(0.77);event.stopPropagation()" title="تصغير">−</button>
+      <button onclick="chartPan(-1);event.stopPropagation()" title="يمين">‹</button>
+      <button onclick="chartPan(1);event.stopPropagation()" title="يسار">›</button>
+      <button onclick="chartReset();event.stopPropagation()" title="إعادة" style="font-size:12px">⟲</button>
+    </div>
     <div class="cload" id="cload">⏳ جاري تحميل M15 من MT5...</div>
   </div>
   <button class="fs-close" id="fsClose" onclick="closeChartFS()">✕</button>
@@ -560,8 +565,8 @@ canvas{display:block;width:100%!important;height:100%!important}
   <div>
     <div class="shdr sg"><span>AI ANALYSIS — TOP DOWN</span></div>
     <div class="mt">
-      <div class="mb mc sel" id="mb-c" onclick="selM('claude')">🟠 Claude<br><span style="font-size:8px">Sonnet 4</span></div>
-      <div class="mb mo" id="mb-o" onclick="selM('openai')">🔵 GPT-4o<br><span style="font-size:8px">OpenAI</span></div>
+      <div class="mb mc" id="mb-c" onclick="selM('claude')">🟠 Claude<br><span style="font-size:8px">Sonnet 4</span></div>
+      <div class="mb mo sel" id="mb-o" onclick="selM('openai')">🔵 GPT-4o<br><span style="font-size:8px">OpenAI</span></div>
     </div>
     <button class="btn" onclick="runAI()" id="aiBtn">🤖 تحليل Top-Down الآن</button>
     <div class="air" id="aiOut" style="color:var(--gdim);font-size:11px;margin-top:6px">اضغط تحليل للحصول على تحليل D1→H4→H1 شامل...</div>
@@ -635,7 +640,7 @@ canvas{display:block;width:100%!important;height:100%!important}
 // CONFIG
 // ═══════════════════════════════════════════════
 const BASE = (window.location.origin && window.location.origin !== 'null' && window.location.origin !== 'file://') ? window.location.origin : 'https://gold-bot-iota.vercel.app';
-let aiModel = 'claude';
+let aiModel = 'openai';
 let curTF   = 'M15'; // افتراضي M15
 let price   = 0, prevP = 0;
 const cdata = { M5:[], M15:[], M30:[], H1:[], H4:[] };
@@ -780,8 +785,9 @@ async function weeklyClaudeReview() {
     + ' اقترح 3 تعديلات. كن موجزاً (أقل من 100 كلمة).';
 
   try {
-    log('[REVIEW] جاري مراجعة Claude الأسبوعية...');
-    var r = await fetch(BASE+'/api/analyze', {
+    log('[REVIEW] جاري المراجعة الأسبوعية (OpenAI)...');
+    var reviewEp = aiModel==='openai' ? BASE+'/api/openai' : BASE+'/api/analyze';
+    var r = await fetch(reviewEp, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({symbol:'XAUUSD',price:price>0?price.toFixed(2):'0',analysis:prompt,max_tokens:400,model:aiModel})
@@ -845,7 +851,7 @@ function renderSLReport() {
   }
 
   // Add review button inline
-  html += '<button onclick="runWeeklyReview()" style="background:#1A365D;color:#fff;border:none;border-radius:6px;padding:6px;font-size:10px;width:100%;margin-top:6px;cursor:pointer">🤖 تحديث مراجعة Claude</button>';
+  html += '<button onclick="runWeeklyReview()" style="background:#1A365D;color:#fff;border:none;border-radius:6px;padding:6px;font-size:10px;width:100%;margin-top:6px;cursor:pointer">🤖 تحديث المراجعة (AI)</button>';
   el.innerHTML = html;
 
   var cnt  = document.getElementById('ll-count');
@@ -862,7 +868,7 @@ function addWeeklyReviewButton() {
   btn.className = 'btn btn-b';
   btn.style.fontSize = '10px';
   btn.style.marginTop = '4px';
-  btn.textContent = '🤖 مراجعة Claude الأسبوعية';
+  btn.textContent = '🤖 المراجعة الأسبوعية (AI)';
   btn.onclick = weeklyClaudeReview;
   el.parentNode.insertBefore(btn, el.nextSibling);
 }
@@ -1870,21 +1876,41 @@ async function fetchCandles(tf){
 }
 
 // ══ Chart Touch Handlers (Pinch Zoom + Pan) ══
+// ══ Chart zoom/pan control functions ══
+var _panDragX = 0, _panDragActive = false, _panMoved = false;
+function chartZoomBtn(factor){
+  chartZoom = Math.max(0.4, Math.min(6.0, chartZoom * factor));
+  drawChart(curTF);
+}
+function chartPan(dir){
+  // dir>0 = أقدم (يسار) ، dir<0 = أحدث (يمين)
+  var step = Math.max(1, Math.round(8/chartZoom));
+  chartOffset = Math.max(0, (chartOffset||0) + dir*step);
+  drawChart(curTF);
+}
+function chartReset(){
+  chartZoom = 1.0; chartOffset = 0; drawChart(curTF);
+}
 function initChartTouch() {
   var cv = document.getElementById('cv');
   if(!cv) return;
-  
-  // Pinch to zoom
+
+  // ── Pinch zoom (2 fingers) + single-finger pan ──
   cv.addEventListener('touchstart', function(e) {
     if(e.touches.length === 2) {
       chartPinchDist = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
       );
+      _panDragActive = false;
       e.preventDefault();
+    } else if(e.touches.length === 1) {
+      _panDragX = e.touches[0].clientX;
+      _panDragActive = true;
+      _panMoved = false;
     }
   }, {passive: false});
-  
+
   cv.addEventListener('touchmove', function(e) {
     if(e.touches.length === 2) {
       var newDist = Math.hypot(
@@ -1893,29 +1919,58 @@ function initChartTouch() {
       );
       if(chartPinchDist > 0) {
         var ratio = newDist / chartPinchDist;
-        chartZoom = Math.max(0.3, Math.min(5.0, chartZoom * ratio));
+        chartZoom = Math.max(0.4, Math.min(6.0, chartZoom * ratio));
         chartPinchDist = newDist;
         drawChart(curTF);
       }
       e.preventDefault();
+    } else if(e.touches.length === 1 && _panDragActive) {
+      var x = e.touches[0].clientX;
+      var dx = x - _panDragX;
+      // عرض الشمعة الواحدة بالبكسل تقريباً
+      var cw = (cv.clientWidth - 62) / Math.max(10, Math.round(60/chartZoom));
+      var candlesMoved = dx / Math.max(2, cw);
+      if(Math.abs(candlesMoved) >= 1){
+        chartOffset = Math.max(0, Math.round((chartOffset||0) + candlesMoved));
+        _panDragX = x;
+        _panMoved = true;
+        drawChart(curTF);
+        e.preventDefault();
+      }
     }
   }, {passive: false});
-  
+
   cv.addEventListener('touchend', function(e) {
     chartPinchDist = 0;
+    _panDragActive = false;
   });
-  
-  // Double tap to reset zoom
+
+  // ── Double tap to reset ──
   var lastTap = 0;
   cv.addEventListener('touchend', function(e) {
     var now = Date.now();
-    if(now - lastTap < 300) {
-      chartZoom   = 1.0;
-      chartOffset = 0;
-      drawChart(curTF);
-    }
+    if(now - lastTap < 300 && !_panMoved) { chartReset(); }
     lastTap = now;
   });
+
+  // ── Mouse wheel zoom (desktop / fullscreen) ──
+  cv.addEventListener('wheel', function(e){
+    e.preventDefault();
+    chartZoom = Math.max(0.4, Math.min(6.0, chartZoom * (e.deltaY<0?1.12:0.89)));
+    drawChart(curTF);
+  }, {passive:false});
+
+  // ── Mouse drag pan (desktop) ──
+  var mDown=false, mX=0;
+  cv.addEventListener('mousedown', function(e){ mDown=true; mX=e.clientX; });
+  window.addEventListener('mousemove', function(e){
+    if(!mDown) return;
+    var dx=e.clientX-mX;
+    var cw=(cv.clientWidth-62)/Math.max(10,Math.round(60/chartZoom));
+    var cm=dx/Math.max(2,cw);
+    if(Math.abs(cm)>=1){ chartOffset=Math.max(0,Math.round((chartOffset||0)+cm)); mX=e.clientX; drawChart(curTF); }
+  });
+  window.addEventListener('mouseup', function(){ mDown=false; });
 }
 
 function updateLastCandle(p){
@@ -2052,6 +2107,7 @@ function drawChart(tf){
       pivotL.push(data[pi].l);
   }
   // Draw S/R levels
+  if(chartFilters.sr){
   pivotH.slice(-3).forEach(function(ph){
     var py=toY(ph);
     if(py<mT||py>H-mB) return;
@@ -2072,6 +2128,7 @@ function drawChart(tf){
     ctx.fillStyle='rgba(38,166,154,0.6)'; ctx.font='8px monospace'; ctx.textAlign='right';
     ctx.fillText('S '+pl.toFixed(1), W-mR-3, py+9);
   });
+  } // end sr filter
 
   // ═══ LIQUIDITY ZONES (Equal Highs/Lows) ═══
   var eqH=[], eqL=[];
@@ -2086,6 +2143,7 @@ function drawChart(tf){
       if(Math.abs(pivotL[ei]-pivotL[ej])<tol) eqL.push((pivotL[ei]+pivotL[ej])/2);
     }
   }
+  if(chartFilters.liq){
   eqH.slice(-2).forEach(function(liq){
     var ly=toY(liq);
     if(ly<mT||ly>H-mB) return;
@@ -2106,9 +2164,10 @@ function drawChart(tf){
     ctx.fillStyle='rgba(255,215,0,0.8)'; ctx.font='bold 8px monospace'; ctx.textAlign='right';
     ctx.fillText('💧EQL', W-mR-3, ly+9);
   });
+  } // end liq filter
 
   // ═══ OB SELL ZONE ═══
-  if(showChartZones) obSellZones.slice(-2).forEach(function(ob,oi){
+  if(chartFilters.ob) obSellZones.slice(-2).forEach(function(ob,oi){
     if(ob.top<yMin||ob.bot>yMax) return;
     var y1=toY(ob.top), y2=toY(ob.bot), zh=Math.abs(y2-y1);
     // Gradient fill
@@ -2128,7 +2187,7 @@ function drawChart(tf){
   });
 
   // ═══ OB BUY ZONE ═══
-  if(showChartZones) obBuyZones.slice(-2).forEach(function(ob,oi){
+  if(chartFilters.ob) obBuyZones.slice(-2).forEach(function(ob,oi){
     if(ob.top<yMin||ob.bot>yMax) return;
     var y1=toY(ob.top), y2=toY(ob.bot), zh=Math.abs(y2-y1);
     var grd=ctx.createLinearGradient(mL,y1,mL,y2);
@@ -2144,7 +2203,7 @@ function drawChart(tf){
   });
 
   // ═══ FVG ZONES ═══
-  if(showChartZones) fvgZones.slice(-3).forEach(function(fvg){
+  if(chartFilters.fvg) fvgZones.slice(-3).forEach(function(fvg){
     if(fvg.top<yMin||fvg.bot>yMax) return;
     var y1=toY(fvg.top), y2=toY(fvg.bot), zh=Math.abs(y2-y1);
     if(zh<1) zh=1;
@@ -2160,56 +2219,116 @@ function drawChart(tf){
   });
 
   // ═══ SO ZONES (Supply/Demand from detectOBandFVG) ═══
-  // Use OB zones but render as S/D with extended look
-  // Supply = OB Sell mitigated? Show lighter
-  // Demand = OB Buy mitigated? Show lighter
-
-  // ═══ EMA 20 (fast) ═══
-  var cls=data.map(function(c){return c.cl;});
-  var e20=cls[0], k20=2/21;
-  ctx.beginPath(); ctx.strokeStyle='rgba(255,235,59,0.7)'; ctx.lineWidth=1;
-  for(var ei=0;ei<data.length;ei++){
-    e20=cls[ei]*k20+e20*(1-k20);
-    var ex=mL+(ei+0.5)*cGap;
-    ei===0?ctx.moveTo(ex,toY(e20)):ctx.lineTo(ex,toY(e20));
+  // ═══ STABLE INDICATORS (computed over ALL data, plotted on visible slice) ═══
+  // مفتاح الاستقرار: نحسب المؤشر على كامل البيانات فيبقى ثابتاً عند الزوم/التحريك
+  var allCls = allData.map(function(c){return c.cl;});
+  // EMA arrays محسوبة مرة واحدة على كامل البيانات
+  function emaArr(arr, period){
+    var k=2/(period+1), out=new Array(arr.length), e=arr[0];
+    for(var z=0;z<arr.length;z++){ e=arr[z]*k+e*(1-k); out[z]=e; }
+    return out;
   }
-  ctx.stroke();
+  var ema20Full = emaArr(allCls, 20);
+  var ema50Full = emaArr(allCls, 50);
+  var ema200Full= emaArr(allCls, 200);
+  // VWAP تراكمي على كامل البيانات (session/full anchored)
+  var vwapFull=new Array(allData.length), _vs=0,_vv=0;
+  for(var z=0;z<allData.length;z++){
+    var cc=allData[z]; var vol=Math.max(1,cc.v);
+    _vs += ((cc.h+cc.l+cc.cl)/3)*vol; _vv += vol;
+    vwapFull[z]=_vs/_vv;
+  }
+  // دالة لرسم خط من مصفوفة كاملة عبر نافذة العرض [startIdx, startIdx+n)
+  function plotFull(fullArr, color, lw, dash){
+    ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=lw;
+    if(dash) ctx.setLineDash(dash);
+    for(var vi=0;vi<n;vi++){
+      var gi=startIdx+vi;
+      if(gi<0||gi>=fullArr.length) continue;
+      var ex=mL+(vi+0.5)*cGap;
+      var ey=toY(fullArr[gi]);
+      vi===0?ctx.moveTo(ex,ey):ctx.lineTo(ex,ey);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+  }
 
+  // ═══ EMA 20 ═══
+  if(chartFilters.ema20) plotFull(ema20Full,'rgba(255,235,59,0.75)',1);
   // ═══ EMA 50 ═══
-  var e50=cls[0], k50=2/51;
-  ctx.beginPath(); ctx.strokeStyle='rgba(33,150,243,0.8)'; ctx.lineWidth=1.2;
-  for(var ei=0;ei<data.length;ei++){
-    e50=cls[ei]*k50+e50*(1-k50);
-    var ex=mL+(ei+0.5)*cGap;
-    ei===0?ctx.moveTo(ex,toY(e50)):ctx.lineTo(ex,toY(e50));
+  if(chartFilters.ema50) plotFull(ema50Full,'rgba(33,150,243,0.85)',1.3);
+  // ═══ EMA 200 ═══
+  if(chartFilters.ema200){
+    plotFull(ema200Full,'rgba(210,210,210,0.55)',1,[8,4]);
+    var e200last=ema200Full[Math.min(allData.length-1,startIdx+n-1)];
+    var e200y=toY(e200last);
+    if(e200y>mT&&e200y<H-mB){
+      ctx.fillStyle='rgba(210,210,210,0.6)'; ctx.font='7px monospace'; ctx.textAlign='right';
+      ctx.fillText('EMA200', W-mR-3, e200y-2);
+    }
   }
-  ctx.stroke();
-
-  // ═══ EMA 200 (from full data) ═══
-  var e200=allData[0].cl, k200=2/201;
-  for(var ei=0;ei<allData.length;ei++) e200=allData[ei].cl*k200+e200*(1-k200);
-  var e200y=toY(e200);
-  if(e200y>mT&&e200y<H-mB){
-    ctx.beginPath(); ctx.strokeStyle='rgba(200,200,200,0.4)'; ctx.lineWidth=0.8;
-    ctx.setLineDash([8,4]);
-    ctx.moveTo(mL,e200y); ctx.lineTo(W-mR,e200y); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle='rgba(200,200,200,0.5)'; ctx.font='7px monospace'; ctx.textAlign='right';
-    ctx.fillText('EMA200', W-mR-3, e200y-2);
+  // ═══ VWAP (منحنى حقيقي ثابت) ═══
+  if(chartFilters.vwap){
+    plotFull(vwapFull,'rgba(156,39,176,0.7)',1.1,[4,2]);
+    var vwLast=vwapFull[Math.min(allData.length-1,startIdx+n-1)];
+    var vwapY=toY(vwLast);
+    if(vwapY>mT&&vwapY<H-mB){
+      ctx.fillStyle='rgba(186,85,211,0.85)'; ctx.font='7px monospace'; ctx.textAlign='right';
+      ctx.fillText('VWAP', W-mR-3, vwapY-2);
+    }
   }
 
-  // ═══ VWAP ═══
-  var vwapSum=0, volSum=0;
-  data.forEach(function(c){var v=Math.max(1,c.v);vwapSum+=((c.h+c.l+c.cl)/3)*v;volSum+=v;});
-  var vwapVal=vwapSum/volSum;
-  var vwapY=toY(vwapVal);
-  if(vwapY>mT&&vwapY<H-mB){
-    ctx.beginPath(); ctx.strokeStyle='rgba(156,39,176,0.6)'; ctx.lineWidth=1;
-    ctx.setLineDash([3,2]);
-    ctx.moveTo(mL,vwapY); ctx.lineTo(W-mR,vwapY); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle='rgba(156,39,176,0.7)'; ctx.font='7px monospace'; ctx.textAlign='right';
-    ctx.fillText('VWAP', W-mR-3, vwapY-2);
+  // ═══ FIBONACCI RETRACEMENT ═══
+  var _fibInfo=null;
+  if(chartFilters.fib){
+    var fib=null;
+    try{ fib=computeFibonacci(allData); }catch(e){}
+    if(fib){
+      _fibInfo=fib;
+      var fibLevels=[
+        {p:fib.swingH, lbl:'1.0', col:'rgba(120,144,156,0.5)'},
+        {p:fib.fib236, lbl:'0.236', col:'rgba(255,193,7,0.45)'},
+        {p:fib.fib382, lbl:'0.382', col:'rgba(255,152,0,0.55)'},
+        {p:fib.fib500, lbl:'0.5', col:'rgba(0,180,255,0.55)'},
+        {p:fib.fib618, lbl:'0.618 ⭐', col:'rgba(76,175,80,0.7)'},
+        {p:fib.fib786, lbl:'0.786', col:'rgba(156,39,176,0.5)'},
+        {p:fib.swingL, lbl:'0.0', col:'rgba(120,144,156,0.5)'}
+      ];
+      // منطقة الذهب (Golden Pocket) 0.618-0.65
+      var gpTop=toY(fib.fib618), gpBot=toY(fib.fib500);
+      if(!(fib.fib618<yMin||fib.fib500>yMax)){
+        ctx.fillStyle='rgba(76,175,80,0.06)';
+        ctx.fillRect(mL,Math.min(gpTop,gpBot),cW2,Math.abs(gpBot-gpTop));
+      }
+      fibLevels.forEach(function(f){
+        if(f.p<yMin||f.p>yMax) return;
+        var fy=toY(f.p);
+        ctx.strokeStyle=f.col; ctx.lineWidth=0.8; ctx.setLineDash([3,3]);
+        ctx.beginPath(); ctx.moveTo(mL,fy); ctx.lineTo(W-mR,fy); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle=f.col; ctx.font='7px monospace'; ctx.textAlign='left';
+        ctx.fillText('fib '+f.lbl+'  '+f.p.toFixed(1), mL+3, fy-2);
+      });
+    }
+  }
+
+  // ═══ KILL ZONE OVERLAY ═══
+  if(chartFilters.killzone){
+    try{
+      var kz=getKillZone();
+      if(kz && kz.active){
+        // شريط علوي يدل أننا داخل Kill Zone فعّال
+        ctx.fillStyle=(kz.active.color||'#00E676');
+        ctx.globalAlpha=0.10; ctx.fillRect(mL,mT,cW2,cH2); ctx.globalAlpha=1;
+        ctx.fillStyle=(kz.active.color||'#00E676');
+        ctx.font='bold 9px monospace'; ctx.textAlign='left';
+        ctx.fillText('⏰ '+kz.active.name+(kz.bestTrade?' ⭐':''), mL+4, mT+34);
+        ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='7px monospace';
+        ctx.fillText(kz.active.desc, mL+4, mT+44);
+      } else if(kz && kz.next){
+        ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.font='8px monospace'; ctx.textAlign='left';
+        ctx.fillText('⏰ التالي: '+kz.next.name+' '+kz.next.b_start, mL+4, mT+34);
+      }
+    }catch(e){}
   }
 
   // ═══ CANDLES ═══
@@ -2304,6 +2423,81 @@ function drawChart(tf){
       ctx.fillStyle='#fff'; ctx.font='bold 8px monospace'; ctx.textAlign='center';
       ctx.fillText(isBuyT?'BUY':'SELL', arrowX, isBuyT?entryY+arrowSize+10:entryY-arrowSize-3);
     }
+  }
+
+  // ═══ PREDICTED DIRECTION BIAS (مؤشر الاتجاه المتوقع + دليل الدخول) ═══
+  if(chartFilters.bias && price>0 && allData.length>20){
+    var biasScore = 0, biasReasons=[];
+    var lastI = Math.min(allData.length-1, startIdx+n-1);
+    // 1) EMA alignment
+    if(price>ema50Full[lastI]){biasScore++;} else {biasScore--;}
+    if(ema20Full[lastI]>ema50Full[lastI]){biasScore++;} else {biasScore--;}
+    if(price>ema200Full[lastI]){biasScore++;} else {biasScore--;}
+    // 2) VWAP
+    if(price>vwapFull[lastI]){biasScore++;} else {biasScore--;}
+    // 3) MSS / structure
+    try{ var mssB=detectMSS(allData); if(mssB){ if(mssB.bos_bull||mssB.choch_bull)biasScore++; if(mssB.bos_bear||mssB.choch_bear)biasScore--; } }catch(e){}
+    // 4) Premium/Discount (شراء في discount، بيع في premium)
+    var pdB=null; try{ pdB=computePremiumDiscount(allData, price); }catch(e){}
+    if(pdB){ if(pdB.isDiscount)biasScore++; if(pdB.isPremium)biasScore--; }
+    // 5) momentum آخر 3 شموع
+    var l3=allData.slice(-3);
+    var bc=l3.filter(function(c){return c.cl>c.o;}).length;
+    if(bc>=2)biasScore++; if(bc<=1)biasScore--;
+
+    var biasDir = biasScore>=2?'BUY': biasScore<=-2?'SELL':'WAIT';
+    var biasCol = biasDir==='BUY'?'rgba(38,166,154,0.95)':biasDir==='SELL'?'rgba(239,83,80,0.95)':'rgba(255,193,7,0.9)';
+    var biasStrength = Math.min(100, Math.abs(biasScore)*16);
+
+    // منطقة الدخول المقترحة (entry zone) — أقرب OB/FVG في اتجاه التحيّز
+    var entryZone=null;
+    if(biasDir==='BUY'){
+      if(obBuyZones.length) entryZone={top:obBuyZones[obBuyZones.length-1].top,bot:obBuyZones[obBuyZones.length-1].bot,lbl:'دخول BUY (OB)'};
+      else if(pdB) entryZone={top:pdB.eq,bot:pdB.low+pdB.range*0.25,lbl:'دخول BUY (Discount)'};
+    } else if(biasDir==='SELL'){
+      if(obSellZones.length) entryZone={top:obSellZones[obSellZones.length-1].top,bot:obSellZones[obSellZones.length-1].bot,lbl:'دخول SELL (OB)'};
+      else if(pdB) entryZone={top:pdB.high-pdB.range*0.25,bot:pdB.eq,lbl:'دخول SELL (Premium)'};
+    }
+    if(entryZone && !(entryZone.top<yMin||entryZone.bot>yMax)){
+      var ez1=toY(entryZone.top), ez2=toY(entryZone.bot);
+      ctx.fillStyle=biasDir==='BUY'?'rgba(38,166,154,0.12)':'rgba(239,83,80,0.12)';
+      ctx.fillRect(mL,Math.min(ez1,ez2),cW2,Math.abs(ez2-ez1)||2);
+      ctx.strokeStyle=biasCol; ctx.lineWidth=0.8; ctx.setLineDash([5,3]);
+      ctx.strokeRect(mL,Math.min(ez1,ez2),cW2,Math.abs(ez2-ez1)||2); ctx.setLineDash([]);
+      ctx.fillStyle=biasCol; ctx.font='bold 8px monospace'; ctx.textAlign='left';
+      ctx.fillText('🎯 '+entryZone.lbl, mL+4, Math.min(ez1,ez2)+10);
+    }
+
+    // لوحة التحيّز أعلى يمين الشارت
+    var bx=W-mR-104, by=mT+4, bw=100, bh=34;
+    ctx.fillStyle='rgba(15,17,23,0.82)';
+    if(ctx.roundRect){ctx.beginPath();ctx.roundRect(bx,by,bw,bh,5);ctx.fill();}else ctx.fillRect(bx,by,bw,bh);
+    ctx.strokeStyle=biasCol; ctx.lineWidth=1;
+    if(ctx.roundRect){ctx.beginPath();ctx.roundRect(bx,by,bw,bh,5);ctx.stroke();}else ctx.strokeRect(bx,by,bw,bh);
+    ctx.fillStyle='rgba(180,190,210,0.7)'; ctx.font='7px monospace'; ctx.textAlign='left';
+    ctx.fillText('الاتجاه المتوقع', bx+6, by+10);
+    ctx.fillStyle=biasCol; ctx.font='bold 13px Orbitron,monospace';
+    ctx.fillText((biasDir==='BUY'?'▲ ':biasDir==='SELL'?'▼ ':'■ ')+biasDir, bx+6, by+24);
+    // شريط القوة
+    ctx.fillStyle='rgba(255,255,255,0.1)'; ctx.fillRect(bx+6,by+28,bw-12,3);
+    ctx.fillStyle=biasCol; ctx.fillRect(bx+6,by+28,(bw-12)*biasStrength/100,3);
+    ctx.fillStyle='rgba(200,210,230,0.6)'; ctx.font='7px monospace'; ctx.textAlign='right';
+    ctx.fillText(biasStrength+'%', bx+bw-6, by+10);
+
+    // سهم كبير عند حافة السعر يشير للاتجاه المتوقع
+    if(biasDir!=='WAIT'){
+      var pcy=toY(price);
+      if(pcy>mT+10&&pcy<H-mB-10){
+        var ax=W-mR-128;
+        ctx.fillStyle=biasCol; ctx.globalAlpha=0.9;
+        ctx.beginPath();
+        if(biasDir==='BUY'){ ctx.moveTo(ax,pcy-9); ctx.lineTo(ax-6,pcy+3); ctx.lineTo(ax+6,pcy+3); }
+        else { ctx.moveTo(ax,pcy+9); ctx.lineTo(ax-6,pcy-3); ctx.lineTo(ax+6,pcy-3); }
+        ctx.closePath(); ctx.fill(); ctx.globalAlpha=1;
+      }
+    }
+    // حدّث متغيّر عام ليستفيد منه باقي النظام
+    window._chartBias={dir:biasDir,score:biasScore,strength:biasStrength};
   }
 
   // ═══ CURRENT PRICE LINE ═══
@@ -2927,6 +3121,37 @@ try{sbTrades=JSON.parse(localStorage.getItem('sb_trades')||'[]');}catch(e){} // 
 // Chart display toggles
 var showChartTrades = true;
 var showChartZones  = true;
+// ══ نظام فلاتر الشارت الاحترافي ══
+var chartFilters = {
+  ema20:   true,
+  ema50:   true,
+  ema200:  true,
+  vwap:    true,
+  ob:      true,
+  fvg:     true,
+  liq:     true,   // السيولة EQH/EQL
+  sr:      true,   // الدعم/المقاومة
+  fib:     false,  // Fibonacci
+  killzone:false,  // Kill Zone
+  bias:    true    // مؤشر الاتجاه المتوقع
+};
+try{ var _cf=JSON.parse(localStorage.getItem('gold_chart_filters')||'null'); if(_cf) chartFilters=Object.assign(chartFilters,_cf); }catch(e){}
+function saveChartFilters(){ try{localStorage.setItem('gold_chart_filters',JSON.stringify(chartFilters));}catch(e){} }
+function toggleFilter(key){
+  chartFilters[key] = !chartFilters[key];
+  saveChartFilters();
+  syncFilterButtons();
+  drawChart(curTF);
+}
+function syncFilterButtons(){
+  Object.keys(chartFilters).forEach(function(k){
+    var b=document.getElementById('flt-'+k);
+    if(!b) return;
+    var on=chartFilters[k];
+    b.classList.toggle('flt-on', on);
+    b.classList.toggle('flt-off', !on);
+  });
+}
 
 function toggleChartTrades(){
   showChartTrades = !showChartTrades;
@@ -2942,6 +3167,11 @@ function toggleChartTrades(){
 
 function toggleChartZones(){
   showChartZones = !showChartZones;
+  chartFilters.ob = showChartZones;
+  chartFilters.fvg = showChartZones;
+  chartFilters.liq = showChartZones;
+  saveChartFilters();
+  syncFilterButtons();
   var btn=document.getElementById('btnToggleZones');
   if(btn){
     btn.textContent = showChartZones?'🔲ON':'🔲OFF';
@@ -3873,72 +4103,80 @@ async function fetchCorrelation(tf) {
           .catch(function(){return null;});
       });
       const dxyResults = await Promise.all(dxyFetches);
-      // Check all loaded
-      var allLoaded = dxyResults.every(function(d,i){
-        if(!d||!d.candles||!d.candles.length){
-          log('[DXY] '+dxySymbols[i].sym+' failed');
-          return false;
+      // ── أي زوج متاح نستخدمه ونعيد التطبيع حسب الأوزان المتوفرة ──
+      var available = [];
+      dxyResults.forEach(function(d,i){
+        if(d && d.candles && d.candles.length){
+          available.push({def:dxySymbols[i], candles:d.candles});
+        } else {
+          log('[DXY] '+dxySymbols[i].sym+' غير متاح');
         }
-        return true;
       });
-      if(allLoaded){
-        // Store EURUSD for quick approx
-        if(dxyResults[0]&&dxyResults[0].candles&&dxyResults[0].candles.length){
-          var eurC=dxyResults[0].candles[dxyResults[0].candles.length-1];
-          window._eurLast=parseFloat(eurC.cl||eurC.close||0);
+      // EURUSD للتقريب السريع (يُستخدم في fetchPrice)
+      var eurEntry = available.find(function(a){return a.def.sym==='EURUSD';});
+      if(eurEntry){
+        var eurC=eurEntry.candles[eurEntry.candles.length-1];
+        window._eurLast=parseFloat(eurC.cl||eurC.close||0);
+      }
+
+      if(available.length >= 1){
+        // إجمالي الأوزان المطلقة المتاحة مقابل الكاملة → معامل تصحيح للأس
+        var fullW = dxySymbols.reduce(function(s,x){return s+Math.abs(x.exp);},0);
+        var availW= available.reduce(function(s,x){return s+Math.abs(x.def.exp);},0);
+        var wScale = availW>0 ? (fullW/availW) : 1; // نضخّم أسس المتاح لتعويض الناقص
+        var minLen = Math.min.apply(null, available.map(function(a){return a.candles.length;}));
+        function dxyFromField(ci, field){
+          var v = DXY_BASE;
+          available.forEach(function(a){
+            var c=a.candles[ci];
+            var raw=parseFloat(c[field]!==undefined?c[field]:(c.cl||c.close||1))||1;
+            v *= Math.pow(raw, a.def.exp*wScale);
+          });
+          return v;
         }
-        // Find minimum candle count across all pairs
-        var minLen = Math.min.apply(null, dxyResults.map(function(d){return d.candles.length;}));
-        // Build DXY candles
         dxyCandles = [];
         for(var ci=0; ci<minLen; ci++){
-          var dxyVal = DXY_BASE;
-          var valid = true;
-          dxySymbols.forEach(function(s,si){
-            var c = dxyResults[si].candles[ci];
-            var cl = parseFloat(c.cl||c.close||0);
-            if(!cl){valid=false;return;}
-            dxyVal *= Math.pow(cl, s.exp);
+          var dxyVal = dxyFromField(ci,'cl');
+          if(!isFinite(dxyVal)||dxyVal<=0) continue;
+          // OHLC تقريبية
+          var dxyO = dxyFromField(ci,'o');
+          // High/Low: للأسس السالبة (EUR/GBP) ينعكس
+          var dxyHv=DXY_BASE, dxyLv=DXY_BASE;
+          available.forEach(function(a){
+            var c=a.candles[ci];
+            var hh=parseFloat(c.h||c.high||c.cl||1)||1, ll=parseFloat(c.l||c.low||c.cl||1)||1;
+            var exp=a.def.exp*wScale;
+            var upper = exp<0 ? ll : hh;
+            var lower = exp<0 ? hh : ll;
+            dxyHv *= Math.pow(upper, exp);
+            dxyLv *= Math.pow(lower, exp);
           });
-          if(!valid) continue;
-          // Build OHLC from close approximation
-          var dxyO = DXY_BASE;
-          dxySymbols.forEach(function(s,si){
-            var c = dxyResults[si].candles[ci];
-            dxyO *= Math.pow(parseFloat(c.o||c.open||c.cl||1), s.exp);
-          });
-          var dxyH = DXY_BASE;
-          dxySymbols.forEach(function(s,si){
-            var c = dxyResults[si].candles[ci];
-            // H/L for DXY: EUR bearish = DXY bullish (inverted for EUR/GBP)
-            var exv = s.exp < 0 ? parseFloat(c.l||c.cl||1) : parseFloat(c.h||c.cl||1);
-            dxyH *= Math.pow(exv, s.exp);
-          });
-          var dxyL = DXY_BASE;
-          dxySymbols.forEach(function(s,si){
-            var c = dxyResults[si].candles[ci];
-            var exv = s.exp < 0 ? parseFloat(c.h||c.cl||1) : parseFloat(c.l||c.cl||1);
-            dxyL *= Math.pow(exv, s.exp);
-          });
-          var t = dxyResults[0].candles[ci].t||0;
+          var t = available[0].candles[ci].t||available[0].candles[ci].time||0;
           if(t>0&&t<1e10) t*=1000;
-          dxyCandles.push({t:t, o:dxyO, h:Math.max(dxyH,dxyL), l:Math.min(dxyH,dxyL), cl:dxyVal, v:1});
+          dxyCandles.push({t:t, o:isFinite(dxyO)?dxyO:dxyVal, h:Math.max(dxyHv,dxyLv), l:Math.min(dxyHv,dxyLv), cl:dxyVal, v:1});
         }
-        log('[DXY] ✓ Calculated from MT5: '+dxyCandles.length+' candles | DXY='+( dxyCandles.length?dxyCandles[dxyCandles.length-1].cl.toFixed(3):'---'));
-        // Update DXY display
-        if(dxyCandles.length){
-          var latestDXY = dxyCandles[dxyCandles.length-1].cl;
-          var prevDXY   = dxyCandles[Math.max(0,dxyCandles.length-2)].cl;
-          var mdxy = document.getElementById('m-dxy');
-          var mdxyd = document.getElementById('m-dxy-dir');
-          if(mdxy) mdxy.textContent = latestDXY.toFixed(2);
-          if(mdxyd){ 
-            mdxyd.textContent = latestDXY>prevDXY ? '↑ BEAR' : '↓ BULL';
-            mdxyd.style.color = latestDXY>prevDXY ? 'var(--red)' : 'var(--green)';
-          }
-        }
+        log('[DXY] ✓ من '+available.length+'/6 أزواج: '+dxyCandles.length+' شمعة | DXY='+(dxyCandles.length?dxyCandles[dxyCandles.length-1].cl.toFixed(3):'---'));
+      } else if(window._eurLast && window._eurLast>0){
+        // ── Fallback نهائي: تقريب DXY من EUR/USD فقط ──
+        var approx = 103.82 * Math.pow(window._eurLast, -0.576);
+        dxyCandles = [{t:Date.now(), o:approx, h:approx*1.001, l:approx*0.999, cl:approx, v:1}];
+        log('[DXY] ⚠️ تقريب من EUR/USD فقط: '+approx.toFixed(2));
       } else {
-        log('[DXY] بعض العملات غير متاحة — استخدام القيمة الأخيرة');
+        log('[DXY] لا توجد بيانات عملات — تعذّر حساب DXY');
+      }
+
+      // ── تحديث العرض ──
+      if(dxyCandles.length){
+        var latestDXY = dxyCandles[dxyCandles.length-1].cl;
+        var prevDXY   = dxyCandles[Math.max(0,dxyCandles.length-2)].cl;
+        dxyValue=latestDXY; dxyPrev=prevDXY;
+        var mdxy = document.getElementById('m-dxy');
+        var mdxyd = document.getElementById('m-dxy-dir');
+        if(mdxy) mdxy.textContent = latestDXY.toFixed(2);
+        if(mdxyd){
+          mdxyd.textContent = latestDXY>prevDXY ? '↑ BEAR' : '↓ BULL';
+          mdxyd.style.color = latestDXY>prevDXY ? 'var(--red)' : 'var(--green)';
+        }
       }
     } catch(e2){ log('[DXY] Error: '+e2.message); }
     updateCorrelationUI();
@@ -4198,6 +4436,7 @@ log('[AUDIO] اضغط زر الصوت لتفعيله على iPhone');
 renderCalendar();
 fetchPrice();
 initChartTouch();
+syncFilterButtons();
 setInterval(fetchPrice,10000);
 fetchCandles('M15'); // M15 افتراضي
 setTimeout(function(){fetchCandles('M5');},2000);
